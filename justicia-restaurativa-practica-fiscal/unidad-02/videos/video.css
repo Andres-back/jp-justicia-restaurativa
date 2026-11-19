@@ -29,9 +29,18 @@ button{font:inherit;cursor:pointer}
 .video-version{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:2px solid var(--marino);border-radius:99px;background:var(--blanco);color:var(--marino);font:800 12.5px/1.25 Montserrat,Arial,sans-serif;text-align:left}
 .video-version[aria-pressed=true]{background:var(--marino);color:var(--blanco)}
 .video-version i{color:var(--oxido)}.video-version[aria-pressed=true] i{color:var(--crema)}
-.video-cc{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:800 11px Montserrat,Arial,sans-serif;color:var(--teal)}
-/* Lengua de señas superpuesta (08/11/2026): recuadro abajo a la derecha, como en televisión, por encima de los controles. */
-.video-senas{position:absolute;right:14px;bottom:28.5%;z-index:3;height:50%;aspect-ratio:9/10;border-radius:16px;overflow:hidden;background:#fff;border:3px solid #fff;box-shadow:0 8px 22px #0007,0 0 0 2px var(--marino);pointer-events:none;animation:senas-entra .35s cubic-bezier(.2,.9,.3,1.2)}
+.video-cc{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--marino);border-radius:999px;background:var(--marino);color:var(--blanco);font:800 11px Montserrat,Arial,sans-serif;cursor:pointer}
+.video-cc i{color:var(--crema)}
+.video-cc.apagados{background:var(--blanco);color:var(--marino)}.video-cc.apagados i{color:var(--oxido)}
+.video-cc:focus-visible{outline:3px solid var(--oxido);outline-offset:2px}
+/* Lengua de señas superpuesta (08/11/2026): abajo a la derecha, como en televisión, por encima de los controles.
+   Esteban, 11/11/2026: «que le quites el fondo y que solo se vea la persona… encerrado en un óvalo para que se vea más estético
+   y minimalista». El clip de la intérprete llega ya sin pared, sobre blanco (el color del óvalo), y lo llena completo: sus
+   bordes coinciden con los del óvalo, así que no se ve ninguna costura. Luego pidió: «está muy grande, hazlo más centrado y
+   que se vean bien los brazos… centra bien a la persona en el óvalo»: el óvalo bajó a 45 % y luego a 35 % del alto («aún está muy grande el óvalo, redúcelo») y la composición va en
+   el propio clip (herramientas/interprete_sin_fondo.py, paso 4): la figura centrada, con todo el ancho de los brazos dentro de
+   la elipse y el torso desvanecido abajo, en vez de cortado por la curva. */
+.video-senas{position:absolute;right:14px;bottom:28.5%;z-index:3;height:35%;aspect-ratio:9/10;border-radius:50%;overflow:hidden;background:#fff;border:2px solid #fff;box-shadow:0 8px 22px #0006;pointer-events:none;animation:senas-entra .35s cubic-bezier(.2,.9,.3,1.2)}
 @keyframes senas-entra{from{opacity:0;transform:translateY(14px) scale(.9)}to{opacity:1;transform:none}}
 .senas-avatar,.senas-clip{position:absolute;inset:0;width:100%;height:100%;display:block}.senas-clip{object-fit:cover;background:#fff}
 .senas-avatar{background:linear-gradient(#FFFFFF,#E5ECEF)}
@@ -41,8 +50,8 @@ button{font:inherit;cursor:pointer}
 .senas-rotulo{position:absolute;left:50%;bottom:5px;transform:translateX(-50%);white-space:nowrap;padding:1px 8px;border-radius:99px;background:#000a;color:#fff;font:700 9.5px Montserrat,Arial,sans-serif;pointer-events:auto}
 .senas-full{position:absolute;right:12px;top:12px;z-index:4;width:34px;height:34px;display:grid;place-items:center;border:0;border-radius:50%;background:#000a;color:#fff}
 .video-marco:fullscreen{border-radius:0;width:100vw;height:100vh}
-.video-marco:fullscreen .video-senas{height:46vh;right:28px;bottom:29vh}
-@container ova (max-width:600px){.video-senas{height:auto;width:36%;right:8px;bottom:28.5%}.senas-rotulo{font-size:8.5px}}
+.video-marco:fullscreen .video-senas{height:36vh;right:28px;bottom:29vh}
+@container ova (max-width:600px){.video-senas{height:auto;width:28%;right:8px;bottom:28.5%}.senas-rotulo{font-size:8.5px}}
 .modo-lista .video-cab{padding-bottom:4px;border-bottom:2px solid var(--niebla)}
 .video-lista{display:flex;flex-direction:column;gap:8px;overflow:auto}
 .video-item{display:grid;grid-template-columns:150px 1fr auto;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--blanco);color:var(--tinta);text-decoration:none;box-shadow:0 4px 12px #003f5e14}
@@ -67,7 +76,13 @@ button{font:inherit;cursor:pointer}
 .trans-frase{border-radius:5px;padding:1px 2px;cursor:pointer;transition:background .2s,color .2s}
 .trans-frase.por-decir{display:none}
 .trans-frase:hover,.trans-frase:focus-visible{background:var(--hielo);color:var(--marino);outline:none;box-shadow:inset 0 -2px 0 var(--oxido)}
-.trans-frase.actual{background:var(--crema);color:var(--marino);font-weight:500}
+/* Esteban, 11/11/2026: «que el resaltado aparezca a medida que va hablando». La frase que suena ya no se pinta entera: el
+   fondo avanza palabra por palabra (.dicha) y la palabra que suena lleva una raya debajo (.sonando). Cada palabra incluye su
+   espacio, así que el fondo es continuo. Sin cambio de grosor por palabra, para que el renglón no se mueva. */
+.trans-frase.actual{color:var(--marino);font-weight:500}
+.trans-pal{transition:background .15s}
+.trans-frase.actual .trans-pal.dicha{background:var(--crema)}
+.trans-frase.actual .trans-pal.sonando{box-shadow:inset 0 -2px 0 var(--oxido)}
 .trans-ayuda{flex:none;font-size:11.5px;line-height:1.35;color:var(--teal)}
 .trans-ayuda i{color:var(--oxido);margin-right:3px}
 @container ova (max-width:700px){
@@ -81,3 +96,7 @@ button{font:inherit;cursor:pointer}
   .video-item{grid-template-columns:1fr}
   .pendiente-titulo{font-size:17px}.pendiente-detalle{font-size:14px}
 }
+
+/* Al terminar: «Reproducir nuevamente» (manual técnico de criptoactivos, U1 §5.3) */
+.video-repetir{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:inline-flex;gap:8px;align-items:center;padding:10px 18px;border:0;border-radius:999px;background:var(--marino);color:#fff;font:700 15px var(--f-titulo,inherit);cursor:pointer;box-shadow:0 0 0 2px #fff}
+.video-repetir:focus-visible{outline:3px solid #fff;outline-offset:2px}

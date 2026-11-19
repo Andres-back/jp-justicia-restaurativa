@@ -1,7 +1,7 @@
 /* Reproductor de casos en video · JP-OVA (reuniones con Juan del 27 y del 30/10/2026)
-   Juan (30/10/2026): «que siempre salga el video sin lenguaje de señas, pero que tenga un botoncito… para ver el video con
-   lenguaje de señas», con la URL lista para poner el video después. Lee la lista de la unidad (script#videos) y muestra el
-   pedido en ?video=ID: la versión sin lenguaje de señas por defecto y la otra al pulsar su botón, cada una con sus
+   Juan (30/10/2026): «que siempre salga el video sin lengua de señas, pero que tenga un botoncito… para ver el video con
+   lengua de señas», con la URL lista para poner el video después. Lee la lista de la unidad (script#videos) y muestra el
+   pedido en ?video=ID: la versión sin lengua de señas por defecto y la otra al pulsar su botón, cada una con sus
    subtítulos (<track kind="subtitles">). Basta copiar el archivo con su nombre en medios/ para que se vea, sin regenerar:
    si la ruta está vacía o el archivo aún no existe, el marco dice «Video en producción», sin errores. Con &revision=1 se
    ven el título, el estado y las rutas previstas. Nunca se inventa el contenido del video. */
@@ -11,6 +11,7 @@
   var raiz = document.querySelector('[data-video]');
   var video = raiz.querySelector('video'), fuente = video.querySelector('source'), pista = video.querySelector('track');
   var pendiente = raiz.querySelector('.video-pendiente'), cc = raiz.querySelector('.video-cc');
+  var conSubtitulos = true, cambiando = false;
   var botones = raiz.querySelectorAll('.video-version');
   var params = new URLSearchParams(location.search);
   var pedido = params.get('video'), revision = params.has('revision');
@@ -18,7 +19,7 @@
   var ESTADOS = { pendiente_confirmacion: 'Pendiente de confirmación de JP', confirmado: 'Pendiente de entrega del video', entregado: 'Entregado' };
   var AVISOS = {
     normal: ['Video en producción', 'Muy pronto podrá ver aquí este video.'],
-    senas: ['Video con lenguaje de señas en producción', 'Mientras tanto, puede verlo sin lenguaje de señas.']
+    senas: ['Video con lengua de señas en producción', 'Mientras tanto, puede verlo sin lengua de señas.']
   };
 
   function avisar(v, version) {
@@ -51,7 +52,8 @@
     /* Una pista nueva por versión: el navegador no siempre recarga una <track> a la que solo se le cambia el src. */
     var nueva = pista.cloneNode(false);
     if (m.subtitulos) nueva.setAttribute('src', m.subtitulos); else nueva.removeAttribute('src');
-    nueva.default = !!m.subtitulos;
+    nueva.default = !!m.subtitulos && conSubtitulos;
+    cambiando = true;
     nueva.addEventListener('error', function () { cc.hidden = true; });
     video.replaceChild(nueva, pista); pista = nueva;
     video.load();
@@ -64,10 +66,38 @@
   fuente.addEventListener('error', fallo);
   video.addEventListener('error', fallo);
   video.addEventListener('loadedmetadata', function () {
-    if (video.textTracks && video.textTracks[0] && pista.getAttribute('src')) video.textTracks[0].mode = 'showing';
+    aplicarSubtitulos();
+    setTimeout(function () { cambiando = false; }, 300);   // la pista nueva pasa por «disabled» al cambiar de versión: no es una decisión de la persona
   });
+  /* Subtítulos: se encienden y se apagan desde este botón o desde el menú del video, y los dos dicen lo mismo. «hidden» y no
+     «disabled», para que la pista siga cargada. La preferencia se conserva al cambiar de versión. */
+  function pintarSubtitulos() {
+    var txt = cc.querySelector('.video-cc-txt');
+    if (txt) txt.textContent = 'Subtítulos: ' + (conSubtitulos ? 'sí' : 'no');
+    cc.classList.toggle('apagados', !conSubtitulos);
+    cc.title = conSubtitulos ? 'Quitar los subtítulos en español' : 'Mostrar los subtítulos en español';
+  }
+  function aplicarSubtitulos() {
+    var pistas = video.textTracks, t = pistas && pistas[0];
+    if (t && pista.getAttribute('src')) t.mode = conSubtitulos ? 'showing' : 'hidden';
+    pintarSubtitulos();
+  }
+  cc.addEventListener('click', function () { conSubtitulos = !conSubtitulos; cambiando = false; aplicarSubtitulos(); });
+  if (video.textTracks && video.textTracks.addEventListener) video.textTracks.addEventListener('change', function () {
+    var t = video.textTracks[0];
+    if (!t || cambiando) return;
+    var on = t.mode === 'showing';
+    if (on !== conSubtitulos) { conSubtitulos = on; pintarSubtitulos(); }
+  });
+  /* Al terminar se ofrece repetir el video con un botón visible. */
+  var repetir = document.createElement('button');
+  repetir.type = 'button'; repetir.className = 'video-repetir'; repetir.hidden = true; repetir.textContent = 'Reproducir nuevamente';
+  video.parentNode.appendChild(repetir);
+  repetir.addEventListener('click', function () { repetir.hidden = true; video.currentTime = 0; video.play(); video.focus(); });
+  video.addEventListener('ended', function () { repetir.hidden = false; });
+  video.addEventListener('play', function () { repetir.hidden = true; });
 
-  /* Lengua de señas superpuesta (reunión con Juan y Sebastián, 08/11/2026): «Ver con lenguaje de señas» pone sobre el mismo video un
+  /* Lengua de señas superpuesta (reunión con Juan y Sebastián, 08/11/2026): «Ver con lengua de señas» pone sobre el mismo video un
      recuadro con la intérprete, sincronizado en reproducción, pausa, salto y velocidad; «Ver sin…» lo quita. Evita exportar cada
      video dos veces. El clip real es medios/<id>-interprete.mp4 (solo la intérprete, fondo blanco o gris; basta copiarlo con ese
      nombre). Mientras no exista, va una figura animada PROVISIONAL (Esteban, 08/11/2026: «un muñeco animado… para mientras tanto»)
@@ -132,14 +162,23 @@
     var q = function (s) { return caja.querySelector(s); }, clip = q('.senas-clip'), avatar = q('.senas-avatar'), rotulo = q('.senas-rotulo'), conClip = false, activo = false, rq = null;
     var bi = q('.sn-brazo.i'), bd = q('.sn-brazo.d'), mi = q('.sn-mano.i'), md = q('.sn-mano.d'), boca = q('.sn-boca'), cejas = caja.querySelectorAll('.sn-ceja');
     var mix = function (x, y, f) { return x + (y - x) * f; };
-    clip.addEventListener('loadeddata', function () { conClip = true; clip.hidden = false; avatar.style.display = 'none'; rotulo.hidden = true; });
+    var alLlegar = null;
+    clip.addEventListener('loadeddata', function () {
+      conClip = true; clip.hidden = false; avatar.style.display = 'none'; rotulo.hidden = true;
+      if (alLlegar) { alLlegar(); alLlegar = null; }
+    });
     clip.addEventListener('error', function () { conClip = false; });
     if (v.id && location.protocol !== 'file:') clip.src = 'medios/' + v.id + '-interprete.mp4';
     function pintar() {
       var t = video.currentTime;
       if (conClip) {
-        if (Math.abs(clip.currentTime - t) > 0.25) clip.currentTime = t;
-        if (clip.playbackRate !== video.playbackRate) clip.playbackRate = video.playbackRate;
+        /* Sincronía (Esteban, 11/11/2026: «debe de estar sincronizado»): si la intérprete se aleja más de 0,25 s salta al
+           tiempo del video; con un desfase menor, acelera o frena un 6 % hasta quedar a menos de 0,04 s, sin saltos. */
+        var des = clip.currentTime - t;
+        /* Un salto a la vez: si se vuelve a pedir en cada cuadro mientras el anterior carga, el clip nunca arranca. */
+        if (Math.abs(des) > 0.25) { if (!clip.seeking) clip.currentTime = t + (video.paused ? 0 : 0.1); des = 0; }
+        var ritmo = video.playbackRate * (video.paused || Math.abs(des) < 0.04 ? 1 : des > 0 ? 0.94 : 1.06);
+        if (Math.abs(clip.playbackRate - ritmo) > 0.001) clip.playbackRate = ritmo;
         if (video.paused !== clip.paused) { if (video.paused) clip.pause(); else clip.play().catch(function () {}); }
       } else {
         var g = gesto(t), f = suave(g.f), A = g.a, B = g.b, vida = g.habla ? Math.sin(t * 7) * 1.6 : 0;
@@ -155,6 +194,8 @@
       if (activo) rq = requestAnimationFrame(pintar);
     }
     return {
+      /* Avisa cuando el clip real de la intérprete cargó (si ya cargó, de inmediato). */
+      conClipReal: function (f) { if (conClip) f(); else alLlegar = f; },
       mostrar: function (si) {
         activo = si; caja.hidden = !si; full.hidden = !si;
         /* El botón de pantalla completa del navegador solo agranda el video y dejaría fuera el recuadro. */
@@ -168,7 +209,10 @@
   /* Transcripción sincronizada (Esteban, 07/11/2026: «el video hacia la izquierda y a la derecha vaya apareciendo la
      transcripción a medida que va hablando… y que cuando ponga el cursor sobre lo que se ha estado hablando se devuelva el
      video hasta ahí»). Solo si existe medios/<id>.transcripcion.json; si no, el reproductor queda como siempre.
-     Cada frase aparece cuando se dice; la que suena se resalta. Sobre una frase ya dicha: al dejar el cursor un instante
+     Cada frase aparece cuando se dice. Dentro de la frase que suena, el resaltado avanza palabra por palabra con la voz
+     (Esteban, 11/11/2026: «que el resaltado aparezca a medida que va hablando, se vaya resaltando»): cada palabra toma su
+     tiempo de «w» (herramientas/transcripcion_palabras.py, lo que oye Whisper) y, si la transcripción no lo trae, se reparte
+     el tiempo de la frase según el largo de sus palabras y sus pausas de puntuación. Sobre una frase ya dicha: al dejar el cursor un instante
      (o al hacer clic, o con Enter) el video vuelve a ese punto. Sirve igual para la versión con lengua de señas. */
   var trans = null;
   function mmss(s) { s = Math.max(0, Math.floor(s)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
@@ -183,14 +227,27 @@
       '<p class="trans-ayuda"><i class="fas fa-rotate-left" aria-hidden="true"></i> Ponga el cursor sobre una frase ya dicha para volver a ese punto.</p>';
     var caja = aside.querySelector('.trans-texto'), vacia = aside.querySelector('.trans-vacia');
     var parrafos = {}, frases = [];
+    function palabrasDe(l, s) {
+      var textos = l.t.split(/\s+/).filter(Boolean), tiempos = l.w && l.w.length === textos.length ? l.w : null;
+      if (!tiempos) {
+        var pesos = textos.map(function (p) { return p.length + 1 + (/[.;:?!]$/.test(p) ? 6 : /,$/.test(p) ? 3 : 0); });
+        var total = pesos.reduce(function (a, b) { return a + b; }, 0) || 1, ac = 0;
+        tiempos = pesos.map(function (x) { var t = l.i + (l.f - l.i) * ac / total; ac += x; return t; });
+      }
+      return textos.map(function (p, k) {
+        var e = document.createElement('span'); e.className = 'trans-pal'; e.textContent = p + ' ';
+        s.appendChild(e); return { el: e, t: tiempos[k] };
+      });
+    }
     datos.lineas.forEach(function (l, k) {
       var p = parrafos[l.p];
       if (!p) { p = parrafos[l.p] = document.createElement('p'); p.className = 'trans-p'; caja.appendChild(p); }
       var s = document.createElement('span');
-      s.className = 'trans-frase por-decir'; s.textContent = l.t + ' ';
+      s.className = 'trans-frase por-decir';
+      var pals = palabrasDe(l, s);
       s.setAttribute('role', 'button'); s.tabIndex = -1;
       s.title = 'Volver a ' + mmss(l.i); s.dataset.i = l.i;
-      p.appendChild(s); frases.push({ el: s, i: l.i, f: l.f, p: p });
+      p.appendChild(s); frases.push({ el: s, i: l.i, f: l.f, p: p, pals: pals, n: 0 });
     });
     /* Video, botones y transcripción van en un bloque interno: las reglas angostas (@container ova) no pueden cambiar el
        propio contenedor, sí a sus hijos. */
@@ -212,6 +269,18 @@
     });
     caja.addEventListener('mouseenter', function () { sobre = true; });
     caja.addEventListener('mouseleave', function () { sobre = false; });
+    /* Resaltado que avanza: en la frase que suena quedan marcadas las palabras ya dichas y subrayada la que suena. */
+    var sonando = null;
+    function pintarPalabras(fr, t) {
+      if (sonando && sonando !== fr) { sonando.pals.forEach(function (p) { p.el.classList.remove('dicha', 'sonando'); }); sonando.n = 0; }
+      sonando = fr;
+      if (!fr) return;
+      var n = 0;
+      while (n < fr.pals.length && fr.pals[n].t <= t + 0.05) n++;
+      if (n === fr.n) return;
+      fr.pals.forEach(function (p, k) { p.el.classList.toggle('dicha', k < n); p.el.classList.toggle('sonando', k === n - 1); });
+      fr.n = n;
+    }
     var alcanzado = 0;   // lo ya escuchado sigue a la vista aunque se vuelva atrás, para poder ir también hacia adelante
     function actualizar() {
       var t = video.currentTime, actualFr = null, alguna = false;
@@ -225,6 +294,7 @@
         if (es) actualFr = fr;
         if (dicha) alguna = true;
       });
+      pintarPalabras(actualFr, t);
       Object.keys(parrafos).forEach(function (k) { parrafos[k].hidden = !parrafos[k].querySelector('.trans-frase:not(.por-decir)'); });
       vacia.hidden = alguna;
       /* La frase que suena queda a la vista, dentro del panel (sin mover la página que contiene el iframe). */
@@ -235,6 +305,17 @@
     }
     video.addEventListener('timeupdate', actualizar);
     video.addEventListener('seeked', actualizar);
+    /* timeupdate llega unas 4 veces por segundo: mientras el video corre, las palabras se pintan en cada cuadro. */
+    var cuadro = null;
+    function seguir() {
+      cuadro = null;
+      if (video.paused || video.ended) return;
+      var t = video.currentTime;
+      if (sonando && sonando.i <= t + 0.05 && t < sonando.f) pintarPalabras(sonando, t); else actualizar();
+      cuadro = requestAnimationFrame(seguir);
+    }
+    video.addEventListener('play', function () { if (!cuadro) cuadro = requestAnimationFrame(seguir); });
+    if (!video.paused) cuadro = requestAnimationFrame(seguir);
     trans = { actualizar: actualizar };
     actualizar();
   }
@@ -248,6 +329,9 @@
 
   if (pedido) {
     var v = actual || { id: '' };
+    /* La pestaña lleva el título del video, no un rótulo genérico (aula, 12/11/2026: la presentación de la unidad se titulaba
+       «Video del caso · Unidad 1»). Sin título de JP, su ubicación (lección y apartado); sin ninguno, el de la plantilla. */
+    if (v.titulo || v.ubicacion) document.title = v.titulo || v.ubicacion;
     cargarTranscripcion(v);
     if (revision) {
       raiz.querySelector('.video-cab').hidden = false;
@@ -260,8 +344,16 @@
     });
     cargar(v, 'normal');
     /* Los casos no llevan lengua de señas, solo los videos que presentan los profesores (Juan, 09/11/2026): sin botones de versión. */
-    if (v.sinSenas) raiz.querySelector('.video-opciones').hidden = true;
-    else if (v.id) senas = montarSenas(v);
+    var opciones = raiz.querySelector('.video-opciones');
+    if (v.sinSenas) opciones.hidden = true;
+    else if (v.id) {
+      senas = montarSenas(v);
+      /* «senasConClip» (12/11/2026; reunión del 05/11: sin la versión en lengua de señas, su botón no se presenta como un
+         recurso que funciona): los botones de versión solo aparecen cuando existe el clip real de la intérprete
+         (medios/<id>-interprete.mp4). Basta copiar el clip con ese nombre, sin tocar el HTML; mientras falte, no hay botones ni
+         figura provisional. Los videos sin esta marca se comportan como antes. */
+      if (v.senasConClip) { opciones.hidden = true; senas.conClipReal(function () { opciones.hidden = false; }); }
+    }
     return;
   }
 
