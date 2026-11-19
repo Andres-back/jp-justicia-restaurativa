@@ -279,3 +279,14 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 .cuadro-tabla .lectura-texto .parr.tramo::before{content:" "}
 /* La nota de fuente de una tabla («Fuente: UNJR-FGN») va debajo de la tabla, no flotando sobre sus filas. */
 .layout-cuadro .escena-pie{position:static;flex:none;text-align:right;margin:4px 6px 0}
+
+/* Imagen propia del paso o momento en ruta y línea (Samir, 19/11/2026: una imagen por tarjeta): ocupa la caja de arte en lugar del
+   objeto del motor, entera y sin recortar cabezas. */
+.ruta-lectura .ruta-arte.con-ilus{width:230px;aspect-ratio:4/3;border-radius:14px;background:none}
+.ruta-lectura .ruta-arte.con-ilus img{width:100%;height:100%;object-fit:contain;display:block}
+.ruta-lectura.apretada .ruta-arte.con-ilus{width:150px}
+
+/* Logro al resolver todas las preguntas de una actividad (19/11/2026, pasada de gamificación): aviso breve con trofeo, una vez,
+   arriba para no tapar la retroalimentación. */
+.j-aviso.logro{top:18%;background:#fff;color:#1E4260;border-color:#1E4260;box-shadow:5px 6px 0 #1E4260}
+.j-aviso.logro::before{content:"\f091";font-family:"Font Awesome 6 Free";font-weight:900;color:#853629;margin-right:10px}

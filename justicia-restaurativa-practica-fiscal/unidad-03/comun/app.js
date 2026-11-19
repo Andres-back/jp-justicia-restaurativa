@@ -280,6 +280,18 @@
   }
   function arteEn(pos) { return !!(datos.ilustraciones && escena && escena.arte && escena.arte.pos === pos); }
   function srcImagen(t) { return BASE + (datos.ilustraciones ? datos.ilustraciones + '/' + t : 'assets/contexto/' + t + '.webp'); }
+  /* Imagen propia de cada elemento (Justicia restaurativa, Samir, 19/11/2026: «cada que haga clic en una card… la imagen es la
+     misma»): un elemento con «ilustracion» la muestra al abrirse, en el lugar de la imagen de la escena (lector de fichas, columna
+     del giro); el que no la trae vuelve a la de la escena. Opcional por datos: sin ese campo en ningún elemento, nada cambia. */
+  function arteElemento(it) {
+    if (!datos.ilustraciones || !it || !escena.bloques.some(function (b) { return (b.items || []).some(function (x) { return x.ilustracion; }); })) return;
+    var propia = (escena.arte && escena.arte.img) || IMAGEN[actual] || escena.ilustracion, src = srcImagen(it.ilustracion || propia);
+    raiz.querySelectorAll('.arte-escena img, .ctx-arte.foto img').forEach(function (img) {
+      if (img.getAttribute('src') === src) return;
+      img.setAttribute('src', src);
+      if (!quieto && img.animate) img.animate([{ opacity: 0, transform: 'scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: 'ease-out' });
+    });
+  }
   /* Escena con poco contenido: un solo bloque de lámina o giro con 1–2 elementos, mapa con hasta 3 ramas o balanza (U1). */
   function escasa(e) {
     if (e.bloques.length !== 1) return false;
@@ -1141,6 +1153,7 @@
         if (g.classList.contains('volteando')) return;
         var it = b.items[Number(g.dataset.i)], porCursor = g._porCursor;
         g._porCursor = false;
+        arteElemento(it);
         voltear(g, function () {
           var h = aLaEsquina(g);
           leer(it.label, segs(it.segs), it.obj, g, h); marcar(g.dataset.id);
@@ -1333,6 +1346,7 @@
       var i = Number(f.dataset.i), it = b.items[i];
       el.querySelectorAll('.ficha').forEach(function (o) { o.setAttribute('aria-selected', String(o === f)); });
       f.classList.add('abierta');   // abierta y sin leer completa: «Falta leer» (base.css)
+      arteElemento(it);
       var arte = panel.querySelector('.panel-arte'), grande = panel.classList.contains('con-figura');
       if (arte) arte.innerHTML = svgObjeto(it.obj, grande ? 150 : 92);
       panel.querySelector('.panel-texto').innerHTML = '<p class="lectura-eyebrow">' + (i + 1) + ' de ' + b.items.length + ' · ' + esc(may(it.label)) + '</p><p class="lectura-texto">' + rico(segs(it.segs)) + '</p>';
@@ -1373,7 +1387,8 @@
       ficha.style.left = pct + '%'; traza.style.width = pct + '%';
       var it = b.items[i];
       caja.innerHTML = '<div class="ruta-texto"><p class="lectura-eyebrow">' + (linea ? 'Momento ' : 'Paso ') + (i + 1) + ' de ' + n + ' · ' + esc(may(it.label)) + '</p><p class="lectura-texto">' + rico(segs(it.segs)) + '</p></div>' +
-        '<span class="ruta-arte">' + svgObjeto(it.obj, 150) + '</span>';
+        (datos.ilustraciones && it.ilustracion ? '<span class="ruta-arte con-ilus"><img src="' + srcImagen(it.ilustracion) + '" alt=""></span>'
+          : '<span class="ruta-arte">' + svgObjeto(it.obj, 150) + '</span>');
       var lt = quieto || vistos[k + '-' + i] ? null : caja.querySelector('.ruta-texto .lectura-texto'), letras = lt ? envolverLetras(lt) : null;
       var partes = !!dosificar(caja.querySelector('.ruta-texto'), function () { crecerLectura(caja); });
       if (!partes) crecerLectura(caja);
@@ -2651,6 +2666,10 @@
           marcarYa(k + '-' + i);
           sig.disabled = pos === pags.length - 1;
           estado();
+          /* Logro al resolver la última pregunta (Justicia restaurativa, 19/11/2026: gamificación con propósito, un aviso breve y una
+             sola vez). Opcional por datos: solo con «datos.juego.logroActividad». */
+          var totalQ = (b.paginas || []).filter(function (p) { return p && p[0] === 'q'; }).length;
+          if (datos.juego && datos.juego.logroActividad && totalQ && Object.keys(resueltas).length === totalQ) juegoAviso(datos.juego.logroActividad, 'logro');
           /* Solo la respuesta correcta deja avanzar: su tarjeta lleva el botón a la página siguiente. */
           if (R) tarjeta({ tipo: 'bien', idx: aciertos++, chip: chip, letra: op.letra, texto: textoBien, desde: o, clasifica: b.modo === 'clasifica',
             categoria: categoria, boton: rotuloSiguiente(), alBoton: function () { if (pos < pags.length - 1) ir(pos + 1); } });
