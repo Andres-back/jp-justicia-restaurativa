@@ -57,12 +57,14 @@ h1{margin:9px 0 3px;font-size:40px;line-height:1.08;font-weight:800;color:var(--
 /* Pie con el curso y la unidad (JP, 11/11/2026: «tiene que ir el nombre del curso y la unidad»; estándar de ambiental) */
 .pie{position:absolute;left:0;right:0;bottom:0;min-height:68px;background:#fff;border-top:3px solid var(--negro);display:flex;align-items:center;justify-content:space-between;gap:28px;padding:8px 3.2%}
 .pie div{display:flex;align-items:center;gap:12px;min-width:0}
-.pie .curso{flex:1 1 52%}.pie .unidad{flex:1 1 44%;justify-content:flex-end;text-align:right}
+/* El centro del pie queda libre para el botón «Pantalla completa» del SCORM (x 528–700 sobre 1200; sesión de Moodle, 19/11/2026):
+   el curso termina antes del 42 % y «Unidad N» empieza en el 63,2 %, como en el pie de Genially (x = 758). */
+.pie .curso{flex:0 1 auto;max-width:38.8%}.pie .unidad{position:absolute;left:63.2%;right:3.2%;top:0;bottom:0;justify-content:flex-start;text-align:left}
 .pie .chip{flex:none;background:var(--negro);color:#fff;font-size:14px;font-weight:700;padding:4px 10px;border-radius:3px}
 .pie .unidad .chip{background:var(--teal)}
 .pie p{margin:0;font-size:13.5px;line-height:1.25;font-weight:700;color:var(--negro)}
 @container (max-width:640px){.hito,.bandera{display:none}.tarjeta{left:12px;right:12px;width:auto;top:12px;padding:15px 16px}h1{font-size:30px}.logros{grid-template-columns:1fr}
-  .pie{flex-direction:column;align-items:stretch;gap:6px;padding:8px 12px}.pie .unidad{justify-content:flex-start;text-align:left;flex-direction:row}.pie p{font-size:12.5px}}
+  .pie{flex-direction:column;align-items:stretch;gap:6px;padding:8px 12px}.pie .curso{max-width:none}.pie .unidad{position:static;justify-content:flex-start;text-align:left;flex-direction:row}.pie p{font-size:12.5px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}.caminante{offset-distance:100%}}
 </style>
 </head>

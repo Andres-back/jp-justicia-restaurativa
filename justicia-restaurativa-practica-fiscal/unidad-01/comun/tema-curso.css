@@ -151,7 +151,7 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 .esq-esc .esquema-hijos{position:absolute;inset:0;height:auto;margin:0;display:block}
 .esq-esc .esq-parada,.esq-esc .esq-parada:nth-child(even),.esq-esc .esq-parada.visto,.esq-esc .esq-parada.visto:nth-child(even){position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-100%);margin:0;padding:0;width:300px;max-width:30%;min-height:0;background:none;border:0;border-radius:0;box-shadow:none;display:flex;flex-direction:column;align-items:center;gap:6px;font:inherit;color:inherit;cursor:pointer;animation:none}
 .esq-esc .esq-tarjeta{animation:aparece .55s cubic-bezier(.2,.8,.2,1) var(--d) both}
-.esq-esc.n3 .esq-parada,.esq-esc.n3 .esq-parada:nth-child(even),.esq-esc.n3 .esq-parada.visto{width:270px}.esq-esc.n4 .esq-parada,.esq-esc.n4 .esq-parada:nth-child(even),.esq-esc.n4 .esq-parada.visto{width:236px;max-width:23%}.esq-esc.n5 .esq-parada,.esq-esc.n5 .esq-parada:nth-child(even),.esq-esc.n5 .esq-parada.visto{width:190px;max-width:19%}
+.esq-esc.n3 .esq-parada,.esq-esc.n3 .esq-parada:nth-child(even),.esq-esc.n3 .esq-parada.visto,.esq-esc.n3 .esq-parada.visto:nth-child(even){width:270px}.esq-esc.n4 .esq-parada,.esq-esc.n4 .esq-parada:nth-child(even),.esq-esc.n4 .esq-parada.visto,.esq-esc.n4 .esq-parada.visto:nth-child(even){width:236px;max-width:23%}.esq-esc.n5 .esq-parada,.esq-esc.n5 .esq-parada:nth-child(even),.esq-esc.n5 .esq-parada.visto,.esq-esc.n5 .esq-parada.visto:nth-child(even){width:190px;max-width:19%}
 .esq-tarjeta{display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;box-sizing:border-box;padding:10px 12px;text-align:center;background:#fff;border:2px solid #000;border-radius:14px;box-shadow:4px 5px 0 #000;transition:transform .2s,box-shadow .2s}
 .esq-parada:hover .esq-tarjeta,.esq-parada:focus-visible .esq-tarjeta{transform:translate(-2px,-3px);box-shadow:6px 8px 0 #000}
 .esq-parada:focus-visible{outline:none}.esq-parada:focus-visible .esq-tarjeta{outline:3px solid #B5563D;outline-offset:3px}
@@ -168,7 +168,8 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 @media (prefers-reduced-motion:reduce){.esq-halo,.esq-nube,.esq-ave,.esq-camino,.esq-pin::after{animation:none!important}}
 @container ova (max-width:600px){
   .esq-paisaje{height:34%}.esq-lamina,.esq-pin{display:none}.esq-esc .esquema-hijos{position:absolute;inset:18% 10px 10px;width:auto;display:flex;flex-direction:column;gap:9px;overflow:visible}
-  .esq-esc .esq-parada,.esq-esc .esq-parada:nth-child(even),.esq-esc .esq-parada.visto{position:static;transform:none;width:100%!important;max-width:none!important;flex:1;min-height:0}
+  /* .visto:nth-child(even) también: la regla de escritorio la nombra y ganaba en celular (paradas vistas pares encimadas, 19/11/2026). */
+  .esq-esc .esq-parada,.esq-esc .esq-parada:nth-child(even),.esq-esc .esq-parada.visto,.esq-esc .esq-parada.visto:nth-child(even){position:static;transform:none;width:100%!important;max-width:none!important;flex:1;min-height:0}
   .esq-yo{display:none}.esq-esc .esq-tarjeta{flex:1;flex-direction:row;justify-content:flex-start;gap:9px;padding:6px 10px;text-align:left;min-height:0;box-shadow:3px 3px 0 #000}
   .esq-esc .esquema-arte .obj-svg{width:30px}.esq-esc .esquema-rotulo{flex:1;font-size:13px}.esq-esc .esquema-marca{flex:none;margin:0}
 }
