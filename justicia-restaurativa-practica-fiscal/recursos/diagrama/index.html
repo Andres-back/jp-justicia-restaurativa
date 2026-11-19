@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Figura interactiva · Justicia restaurativa en la práctica del fiscal</title>
+<!-- Diagramas interactivos de las figuras de la ficha aprobada (Juan, 18/11/2026: «tipo imagen no, pero en html»).
+     Un solo recurso dirigido por datos: index.html?f=<id> (los mismos id de salida/recursos/figura/, p. ej. jr-u1-p18).
+     Texto literal de plan/figuras-texto.json (copiado en datos.js). escena.css y escena.js son copia de la base de los
+     recursos de delitos ambientales; el kit es ../comun/ (paleta del curso, fuentes e iconos locales). Sin CDN. -->
+<link rel="stylesheet" href="../comun/assets/vendor/fontawesome.min.css">
+<link rel="stylesheet" href="../comun/assets/vendor/solid.min.css">
+<link rel="stylesheet" href="../comun/dae.css">
+<link rel="stylesheet" href="escena.css">
+<link rel="stylesheet" href="diagrama.css">
+</head>
+<body class="escena" data-recurso="diagrama">
+<script>(function(){var m=location.search.match(/[?&]f=([\w-]+)/);document.body.setAttribute('data-recurso','diagrama-'+(m?m[1]:'sin-figura'));})();</script>
+<header class="esc-cab">
+  <span class="etiqueta"><i class="fas fa-diagram-project" aria-hidden="true"></i> <span class="etq-texto">Figura</span></span>
+  <div class="esc-titulos">
+    <h1 id="titulo-fig">Figura</h1>
+    <p class="esc-guia"></p>
+  </div>
+  <div class="avance" hidden><span class="texto">Exploración 0 / 0</span><span class="barra"><span></span></span></div>
+</header>
+<main class="esc-escenario"><div id="diagrama" class="diag"></div></main>
+<footer class="esc-pie"><span class="fuente-fig"></span></footer>
+<script src="../comun/kit.js"></script>
+<script src="escena.js"></script>
+<script src="datos.js"></script>
+<script src="diagrama.js"></script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Figura de la lección · Justicia restaurativa en la práctica del fiscal</title>
+<!-- Generado por herramientas/figuras_restaurativa.py; no se edita a mano. Figura original de la ficha aprobada (10/11/2026), con
+     lupa. Los autores piden mejorar estas gráficas: el rediseño está pendiente de JP (plan/notas-virtualizacion.md). -->
+<link rel="stylesheet" href="../comun/assets/vendor/fontawesome.min.css">
+<link rel="stylesheet" href="../comun/assets/vendor/solid.min.css">
+<link rel="stylesheet" href="../comun/dae.css">
+<style>
+/* Infografía SINA (U1, L3, p. 20–21) con lupa al pasar el cursor (Juan, 06/11/2026: «no improvisamos, saquemos la de aquí…
+   formato más grande… ponerle una Lupita al Mouse»). Cabe sin desplazamiento a 1113 × 448, 767 × 510 y 390 × 566. */
+html,body{height:100%;overflow:hidden}
+.caja{height:100vh;container-type:size;container-name:sina}
+.sina{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;padding:12px 14px 48px}
+.visor{position:relative;min-height:0;border:2px solid var(--negro);border-radius:14px;background:var(--fondo-suave);overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:none;touch-action:none}
+.visor img.base{max-width:100%;max-height:100%;width:auto;height:auto;display:block;user-select:none;-webkit-user-drag:none}
+.visor.sin-lupa{cursor:zoom-in}
+.lupa{position:absolute;width:190px;height:190px;border-radius:50%;border:3px solid var(--negro);box-shadow:4px 4px 0 var(--negro),inset 0 0 0 4px var(--blanco);background-repeat:no-repeat;background-color:var(--blanco);pointer-events:none;display:none;z-index:3}
+.visor:not(.sin-lupa):hover .lupa,.visor.tocando .lupa,.visor.teclado .lupa{display:block}
+.panel{min-height:0;display:flex;flex-direction:column;gap:6px}
+.panel .etiqueta{align-self:flex-start;margin:0}
+.panel h1{font-size:.95rem;margin:0}
+.panel .figura{font-family:var(--t-titulo);font-size:.86rem;margin:0}
+.panel .figura b{display:block}
+.panel .instr{font-size:.74rem;line-height:1.4;margin:0;color:var(--carbon)}
+.controles{display:flex;flex-wrap:wrap;gap:8px}
+.controles button{font-family:var(--t-titulo);font-weight:700;font-size:.74rem;background:var(--blanco);border:1.5px solid var(--negro);border-radius:999px;padding:4px 11px;cursor:pointer;display:inline-flex;gap:6px;align-items:center;box-shadow:2px 2px 0 var(--negro)}
+.controles button[aria-pressed="true"]{background:var(--amarillo)}
+.controles .nivel{font-family:var(--t-titulo);font-size:.76rem;font-weight:700;align-self:center}
+.panel .nota-fuente{margin-top:auto;font-size:.64rem;line-height:1.35;word-break:break-word}
+.panel .nota-fuente .url-cita{word-break:break-all}
+/* 2.1. Sector central (p. 21): una ventana por entidad */
+.sector{display:flex;flex-direction:column;gap:6px}
+.sector-tit{font-family:var(--t-titulo);font-weight:800;font-size:.82rem;margin:0}
+.entidades{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.entidad{display:flex;flex-direction:column;align-items:center;gap:1px;font-family:var(--t-titulo);background:var(--blanco);border:1.5px solid var(--negro);border-radius:10px;padding:5px 4px;box-shadow:2px 2px 0 var(--negro);cursor:pointer;color:var(--negro)}
+.entidad b{font-size:.84rem}
+.entidad .est-ent{font-size:.58rem;font-weight:700;color:var(--gris-texto)}
+.entidad.pendiente{animation:latido-e 1.8s ease-in-out infinite}
+@keyframes latido-e{50%{box-shadow:2px 2px 0 var(--negro),0 0 0 4px color-mix(in srgb,var(--amarillo) 70%,transparent)}}
+.entidad.vista{background:var(--menta-suave)}
+.entidad.vista .est-ent{color:var(--teal)}
+.entidad:hover{background:var(--amarillo-suave)}
+.ent-texto{margin:0;font-size:1rem;line-height:1.6}
+.ent-texto .rotulo{font-family:var(--t-titulo);font-weight:700}
+@media (prefers-reduced-motion:reduce){.entidad.pendiente{animation:none}}
+/* Vista ampliada: la imagen a tamaño grande con desplazamiento libre (útil en el celular) */
+.ampliada{position:fixed;inset:0;background:var(--blanco);z-index:60;display:flex;flex-direction:column}
+.ampliada[hidden]{display:none}
+.ampliada .barra-amp{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:2px solid var(--negro);background:var(--amarillo)}
+.ampliada .barra-amp p{margin:0;flex:1;font-family:var(--t-titulo);font-weight:700;font-size:.85rem}
+.ampliada .lienzo{flex:1;overflow:auto;background:var(--fondo-suave)}
+.ampliada .lienzo img{display:block;max-width:none}
+@container sina (max-width:760px){
+  .sina{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto auto auto;gap:8px}
+  .panel{display:contents}
+  .panel .etiqueta,.panel .instr{display:none}
+  .panel h1{display:none}
+  .panel .figura{grid-row:1;font-size:.9rem}
+  .panel .figura b{display:inline}
+  .visor{grid-row:2}
+  .controles{grid-row:3}
+  .panel .nota-fuente{grid-row:5;margin:0;font-size:.68rem}
+  .sector{grid-row:4;flex-direction:row;align-items:center}
+  .sector-tit{font-size:.72rem;flex:0 0 auto}
+  .entidades{flex:1}
+  .entidad{padding:3px 4px}
+  .entidad b{font-size:.74rem}
+  .lupa{width:150px;height:150px}
+}
+
+/* Justicia restaurativa: figuras de la ficha, una por dirección (?f=id); partes si la figura viene en varias imágenes. */
+.panel .entrada-fig{font-size:.86rem;line-height:1.5;margin:0}
+.panel .leccion-fig{font-family:var(--t-titulo);font-size:.72rem;font-weight:700;color:var(--gris-texto);margin:0}
+.partes{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.partes button{font-family:var(--t-titulo);font-weight:700;font-size:.74rem;background:var(--blanco);border:1.5px solid var(--negro);border-radius:999px;padding:4px 11px;cursor:pointer;box-shadow:2px 2px 0 var(--negro)}
+.partes button[aria-pressed="true"]{background:var(--amarillo)}
+.partes .visto::after{content:" ✓"}
+.sina{grid-template-columns:minmax(0,1fr) 290px}
+.visor{background:var(--blanco)}
+@container sina (max-width:760px){.sina{grid-template-columns:1fr}.panel .entrada-fig{grid-row:1;font-size:.8rem}.panel .figura{grid-row:2}.visor{grid-row:3}.partes{grid-row:4}.controles{grid-row:5}.panel .nota-fuente{grid-row:6}.panel .leccion-fig{display:none}}
+</style>
+</head>
+<body>
+<main class="caja"><div class="sina">
+  <div class="visor" data-visor tabindex="0" aria-label="Figura de la ficha. Mueva el cursor o use las flechas para recorrerla con la lupa.">
+    <img class="base" src="" alt="" data-img>
+    <div class="lupa" data-lupa aria-hidden="true"></div>
+  </div>
+  <aside class="panel">
+    <span class="etiqueta"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> Explore con la lupa</span>
+    <p class="leccion-fig" data-leccion></p>
+    <p class="entrada-fig" data-entrada hidden></p>
+    <p class="figura"><b data-titulo></b></p>
+    <div class="partes" data-partes hidden role="group" aria-label="Partes de la figura"></div>
+    <p class="instr">Pase el cursor sobre la figura para leerla de cerca. En el celular, toque y deslice el dedo. Con el teclado, use las flechas.</p>
+    <div class="controles">
+      <button type="button" data-lupa-sw aria-pressed="true"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> Lupa</button>
+      <button type="button" data-menos aria-label="Menos aumento"><i class="fas fa-minus" aria-hidden="true"></i></button>
+      <span class="nivel" data-nivel aria-live="polite">2,5×</span>
+      <button type="button" data-mas aria-label="Más aumento"><i class="fas fa-plus" aria-hidden="true"></i></button>
+      <button type="button" data-ampliar><i class="fas fa-up-right-and-down-left-from-center" aria-hidden="true"></i> Ver en grande</button>
+    </div>
+    <p class="nota-fuente" data-pie></p>
+  </aside>
+</div></main>
+<div class="ampliada" data-ampliada hidden role="dialog" aria-modal="true" aria-label="Figura ampliada">
+  <div class="barra-amp"><p data-titulo-amp></p>
+    <button type="button" class="boton" data-cerrar-amp><i class="fas fa-xmark" aria-hidden="true"></i> Cerrar</button></div>
+  <div class="lienzo"><img src="" alt="" data-img-amp></div>
+</div>
+<script type="application/json" id="figuras">{"jr-u1-p18": {"titulo": "Figura. Justicia restaurativa como complemento del proceso penal", "pie": "Fuente: propia", "entrada": "", "leccion": "Unidad 1 · Lección 1.1", "partes": [{"src": "img/jr-u1-p18-1.png", "w": 811, "h": 948}, {"src": "img/jr-u1-p18-2.png", "w": 818, "h": 913}, {"src": "img/jr-u1-p18-3.png", "w": 820, "h": 826}]}, "jr-u1-p26": {"titulo": "Figura 2. Ejes de la justicia restaurativa", "pie": "Fuente: elaboración propia", "entrada": "", "leccion": "Unidad 1 · Lección 1.1", "partes": [{"src": "img/jr-u1-p26-1.png", "w": 904, "h": 660}]}, "jr-u1-p30": {"titulo": "Figura 3. Fases participación justicia restaurativa", "pie": "Fuente: Elaboración propia con insumos de la Unidad Nacional de Justicia Restaurativa.", "entrada": "", "leccion": "Unidad 1 · Lección 1.4", "partes": [{"src": "img/jr-u1-p30-1.png", "w": 1285, "h": 546}]}, "jr-u2-p47": {"titulo": "Figura 1. Trámite de la mediación", "pie": "Fuente: Manual de Justicia Restaurativa de la FGN, p. 27.", "entrada": "", "leccion": "Unidad 2 · Lección 2.1", "partes": [{"src": "img/jr-u2-p47-1.png", "w": 1333, "h": 546}]}, "jr-u2-p47b": {"titulo": "Figura 2. Procedimiento mediación", "pie": "Fuente: Elaboración propia", "entrada": "La siguiente figura discrimina los pasos anteriores:", "leccion": "Unidad 2 · Lección 2.1", "partes": [{"src": "img/jr-u2-p47b-1.png", "w": 1441, "h": 743}]}, "jr-u2-p50": {"titulo": "Figura 3. Mecanismos de justicia restaurativa", "pie": "Fuente: Elaboración propia", "entrada": "", "leccion": "Unidad 2 · Lección 2.1", "partes": [{"src": "img/jr-u2-p50-1.png", "w": 1447, "h": 596}]}, "jr-u2-p56": {"titulo": "Figura 4. Actuaciones susceptibles de aplicación del enfoque restaurativo", "pie": "Fuente: Elaboración propia", "entrada": "", "leccion": "Unidad 2 · Lección 2.1", "partes": [{"src": "img/jr-u2-p56-1.png", "w": 1376, "h": 705}]}, "jr-u2-p59": {"titulo": "Figura 5. Fundamentos sobre la procedencia de la Suspensión del procedimiento a prueba", "pie": "Fuente: Elaboración propia", "entrada": "", "leccion": "Unidad 2 · Lección 2.1", "partes": [{"src": "img/jr-u2-p59-1.png", "w": 1424, "h": 655}]}, "jr-u2-p64": {"titulo": "Figura 6. Enfoque restaurativo e instituciones o figuras procesales", "pie": "Fuente: Elaboración propia", "entrada": "", "leccion": "Unidad 2 · Lección 2.1", "partes": [{"src": "img/jr-u2-p64-1.png", "w": 1482, "h": 680}]}, "jr-u2-p65": {"titulo": "Figura 7. Perspectiva transversal del enfoque restaurativo del proceso penal", "pie": "Fuente: Elaboración propia", "entrada": "", "leccion": "Unidad 2 · Lección 2.1", "partes": [{"src": "img/jr-u2-p65-1.png", "w": 1371, "h": 842}]}, "jr-u3-p83": {"titulo": "Figura 1. Pintura rememorativa al caso", "pie": "Nota: Cansado. Vincent van Gogh. 1882. Lápiz sobre papel.", "entrada": "", "leccion": "Unidad 3 · Lección 3.1", "partes": [{"src": "img/jr-u3-p83-1.png", "w": 859, "h": 568}]}, "jr-u3-p87": {"titulo": "Figura 2. Red articulación justicia restaurativa", "pie": "Fuente: Fiscalía General de la Nación", "entrada": "", "leccion": "Unidad 3 · Lección 3.1", "partes": [{"src": "img/jr-u3-p87-1.png", "w": 1306, "h": 941}]}, "jr-u4-p123": {"titulo": "Figura 2. Indicadores de responsabilización", "pie": "Fuente: elaboración propia", "entrada": "", "leccion": "Unidad 4 · Lección 4.3", "partes": [{"src": "img/jr-u4-p123-1.png", "w": 1285, "h": 884}, {"src": "img/jr-u4-p123-2.png", "w": 1285, "h": 458}]}, "jr-u4-p124": {"titulo": "Figura 3. Indicadores de reparación", "pie": "Fuente: elaboración propia", "entrada": "", "leccion": "Unidad 4 · Lección 4.3", "partes": [{"src": "img/jr-u4-p124-1.png", "w": 1285, "h": 416}, {"src": "img/jr-u4-p124-2.png", "w": 1285, "h": 742}]}, "jr-u4-p125": {"titulo": "Figura 4. Indicadores de reintegración", "pie": "Fuente: elaboración propia", "entrada": "", "leccion": "Unidad 4 · Lección 4.3", "partes": [{"src": "img/jr-u4-p125-1.png", "w": 1285, "h": 870}, {"src": "img/jr-u4-p125-2.png", "w": 1285, "h": 573}]}}</script>
+<script src="../comun/kit.js"></script>
+<script>
+/* La figura pedida en ?f=id: su título, su fuente, la frase que la anuncia y sus partes (si viene en varias imágenes). */
+(function () {
+  'use strict';
+  var F = JSON.parse(document.getElementById('figuras').textContent);
+  var id = (new URLSearchParams(location.search)).get('f') || Object.keys(F)[0], d = F[id] || F[Object.keys(F)[0]];
+  var img = document.querySelector('[data-img]'), amp = document.querySelector('[data-img-amp]');
+  var q = function (s) { return document.querySelector(s); };
+  document.title = d.titulo + ' · ' + d.leccion;
+  q('[data-titulo]').textContent = d.titulo + '.';
+  q('[data-titulo-amp]').textContent = d.titulo + ' · desplácese para recorrerla';
+  q('[data-leccion]').textContent = d.leccion;
+  q('[data-pie]').textContent = d.pie;
+  if (d.entrada) { q('[data-entrada]').textContent = d.entrada; q('[data-entrada]').hidden = false; }
+  var vistas = {};
+  function poner(k) {
+    var p = d.partes[k];
+    img.src = p.src; img.width = p.w; img.height = p.h; amp.src = p.src;
+    img.alt = d.titulo + (d.partes.length > 1 ? ' (parte ' + (k + 1) + ' de ' + d.partes.length + ')' : '') + '. Figura de la ficha del curso; su texto se lee con la lupa o en «Ver en grande».';
+    q('[data-visor]').setAttribute('aria-label', img.alt + ' Mueva el cursor o use las flechas para recorrerla con la lupa.');
+    vistas[k] = true;
+    document.querySelectorAll('[data-parte]').forEach(function (b, i) { b.setAttribute('aria-pressed', String(i === k)); b.classList.toggle('visto', !!vistas[i]); });
+  }
+  if (d.partes.length > 1) {
+    var c = q('[data-partes]'); c.hidden = false;
+    d.partes.forEach(function (_, k) {
+      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-parte', k); b.textContent = 'Parte ' + (k + 1) + ' de ' + d.partes.length;
+      b.addEventListener('click', function () { poner(k); }); c.appendChild(b);
+    });
+  }
+  poner(0);
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var visor = document.querySelector('[data-visor]'), img = document.querySelector('[data-img]'), lupa = document.querySelector('[data-lupa]');
+  var nivelEl = document.querySelector('[data-nivel]');
+  var aumento = Kit.leer('jr-figura-aumento', 2.5), punto = { x: .5, y: .5 };
+  function pintar() {
+    var r = img.getBoundingClientRect(), v = visor.getBoundingClientRect();
+    var w = r.width * aumento, h = r.height * aumento, lw = lupa.offsetWidth || 190;
+    var cx = r.left - v.left + punto.x * r.width, cy = r.top - v.top + punto.y * r.height;
+    lupa.style.left = (cx - lw / 2) + 'px';
+    lupa.style.top = (cy - lw / 2 - (visor.classList.contains('tocando') ? lw * .6 : 0)) + 'px';
+    lupa.style.backgroundImage = 'url("' + img.currentSrc + '")';
+    lupa.style.backgroundSize = w + 'px ' + h + 'px';
+    lupa.style.backgroundPosition = (lw / 2 - punto.x * w) + 'px ' + (lw / 2 - punto.y * h) + 'px';
+    nivelEl.textContent = String(aumento).replace('.', ',') + '×';
+  }
+  function mover(e) {
+    var r = img.getBoundingClientRect();
+    punto.x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    punto.y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+    pintar();
+  }
+  visor.addEventListener('pointermove', mover);
+  visor.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') { visor.classList.add('tocando'); mover(e); } });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) { visor.addEventListener(t, function () { visor.classList.remove('tocando'); }); });
+  visor.addEventListener('focus', function () { visor.classList.add('teclado'); pintar(); });
+  visor.addEventListener('blur', function () { visor.classList.remove('teclado'); });
+  visor.addEventListener('keydown', function (e) {
+    var d = { ArrowLeft: [-.04, 0], ArrowRight: [.04, 0], ArrowUp: [0, -.04], ArrowDown: [0, .04] }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    punto.x = Math.min(1, Math.max(0, punto.x + d[0])); punto.y = Math.min(1, Math.max(0, punto.y + d[1])); pintar();
+  });
+  var sw = document.querySelector('[data-lupa-sw]');
+  sw.addEventListener('click', function () {
+    var on = sw.getAttribute('aria-pressed') !== 'true';
+    sw.setAttribute('aria-pressed', String(on)); visor.classList.toggle('sin-lupa', !on);
+  });
+  function cambiar(d) { aumento = Math.min(5, Math.max(1.5, Math.round((aumento + d) * 2) / 2)); Kit.guardar('jr-figura-aumento', aumento); pintar(); }
+  document.querySelector('[data-mas]').addEventListener('click', function () { cambiar(.5); });
+  document.querySelector('[data-menos]').addEventListener('click', function () { cambiar(-.5); });
+  visor.addEventListener('wheel', function (e) { if (!visor.classList.contains('sin-lupa')) { e.preventDefault(); cambiar(e.deltaY < 0 ? .5 : -.5); } }, { passive: false });
+  // Vista ampliada (imagen a 2× de su tamaño natural, con desplazamiento libre)
+  var amp = document.querySelector('[data-ampliada]'), imgAmp = document.querySelector('[data-img-amp]'), volver = null;
+  document.querySelector('[data-ampliar]').addEventListener('click', function (e) {
+    volver = e.currentTarget; amp.hidden = false;
+    imgAmp.style.width = Math.max(img.naturalWidth * 2, window.innerWidth) + 'px';
+    amp.querySelector('[data-cerrar-amp]').focus();
+  });
+  function cerrarAmp() { amp.hidden = true; if (volver) volver.focus(); }
+  amp.querySelector('[data-cerrar-amp]').addEventListener('click', cerrarAmp);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !amp.hidden) cerrarAmp(); });
+  img.addEventListener('load', pintar); window.addEventListener('resize', pintar);
+  if (img.complete) pintar();
+  Kit.pantallaCompleta();
+})();
+</script>
+</body>
+</html>

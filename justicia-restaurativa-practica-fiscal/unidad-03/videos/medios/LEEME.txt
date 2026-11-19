@@ -1,0 +1,13 @@
+Medios de los casos en video · Unidad 3
+
+Aquí van los archivos definitivos que entregue JP o la rama audiovisual, con estos nombres exactos (rutas relativas,
+portables dentro del paquete de Genially y del SCORM):
+- jr-u3-cierre (Recursos académicos de la unidad 3 (3.8 Actividad de acompañamiento dirigido)): medios/jr-u3-cierre.mp4, medios/jr-u3-cierre.es.vtt, medios/jr-u3-cierre-lsc.mp4, medios/jr-u3-cierre-lsc.es.vtt
+- jr-u3-jep-macrocaso-01 (Unidad 3, Lección 3.4): medios/jr-u3-jep-macrocaso-01.mp4, medios/jr-u3-jep-macrocaso-01.es.vtt, medios/jr-u3-jep-macrocaso-01-lsc.mp4, medios/jr-u3-jep-macrocaso-01-lsc.es.vtt
+- jr-u3-jep-macrocaso-03 (Unidad 3, Lección 3.4): medios/jr-u3-jep-macrocaso-03.mp4, medios/jr-u3-jep-macrocaso-03.es.vtt, medios/jr-u3-jep-macrocaso-03-lsc.mp4, medios/jr-u3-jep-macrocaso-03-lsc.es.vtt
+- jr-u3-presentacion (Presentación de la unidad 3): medios/jr-u3-presentacion.mp4, medios/jr-u3-presentacion.es.vtt, medios/jr-u3-presentacion-lsc.mp4, medios/jr-u3-presentacion-lsc.es.vtt
+
+Formato previsto: video MP4 (H.264 + AAC) y subtítulos WebVTT en español (.vtt, UTF-8).
+El reproductor los toma en cuanto están aquí; mientras falten, dice «Video en producción». Los copia
+herramientas/integrar_entregas.py (solo lo aprobado). Después: cambiar el estado del caso a «entregado», volver a
+generar el reproductor y probar ambas versiones con subtítulos en el iframe y en el paquete antes de declararlos integrados.

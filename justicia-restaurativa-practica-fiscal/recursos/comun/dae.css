@@ -1,0 +1,144 @@
+/* Kit común de los recursos HTML del curso «Justicia restaurativa en la práctica del fiscal» (reunión con Juan del 06/11/2026).
+   - Estilo de la página DAE de la presentación del curso (captura «con este estilo»): logo DAE, botones redondeados con
+     borde negro y sombra desplazada, acento amarillo, títulos en negrita, acordeones con (+) y «Abrir/Cerrar todos».
+   - Colores: SOLO los de la portada del curso (recursos/paleta-curso.json). Ningún color fuera de :root.
+   - Lo usan los HTML de unidad (presentación, recursos académicos, cierre) y los recursos interactivos. */
+@font-face{font-family:Montserrat;src:url('assets/fonts/montserrat-latin.woff2') format('woff2');font-weight:400 800;font-display:swap}
+@font-face{font-family:Montserrat;src:url('assets/fonts/montserrat-latin-ext.woff2') format('woff2');font-weight:400 800;font-display:swap;unicode-range:U+0100-02FF,U+1E00-1EFF}
+@font-face{font-family:Roboto;src:url('assets/fonts/roboto-latin.woff2') format('woff2');font-weight:400 700;font-display:swap}
+@font-face{font-family:Roboto;src:url('assets/fonts/roboto-latin-ext.woff2') format('woff2');font-weight:400 700;font-display:swap;unicode-range:U+0100-02FF,U+1E00-1EFF}
+
+:root{
+  --fondo:#F2D1CD; --oliva:#B5563D; --amarillo:#E3A793; --carbon:#1E4260; --gris-titulo:#8FA3B5;
+  --gris-menu:#1E4260; --gris-texto:#486781; --negro:#000000; --blanco:#FFFFFF;
+  --naranja:#B5563D; --teal:#486781; --azul-gris:#738CA3; --menta:#D2DAE2; --petroleo:#738CA3;
+  --marino:#1E4260; --oxido:#853629; --tronco:#853629;
+  /* tintes y mezclas de la paleta (qa_paleta los admite) */
+  --amarillo-suave:color-mix(in srgb,var(--amarillo) 35%,var(--blanco));
+  --menta-suave:color-mix(in srgb,var(--menta) 40%,var(--blanco));
+  --fondo-suave:color-mix(in srgb,var(--fondo) 45%,var(--blanco));
+  --oliva-suave:color-mix(in srgb,var(--oliva) 18%,var(--blanco));
+  --leida:color-mix(in srgb,var(--menta) 70%,var(--teal));
+  --linea:var(--carbon);
+  --radio:14px;
+  --sombra:4px 4px 0 var(--negro);
+  --t-titulo:'Montserrat',system-ui,sans-serif;
+  --t-texto:'Roboto',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--blanco);color:var(--carbon);font-family:var(--t-texto);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.dae{max-width:1080px;margin:0 auto;padding:0 28px 96px}
+h1,h2,h3,h4{font-family:var(--t-titulo);color:var(--negro);line-height:1.25;margin:0 0 .5em}
+h1{font-size:clamp(1.45rem,3.2vw,2.05rem);font-weight:800}
+h2{font-size:clamp(1.2rem,2.4vw,1.5rem);font-weight:700}
+h3{font-size:1.08rem;font-weight:700}
+p{margin:0 0 .9em}
+.may::first-letter{text-transform:uppercase}
+a{color:var(--marino);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--teal)}
+:focus-visible{outline:3px solid var(--naranja);outline-offset:3px;border-radius:6px}
+
+/* Cabecera DAE */
+.dae-cab{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 0 18px;border-bottom:2px solid var(--negro);margin-bottom:28px;flex-wrap:wrap}
+.dae-logos{display:flex;align-items:center;gap:18px}
+.dae-logos img.dae-logo{height:46px;width:auto;display:block}
+.dae-logos img.fgn-logo{height:52px;width:auto;display:block}
+.dae-nav{display:flex;gap:10px;flex-wrap:wrap}
+.pildora{display:inline-flex;align-items:center;gap:8px;font-family:var(--t-titulo);font-weight:600;font-size:.82rem;color:var(--negro);background:var(--blanco);border:1.5px solid var(--negro);border-radius:999px;padding:7px 16px;text-decoration:none;cursor:pointer}
+.pildora[aria-current="true"],.pildora.activa{background:var(--amarillo)}
+.pildora:hover{background:var(--amarillo-suave)}
+
+/* Portada de la página */
+.etiqueta{display:inline-flex;align-items:center;gap:8px;font-family:var(--t-titulo);font-weight:600;font-size:.8rem;background:var(--menta);color:var(--negro);border:1.5px solid var(--negro);border-radius:999px;padding:5px 14px;box-shadow:2px 2px 0 var(--negro);margin-bottom:12px}
+.etiqueta i{font-size:.85em}
+.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:28px;align-items:center;margin-bottom:26px}
+.hero .ilustracion{border-radius:var(--radio);overflow:hidden;background:var(--fondo);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+.hero .ilustracion img{width:100%;height:100%;object-fit:contain;display:block}
+.hero p.bajada{color:var(--gris-texto);font-size:1.02rem}
+.titulo-curso{color:var(--gris-texto);font-family:var(--t-titulo);font-weight:600;font-size:.86rem;margin:0 0 6px;letter-spacing:.01em}
+.titulo-curso b{color:var(--oliva)}
+
+/* Botones DAE: redondeados, borde negro, sombra desplazada */
+.boton{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--t-titulo);font-weight:700;font-size:.9rem;color:var(--negro);background:var(--blanco);border:2px solid var(--negro);border-radius:12px;padding:11px 20px;box-shadow:var(--sombra);cursor:pointer;text-decoration:none;transition:transform .12s,box-shadow .12s}
+.boton:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--negro)}
+.boton:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--negro)}
+.boton.primario{background:var(--amarillo)}
+.boton.oscuro{background:var(--carbon);color:var(--blanco)}
+.boton[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+.botonera{display:flex;gap:16px;flex-wrap:wrap;margin:18px 0 6px}
+.separador{border:0;border-top:2px solid var(--negro);margin:26px 0 12px}
+.abrir-cerrar{display:flex;justify-content:flex-end;gap:24px;margin:6px 0 20px}
+.abrir-cerrar button{background:none;border:0;border-bottom:1.5px solid var(--carbon);font-family:var(--t-titulo);font-weight:600;font-size:.8rem;color:var(--carbon);padding:4px 0;cursor:pointer}
+.abrir-cerrar button:hover{color:var(--teal);border-color:var(--teal)}
+
+/* Acordeón DAE */
+.seccion{margin:0 0 30px}
+.seccion>h2{margin-bottom:14px}
+.acordeon{border:1.5px solid var(--negro);border-radius:var(--radio);background:var(--blanco);margin:0 0 14px;box-shadow:3px 3px 0 var(--menta);overflow:hidden}
+.acordeon>summary{list-style:none;display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;font-family:var(--t-titulo);font-weight:700;font-size:1.02rem;color:var(--negro)}
+.acordeon>summary::-webkit-details-marker{display:none}
+.acordeon>summary .icono{flex:0 0 38px;height:38px;border-radius:9px;background:var(--oliva);color:var(--blanco);display:flex;align-items:center;justify-content:center;border:1.5px solid var(--negro)}
+.acordeon>summary .titulo{flex:1}
+.acordeon>summary .mas{flex:0 0 26px;height:26px;border:1.5px solid var(--negro);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:transform .2s}
+.acordeon[open]>summary .mas{transform:rotate(45deg);background:var(--amarillo)}
+.acordeon[open]>summary{border-bottom:1.5px dashed var(--gris-titulo)}
+.acordeon .cuerpo{padding:16px 22px 18px}
+.acordeon .cuerpo ul,.acordeon .cuerpo ol{margin:0 0 .9em;padding-left:1.3em}
+.acordeon .cuerpo li{margin:0 0 .45em}
+.acordeon.visto>summary .icono{background:var(--teal)}
+.acordeon .estado{font-family:var(--t-titulo);font-size:.72rem;font-weight:600;color:var(--gris-texto);white-space:normal}
+.acordeon.visto .estado{color:var(--teal)}
+
+/* Tarjetas y rejillas */
+.rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.tarjeta{border:1.5px solid var(--negro);border-radius:var(--radio);background:var(--blanco);padding:16px 18px;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:8px}
+.tarjeta h3{margin:0}
+.tarjeta .sello{align-self:flex-start;font-family:var(--t-titulo);font-weight:700;font-size:.72rem;border:1.5px solid var(--negro);border-radius:999px;padding:3px 10px;background:var(--amarillo)}
+.tarjeta.video .sello{background:var(--menta)}
+.tarjeta .pie{margin-top:auto;font-size:.82rem;color:var(--gris-texto)}
+.caja-clave{background:var(--amarillo-suave);border:2px solid var(--negro);border-left:8px solid var(--oliva);border-radius:var(--radio);padding:14px 18px;margin:16px 0;font-weight:500}
+.nota-fuente{font-size:.8rem;color:var(--gris-texto);margin-top:8px}
+.pendiente{display:flex;gap:12px;align-items:flex-start;background:var(--fondo-suave);border:1.5px dashed var(--carbon);border-radius:var(--radio);padding:14px 16px;font-size:.92rem}
+.pendiente i{color:var(--carbon);margin-top:4px}
+
+/* Lista de lecciones */
+.lecciones{counter-reset:lec;display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.lecciones li{display:flex;gap:14px;align-items:center;border:1.5px solid var(--negro);border-radius:12px;padding:12px 16px;background:var(--blanco)}
+.lecciones li .num{flex:0 0 44px;height:44px;border-radius:50%;background:var(--amarillo);border:1.5px solid var(--negro);display:flex;align-items:center;justify-content:center;font-family:var(--t-titulo);font-weight:800}
+.lecciones li b{font-family:var(--t-titulo)}
+
+/* Video embebido (marco de 16:9 con el reproductor del curso) */
+.marco-video{position:relative;aspect-ratio:16/9;border:2px solid var(--negro);border-radius:var(--radio);overflow:hidden;background:var(--carbon);box-shadow:var(--sombra)}
+.marco-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* Ventana (modal) accesible */
+.ventana-fondo{position:fixed;inset:0;background:color-mix(in srgb,var(--negro) 55%,transparent);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
+.ventana-fondo[hidden]{display:none}
+.ventana{background:var(--blanco);border:2px solid var(--negro);border-radius:18px;box-shadow:6px 6px 0 var(--negro);max-width:760px;width:100%;max-height:calc(100vh - 36px);display:flex;flex-direction:column}
+.ventana .ventana-cab{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1.5px solid var(--negro);background:var(--amarillo);border-radius:16px 16px 0 0}
+.ventana .ventana-cab h2{margin:0;font-size:1.1rem;flex:1}
+.ventana .ventana-cuerpo{padding:18px 22px;overflow:auto}
+.ventana .cerrar{border:1.5px solid var(--negro);background:var(--blanco);border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:1rem}
+
+/* Barra de avance */
+.avance{display:flex;align-items:center;gap:12px;font-family:var(--t-titulo);font-size:.8rem;font-weight:600;color:var(--carbon);margin:0 0 16px}
+.avance .barra{flex:1;height:8px;border-radius:999px;background:var(--fondo);border:1px solid var(--carbon);overflow:hidden}
+.avance .barra span{display:block;height:100%;width:0;background:var(--teal);transition:width .4s}
+
+/* Botón de pantalla completa: franja propia abajo a la izquierda (directriz del taller) */
+.franja-pc{position:fixed;left:0;bottom:0;padding:8px 10px;z-index:40;pointer-events:none}
+.franja-pc .boton-pc{pointer-events:auto;font-family:var(--t-titulo);font-weight:700;font-size:.78rem;display:inline-flex;align-items:center;gap:8px;background:var(--carbon);color:var(--blanco);border:1.5px solid var(--negro);border-radius:999px;padding:7px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--negro)}
+body.en-pc .franja-pc .boton-pc{background:var(--amarillo);color:var(--negro)}
+
+/* Pie */
+.dae-pie{margin-top:40px;padding-top:16px;border-top:2px solid var(--negro);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.78rem;color:var(--gris-texto)}
+
+@media (max-width:760px){
+  .dae{padding:0 16px 90px}
+  .hero{grid-template-columns:1fr}
+  .dae-logos img.dae-logo{height:36px}
+  .dae-logos img.fgn-logo{height:40px}
+  .abrir-cerrar{justify-content:flex-start}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

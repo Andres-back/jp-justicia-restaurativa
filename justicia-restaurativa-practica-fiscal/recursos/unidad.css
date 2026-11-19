@@ -1,0 +1,181 @@
+/* HTML de unidad del curso de Justicia restaurativa, estándar de Juan del 07/11/2026: presentación de la unidad, recursos
+   académicos y referencias (dos entradas) y aviso de felicitaciones.
+   Complementa el kit común (comun/dae.css) sin modificarlo. Solo variables de la paleta del curso. */
+
+/* El título del curso va en gris: el oliva sobre blanco no alcanza contraste en letra pequeña */
+.titulo-curso{color:var(--gris-texto)}
+h1 .unidad-n{display:block;font-size:.62em;font-weight:700;color:var(--gris-texto);margin-bottom:4px}
+.hero-simple{grid-template-columns:1fr}
+
+/* Acordeón: icono oscuro sobre oliva (como la página DAE) y estado de lectura bajo el título */
+.acordeon>summary .icono{color:var(--carbon)}
+.acordeon.visto>summary .icono{color:var(--blanco)}
+.acordeon>summary .titulo{display:flex;flex-direction:column;gap:2px;min-width:0;overflow-wrap:anywhere}
+.acordeon>summary .titulo .estado{display:block}
+.acordeon .cuerpo h3{margin-top:.6em}
+.acordeon .cuerpo>p:last-child{margin-bottom:0}
+.acordeon .cuerpo .lecciones{padding-left:0}
+
+/* Ilustración que aún no llega: fondo de la paleta con la isla de la portada */
+.ilustracion.sin-imagen{
+  background:
+    radial-gradient(ellipse 62% 22% at 50% 88%, var(--oliva) 0 99%, transparent 100%),
+    radial-gradient(circle at 30% 30%, var(--blanco) 0 7%, transparent 7.5%),
+    radial-gradient(circle at 70% 24%, var(--blanco) 0 6%, transparent 6.5%),
+    var(--fondo);
+  min-height:220px}
+
+/* Listas */
+.lista-letras{list-style:none;padding-left:0!important}
+.lista-letras li{padding-left:0}
+.referencias{list-style:none;padding-left:0!important;margin:0 0 1em}
+.referencias li{padding-left:1.6em;text-indent:-1.6em;margin:0 0 .75em;overflow-wrap:anywhere;word-break:normal}
+.referencias a{overflow-wrap:anywhere;word-break:break-word}
+
+/* ---------- 1. Presentación: «Desarrollo del contenido temático» con SOLO el video ---------- */
+.desarrollo{scroll-margin-top:16px}
+.desarrollo>h2{display:flex;align-items:center;gap:10px}
+.desarrollo>h2 i{color:var(--teal)}
+/* El reproductor del curso trae el video y, debajo, los botones «sin / con lengua de señas» */
+.marco-video.marco-presentacion{aspect-ratio:16/10.2;background:var(--fondo-suave)}
+.nota-video{margin:12px 0 0;font-size:.88rem;color:var(--gris-texto);display:flex;gap:8px;align-items:flex-start}
+.nota-video i{color:var(--teal);margin-top:.25em}
+
+/* ---------- 2. Recursos académicos y referencias: dos entradas ---------- */
+.vista>h2{margin-bottom:16px}
+.vista h2:focus{outline:none}
+.entradas{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.entrada{display:flex;align-items:center;gap:18px;text-align:left;cursor:pointer;font:inherit;color:var(--carbon);
+  border:2px solid var(--negro);border-radius:18px;box-shadow:var(--sombra);padding:24px 22px;min-height:168px;
+  transition:transform .12s,box-shadow .12s}
+.entrada:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--negro)}
+.entrada-recursos{background:var(--menta-suave)}
+.entrada-referencias{background:var(--amarillo-suave)}
+.entrada-icono{flex:0 0 68px;height:68px;border-radius:50%;background:var(--carbon);color:var(--blanco);border:2px solid var(--negro);
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem}
+.entrada-texto{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.entrada-titulo{font-family:var(--t-titulo);font-weight:800;font-size:1.3rem;color:var(--negro);overflow-wrap:anywhere}
+.entrada-sub{font-size:.92rem;color:var(--carbon);overflow-wrap:anywhere}
+.entrada-meta{font-family:var(--t-titulo);font-weight:600;font-size:.78rem;color:var(--gris-texto)}
+.entrada-ir{flex:0 0 auto;font-size:1.2rem;color:var(--negro)}
+
+.vista-cab{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin-bottom:12px}
+.vista-cab .volver{font-size:.84rem;padding:8px 14px}
+.grupo-cajitas{margin:0 0 26px}
+.grupo-cajitas>h3{display:flex;align-items:flex-start;gap:10px;padding-bottom:6px;border-bottom:1.5px solid var(--negro);margin-bottom:14px;overflow-wrap:anywhere}
+.grupo-cajitas>h3 i{color:var(--teal);margin-top:.2em}
+.objetivo{font-style:normal;margin:0 0 14px}
+.cajitas{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.cajita{border:1.5px solid var(--negro);border-radius:var(--radio);background:var(--blanco);padding:16px 18px;box-shadow:var(--sombra);
+  display:flex;flex-direction:column;gap:8px}
+.cajita .sello{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;font-family:var(--t-titulo);font-weight:700;font-size:.74rem;
+  background:var(--fondo);border:1.5px solid var(--negro);border-radius:999px;padding:3px 10px}
+.cajita-video .sello{background:var(--menta)}
+.cajita-recurso .sello{background:var(--amarillo)}
+.cajita h4{font-family:var(--t-titulo);font-size:1rem;font-weight:700;color:var(--negro);margin:0;overflow-wrap:anywhere}
+.cajita .detalle{margin:0;color:var(--gris-texto);font-size:.9rem;overflow-wrap:anywhere}
+.cajita .boton{margin-top:auto;align-self:flex-start;font-size:.84rem;padding:9px 14px}
+.cajita .pie{margin:0;font-size:.82rem;color:var(--gris-texto)}
+.cajita.vista{box-shadow:4px 4px 0 var(--teal)}
+
+/* Ventanas */
+.ventana.ancha{max-width:1180px}
+.ventana.ventana-video{max-width:900px}
+.ventana.ventana-referencias{max-width:880px}
+.ventana-referencias .ventana-cuerpo h3{margin-top:.4em}
+.marco-recurso{position:relative;width:100%;aspect-ratio:1113/448;border:2px solid var(--negro);border-radius:10px;overflow:hidden;background:var(--blanco)}
+.marco-recurso iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.ventana .marco-video{box-shadow:none;aspect-ratio:16/10.2;background:var(--fondo-suave)}
+.abrir-aparte{margin:10px 0 0;font-size:.86rem}
+.abrir-aparte i{margin-right:4px}
+.galeria-principios{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.galeria-principios figure{margin:0;border:1.5px solid var(--negro);border-radius:var(--radio);overflow:hidden;background:var(--blanco);display:flex;flex-direction:column}
+.galeria-principios figcaption{flex:1}
+.galeria-principios img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}
+.galeria-principios figcaption{padding:8px 12px;font-family:var(--t-titulo);font-weight:700;font-size:.86rem;background:var(--blanco);border-top:1.5px solid var(--negro);overflow-wrap:anywhere}
+
+/* Video, documento o recurso que aún no existe: aviso genérico, como el reproductor del curso */
+.en-produccion{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;
+  min-height:220px;padding:24px;border:2px dashed var(--carbon);border-radius:var(--radio);background:var(--fondo-suave)}
+.en-produccion i{font-size:2rem;color:var(--teal)}
+.en-produccion .ep-titulo{font-family:var(--t-titulo);font-weight:700;font-size:1.1rem;margin:0;color:var(--negro)}
+.en-produccion .ep-detalle{margin:0;color:var(--gris-texto);font-size:.92rem}
+
+/* Índice de la unidad */
+.tarjeta h3{overflow-wrap:anywhere}
+.tarjeta .detalle{margin:0;color:var(--gris-texto);font-size:.92rem}
+a.tarjeta-indice{text-decoration:none;color:var(--carbon)}
+a.tarjeta-indice:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--negro)}
+a.tarjeta-indice h3{color:var(--negro)}
+
+/* Pantalla completa en una franja propia al pie de la ventana (la página se desplaza: la franja no tapa el final) */
+.unidad-html .franja-pc{left:0;right:0;display:flex;justify-content:flex-start;padding:6px 16px;
+  background:color-mix(in srgb,var(--blanco) 94%,transparent);border-top:1.5px solid var(--negro)}
+.unidad-html .dae{padding-bottom:110px}
+
+@media (max-width:760px){
+  .entradas{grid-template-columns:1fr;gap:16px}
+  .entrada{padding:18px 16px;gap:14px;min-height:0}
+  .entrada-icono{flex-basis:52px;height:52px;font-size:1.25rem}
+  .entrada-titulo{font-size:1.12rem}
+  .marco-video.marco-presentacion,.ventana .marco-video{aspect-ratio:auto;height:calc(56vw + 118px)}
+  .marco-recurso{aspect-ratio:auto;height:70vh}
+  .ventana .ventana-cuerpo{padding:14px}
+  .dae-nav{width:100%}
+  .pildora{font-size:.76rem;padding:6px 12px}
+  .botonera .boton{width:100%}
+}
+
+/* ---------- 3. Aviso «¡Felicitaciones!»: pequeño, ambientado, para el muro de la unidad en Moodle ---------- */
+.felicitaciones-html{background:transparent;margin:0;padding:8px 14px 14px 8px}
+.felic{position:relative;display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:center;max-width:820px;margin:0 auto;
+  padding:18px 24px 18px 18px;border:2px solid var(--negro);border-radius:20px;box-shadow:var(--sombra);overflow:hidden;
+  background:
+    radial-gradient(ellipse 70% 40% at 0% 100%, var(--menta-suave) 0 99%, transparent 100%),
+    radial-gradient(ellipse 55% 45% at 100% 0%, var(--amarillo-suave) 0 99%, transparent 100%),
+    var(--blanco)}
+.felic::after{content:"";position:absolute;left:0;right:0;bottom:0;height:7px;
+  background:linear-gradient(90deg,var(--oliva) 0 33%,var(--teal) 33% 66%,var(--amarillo) 66%)}
+.felic-arte{position:relative;aspect-ratio:1;border-radius:50%;background:var(--fondo);border:2px solid var(--negro);overflow:hidden;
+  display:flex;align-items:center;justify-content:center}
+.felic-arte img{width:118%;height:auto;display:block;transform:translateY(4%)}
+.felic-texto{position:relative;z-index:1;min-width:0}
+.felic-texto p{margin:0}
+.felic-titulo{font-family:var(--t-titulo);font-weight:800;font-size:clamp(1.5rem,3.4vw,2.05rem);color:var(--negro);line-height:1.15;
+  display:inline-flex;align-items:center;gap:10px;background:linear-gradient(transparent 58%, var(--amarillo) 58%)}
+.felic-titulo i{color:var(--teal);font-size:.8em}
+.felic-completado{font-family:var(--t-titulo);font-weight:700;font-size:1.08rem;color:var(--carbon);margin-top:6px!important}
+.felic-unidad{font-family:var(--t-titulo);font-weight:600;font-size:.84rem;color:var(--gris-texto);margin-top:2px!important;overflow-wrap:anywhere}
+.felic-avance{font-size:.9rem;line-height:1.5;margin-top:10px!important}
+.felic-invitacion{font-size:.9rem;line-height:1.5;margin-top:8px!important;padding:8px 12px;border-left:6px solid var(--oliva);
+  background:var(--amarillo-suave);border-radius:0 10px 10px 0}
+.felic-invitacion i{color:var(--teal);margin-right:6px}
+/* Franja para los dos botones dentro del recuadro (JP y Esteban, 14/11/2026: «unificar esto… que sea dentro del recuadro»).
+   En la imagen del muro queda vacía; en el aula, los botones reales van encima (herramientas/aula_felicitaciones.py). */
+.felic-botones{grid-column:1/-1;height:64px;margin:-8px 0 2px}
+/* Hojas que caen despacio detrás del texto */
+.hoja{position:absolute;width:14px;height:14px;border-radius:0 100% 0 100%;opacity:.75;z-index:0;
+  animation:caer 9s linear infinite}
+.hoja.h1{left:8%;top:-10%;background:var(--oliva);animation-delay:0s}
+.hoja.h2{left:30%;top:-10%;background:var(--teal);animation-delay:-2.2s;width:11px;height:11px}
+.hoja.h3{left:52%;top:-10%;background:var(--menta);animation-delay:-4.5s}
+.hoja.h4{left:70%;top:-10%;background:var(--oliva);animation-delay:-6.1s;width:10px;height:10px}
+.hoja.h5{left:18%;top:-10%;background:var(--amarillo);animation-delay:-7.4s}
+.hoja.h6{left:84%;top:-10%;background:var(--teal);animation-delay:-3.3s;width:12px;height:12px}
+@keyframes caer{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(14px,62px) rotate(120deg)}100%{transform:translate(-6px,130px) rotate(260deg);opacity:0}}
+@media (max-width:560px){
+  .felic{grid-template-columns:1fr;justify-items:center;text-align:center;padding:16px}
+  .felic-arte{width:150px}
+  .felic-titulo{justify-content:center}
+  .felic-invitacion{text-align:left}
+}
+
+/* Justicia restaurativa: ventana de lectura (material complementario y Tabla 5) y aviso de finalización con el texto de la ficha. */
+.texto-soporte p{line-height:1.6;margin:0 0 .9em}.texto-soporte p:first-letter{text-transform:uppercase}
+.texto-soporte ul.referencias{margin:0}
+.tabla-ruta{width:100%;border-collapse:collapse;font-size:.82rem;line-height:1.45}
+.tabla-ruta th,.tabla-ruta td{border:1.5px solid var(--negro);padding:6px 8px;vertical-align:top;text-align:left}
+.tabla-ruta th{background:var(--amarillo);font-family:var(--t-titulo)}.tabla-ruta td.fase{font-family:var(--t-titulo);font-weight:700;background:var(--fondo)}
+.tabla-envoltura{overflow-x:auto}.tabla-pie{font-size:.8rem;margin:.6em 0 0}
+.felic-titulo{font-size:clamp(20px,3vw,26px);line-height:1.2;display:flex;align-items:center;gap:10px}
+.felicitaciones-html .felic-avance{line-height:1.6}

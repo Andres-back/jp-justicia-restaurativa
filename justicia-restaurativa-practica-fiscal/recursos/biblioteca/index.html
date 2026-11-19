@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Biblioteca de normas · Justicia restaurativa en la práctica del fiscal</title>
+<!-- Biblioteca de normas (Juan, 18/11/2026: «una tabla bien bonita… completas todas, como una biblioteca»; «no tanto
+     microlearning ni pedacitos chiquitos»). Un solo recurso dirigido por datos: index.html?b=<id> (p. ej. jr-u2-normas).
+     El texto literal está en datos.js, que genera herramientas/biblioteca_restaurativa.py (no se edita a mano).
+     Kit ../comun/ (fuentes e iconos locales, ventana accesible, pantalla completa); escena.css es copia de la base de los
+     recursos del curso. Paleta del curso declarada en un solo lugar: el :root de biblioteca.css. Sin CDN. -->
+<link rel="stylesheet" href="../comun/assets/vendor/fontawesome.min.css">
+<link rel="stylesheet" href="../comun/assets/vendor/solid.min.css">
+<link rel="stylesheet" href="../comun/dae.css">
+<link rel="stylesheet" href="escena.css">
+<link rel="stylesheet" href="biblioteca.css">
+</head>
+<body class="escena" data-recurso="biblioteca">
+<header class="esc-cab">
+  <span class="etiqueta"><i class="fas fa-book-open" aria-hidden="true"></i> <span class="etq-texto">Biblioteca de normas</span></span>
+  <div class="esc-titulos">
+    <h1 id="titulo-bib">Biblioteca de normas</h1>
+    <p class="esc-guia">Elija un libro para leer la norma completa.</p>
+  </div>
+  <button type="button" class="boton-presentacion" data-abre="entrada" hidden>
+    <i class="fas fa-scroll" aria-hidden="true"></i><span class="bp-texto">Clic para leer la presentación</span>
+    <span class="estado-lectura">Por leer</span><i class="fas fa-circle-check marca-visto" aria-hidden="true"></i>
+  </button>
+  <div class="avance" hidden><span class="texto">Exploración 0 / 0</span><span class="barra"><span></span></span></div>
+</header>
+<main class="esc-escenario"><div id="biblioteca" class="bib"></div></main>
+<footer class="esc-pie">
+  <span class="leyenda" aria-hidden="true"><span class="punto"></span> Por leer <i class="fas fa-circle-check"></i> Leído</span>
+  <span class="ubicacion"></span>
+</footer>
+<script src="../comun/kit.js"></script>
+<script src="datos.js"></script>
+<script src="biblioteca.js"></script>
+</body>
+</html>

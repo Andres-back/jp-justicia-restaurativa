@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Actividad práctica · Justicia restaurativa en la práctica del fiscal</title>
+<!-- Decisiones en lugar de la selección múltiple (Juan, 06/11/2026: «la opción múltiple ya está como muy trillado»; 18/11/2026,
+     ante la pregunta de Juana: «esta no la usemos… de esta hubo bastantes en ambiental»). Un solo recurso dirigido por datos:
+     index.html?d=<id>. Formas: «ruta» (un camino con una parada por momento y señales para decidir) y «chat» (una conversación:
+     la persona escribe y usted, fiscal, elige qué responder). El texto literal está en datos.js, que genera
+     herramientas/decision_restaurativa.py (no se edita a mano). Kit ../comun/ (fuentes e iconos locales, ventana accesible,
+     pantalla completa); escena.css es copia de la base de los recursos del curso. Paleta del curso declarada en un solo lugar:
+     el :root de decision.css. Sin CDN. -->
+<link rel="stylesheet" href="../comun/assets/vendor/fontawesome.min.css">
+<link rel="stylesheet" href="../comun/assets/vendor/solid.min.css">
+<link rel="stylesheet" href="../comun/dae.css">
+<link rel="stylesheet" href="escena.css">
+<link rel="stylesheet" href="decision.css">
+</head>
+<body class="escena" data-recurso="decision">
+<script>(function(){var m=location.search.match(/[?&]d=([\w-]+)/);document.body.setAttribute('data-recurso','decision-'+(m?m[1]:'sin-actividad'));})();</script>
+<header class="esc-cab">
+  <span class="etiqueta"><i class="fas fa-puzzle-piece" aria-hidden="true"></i> <span class="etq-texto">Actividad práctica</span></span>
+  <div class="esc-titulos">
+    <h1 id="titulo-dec">Actividad práctica</h1>
+    <p class="esc-guia"></p>
+  </div>
+  <div class="marcador">
+    <div class="avance"><span class="texto">Avance 0 / 0</span><span class="barra"><span></span></span></div>
+    <span class="estrellas" title="Estrellas ganadas"><i class="fas fa-star" aria-hidden="true"></i> <span class="e-texto">0 / 0</span></span>
+  </div>
+</header>
+<main class="esc-escenario"><div id="decision" class="dec"></div></main>
+<footer class="esc-pie">
+  <button type="button" class="boton-ayuda"><i class="fas fa-circle-question" aria-hidden="true"></i> Clic para ver cómo se juega</button>
+  <span class="ubicacion"></span>
+</footer>
+<div class="aviso-esc" role="status" hidden></div>
+<script src="../comun/kit.js"></script>
+<script src="datos.js"></script>
+<script src="decision.js"></script>
+</body>
+</html>

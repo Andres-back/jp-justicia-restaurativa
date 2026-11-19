@@ -1,0 +1,73 @@
+/* Escenario de los recursos interactivos (rama de interactivos, 06/11/2026). Copia idéntica en cada carpeta de recurso,
+   para que cada una viaje sola en el paquete. Va después de ../comun/dae.css y usa solo sus variables (paleta del curso).
+   Pensado para el iframe de Genially de 1113 × 448; legible a 767 × 510 y a 390 × 566. Sin desplazamiento de la página. */
+html,body{height:100%}
+body.escena{height:100vh;overflow:hidden;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:var(--blanco)}
+.esc-cab{display:flex;align-items:center;gap:12px;padding:7px 14px 6px;border-bottom:2px solid var(--negro);min-height:0}
+.esc-cab .etiqueta{margin:0;font-size:.68rem;padding:3px 10px;box-shadow:2px 2px 0 var(--negro);flex:0 0 auto}
+.esc-cab .esc-titulos{flex:1;min-width:0}
+.esc-cab h1{font-size:1rem;margin:0;line-height:1.2}
+.esc-guia{font-size:.76rem;color:var(--gris-texto);margin:1px 0 0;line-height:1.3}
+.esc-cab .avance{margin:0;width:190px;flex:0 0 auto;font-size:.72rem}
+.esc-cab .avance[hidden]{display:none}
+.esc-escenario{position:relative;min-height:0;padding:10px 14px;overflow:hidden}
+.esc-pie{min-height:34px;display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:2px 14px 2px 178px;font-size:.68rem;line-height:1.25;color:var(--gris-texto);border-top:1px solid var(--fondo);text-align:right}
+.franja-pc{padding:4px 8px}
+.franja-pc .boton-pc{font-size:.72rem;padding:5px 12px}
+
+/* Estado de lectura de cada elemento */
+.estado-lectura{display:inline-flex;align-items:center;gap:5px;font-family:var(--t-titulo);font-size:.64rem;font-weight:700;color:var(--gris-texto);line-height:1.2}
+.estado-lectura::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--naranja);flex:0 0 8px}
+[data-estado="leido"] .estado-lectura{color:var(--teal)}
+[data-estado="leido"] .estado-lectura::before{background:var(--teal)}
+[data-estado="parcial"] .estado-lectura::before{background:var(--amarillo);box-shadow:0 0 0 1px var(--carbon)}
+@keyframes latido{0%,100%{box-shadow:var(--sombra)}50%{box-shadow:4px 4px 0 var(--negro),0 0 0 5px color-mix(in srgb,var(--amarillo) 70%,transparent)}}
+.late{animation:latido 1.8s ease-in-out infinite}
+
+/* Lector por partes dentro de la ventana (sin desplazamiento) */
+.ventana .ventana-cuerpo{overflow:hidden;padding:14px 20px 12px}
+.ventana .ventana-cab{padding:10px 14px}
+.ventana .ventana-cab h2{font-size:1rem}
+.lector-pagina{font-size:.98rem;line-height:1.6}
+.lector-pagina p{margin:0 0 .7em}
+.lector-pagina p:last-child{margin-bottom:0}
+.lector-pagina ul{margin:0 0 .7em;padding-left:1.2em}
+.lector-pagina li{margin:0 0 .35em}
+.lector-pagina .rotulo{font-family:var(--t-titulo);font-weight:700;color:var(--negro)}
+.lector-pagina .norma{display:inline-flex;align-items:center;gap:6px;font-family:var(--t-titulo);font-size:.78rem;font-weight:700;background:var(--oliva-suave);border:1.5px solid var(--negro);border-radius:999px;padding:2px 10px;margin:0 0 .6em}
+.lector-nav{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1.5px dashed var(--gris-titulo)}
+.lector-nav .parte{font-family:var(--t-titulo);font-size:.74rem;font-weight:600;color:var(--gris-texto);flex:1}
+.lector-nav .puntos{display:flex;gap:5px}
+.lector-nav .puntos span{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--carbon);background:var(--blanco)}
+.lector-nav .puntos span.hecho{background:var(--teal);border-color:var(--teal)}
+.lector-nav .boton{padding:7px 14px;font-size:.8rem;box-shadow:3px 3px 0 var(--negro)}
+.lector-nav .boton[hidden]{display:none}
+.globo-siga{position:relative}
+.globo-siga::after{content:"¡Siga aquí!";position:absolute;right:0;bottom:calc(100% + 8px);background:var(--carbon);color:var(--blanco);font-family:var(--t-titulo);font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:8px;white-space:nowrap;pointer-events:none}
+.pendiente-recurso{display:flex;gap:10px;align-items:flex-start;background:var(--fondo-suave);border:1.5px dashed var(--carbon);border-radius:12px;padding:10px 12px;font-size:.86rem;line-height:1.45}
+.pendiente-recurso i{margin-top:3px}
+.pendiente-recurso b{font-family:var(--t-titulo)}
+.chip-rel{display:inline-flex;align-items:center;gap:6px;font-family:var(--t-titulo);font-size:.74rem;font-weight:700;background:var(--menta-suave);border:1.5px solid var(--negro);border-radius:999px;padding:3px 10px;margin:0 6px 6px 0}
+
+/* Celebración al completar */
+.esc-cab .avance.completo .barra span{background:var(--oliva)}
+.aviso-esc{position:fixed;left:50%;top:10px;transform:translateX(-50%);background:var(--carbon);color:var(--blanco);font-family:var(--t-titulo);font-size:.78rem;font-weight:700;padding:7px 14px;border-radius:10px;z-index:60;box-shadow:3px 3px 0 var(--negro);max-width:calc(100% - 24px);text-align:center}
+.aviso-esc[hidden]{display:none}
+
+@media (max-width:600px){
+  .esc-cab{flex-wrap:wrap;gap:6px 10px;padding:6px 10px}
+  .esc-cab .esc-titulos{flex:1 1 100%;order:2}
+  .esc-cab h1{font-size:.92rem}
+  .esc-guia{font-size:.72rem}
+  .esc-cab .avance{width:auto;flex:1;order:1}
+  .esc-escenario{padding:8px 10px}
+  .esc-pie{padding:2px 8px 2px 166px;font-size:.6rem}
+  .ventana-fondo{padding:8px}
+  .ventana .ventana-cuerpo{padding:10px 14px 10px}
+  .lector-pagina{font-size:.92rem;line-height:1.55}
+  .lector-nav{gap:6px;flex-wrap:wrap}
+  .lector-nav .puntos{display:none}
+  .lector-nav .parte{flex:1 1 100%}
+  .lector-nav .boton{padding:6px 10px;font-size:.74rem}
+  .aviso-esc{top:auto;bottom:42px}
+}

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Unidad 2 · Unidad 2 · Justicia restaurativa en la práctica del fiscal</title>
+<link rel="stylesheet" href="../comun/assets/vendor/fontawesome.min.css">
+<link rel="stylesheet" href="../comun/assets/vendor/solid.min.css">
+<link rel="stylesheet" href="../comun/dae.css?v=20261110">
+<link rel="stylesheet" href="../unidad.css?v=20261110">
+</head>
+<body class="unidad-html pagina-indice" data-unidad="2">
+<!-- HTML de unidad (estándar de Juan del 07/11/2026): va en el cuerpo de la unidad en el aula Moodle de la DAE, fuera de
+     Genially, con el estilo de la página DAE. Texto literal de la ficha «DEFINITIVO»; las notas para la virtualización no
+     se muestran: orientan qué video o recurso va en cada lugar. Generado por herramientas/html_unidad_ambientales/generar.py;
+     no se edita a mano. -->
+<div class="dae">
+<header class="dae-cab">
+  <div class="dae-logos">
+    <img class="dae-logo" src="../comun/img/logo-dae.png" alt="DAE · Dirección de Altos Estudios" width="180" height="46">
+    <img class="fgn-logo" src="../comun/img/logo-fiscalia.png" alt="Fiscalía General de la Nación" width="40" height="52">
+  </div>
+  <nav class="dae-nav" aria-label="Páginas de la unidad 2"><a class="pildora" href="presentacion.html">Presentación de la unidad</a><a class="pildora" href="recursos-academicos.html">Recursos académicos y referencias</a></nav>
+</header>
+<main id="contenido-principal">
+<section class="hero hero-simple">
+  <div>
+    <span class="etiqueta"><i class="fas fa-layer-group" aria-hidden="true"></i> Unidad 2</span>
+    <p class="titulo-curso">Justicia restaurativa en la práctica del fiscal</p>
+    <h1>Aplicación jurídica de la justicia restaurativa en el proceso penal</h1>
+  </div>
+</section>
+<hr class="separador">
+<section class="seccion"><h2>Páginas de la unidad</h2><div class="rejilla"><a class="tarjeta tarjeta-indice" href="presentacion.html"><span class="sello"><i class="fas fa-leaf" aria-hidden="true"></i> HTML de unidad</span><h3>1 · Presentación de la unidad</h3><p class="detalle">Moodle: primer ítem de la unidad, antes de la Lección 1. Introducción, competencias, contenidos y el video de presentación.</p></a><a class="tarjeta tarjeta-indice" href="recursos-academicos.html"><span class="sello"><i class="fas fa-photo-film" aria-hidden="true"></i> HTML de unidad</span><h3>2 · Recursos académicos y referencias bibliográficas</h3><p class="detalle">Moodle: después de las lecciones. Dos entradas: recursos académicos (ventanas) y referencias bibliográficas.</p></a><a class="tarjeta tarjeta-indice" href="felicitaciones.html"><span class="sello"><i class="fas fa-award" aria-hidden="true"></i> HTML de unidad</span><h3>3 · Aviso de felicitaciones</h3><p class="detalle">Moodle: debajo de «Unidad 2 - Evaluación», oculto hasta completar la evaluación (en el muro va como imagen: felicitaciones-u2.png).</p></a></div></section>
+</main>
+<footer class="dae-pie">
+  <span>Unidad 2 · Justicia restaurativa en la práctica del fiscal</span>
+  <span>Dirección de Altos Estudios · Fiscalía General de la Nación</span>
+</footer>
+</div>
+<script src="../comun/kit.js?v=20261110"></script>
+<script>
+(function(){
+  'use strict';
+  Kit.pantallaCompleta();
+  // Imagen generada que aún no existe: se queda el fondo de la paleta, sin icono roto.
+  document.querySelectorAll('img[data-opcional]').forEach(function(img){
+    function sin(){ img.hidden = true; var c = img.closest('[data-marco]'); if (c) c.classList.add('sin-imagen'); }
+    if (img.complete && img.naturalWidth === 0) sin();
+    img.addEventListener('error', sin);
+  });
+  // ¿Existe el archivo? Con http se pregunta (HEAD); con file:// o sin red se abre igual.
+  function existe(src, si, no){
+    if (!/^https?:/.test(location.protocol)) { si(); return; }
+    fetch(src.split('?')[0].split('#')[0], {method: 'HEAD', cache: 'no-store'}).then(function(r){ (r.ok ? si : no)(); }).catch(si);
+  }
+  window.__existe = existe;
+  var AVISO = {video: ['fa-clapperboard', 'Video en producción'], recurso: ['fa-screwdriver-wrench', 'Recurso en preparación'],
+               documento: ['fa-file-pdf', 'Documento en preparación']};
+  window.__pendiente = function(tipo, titulo){
+    var a = AVISO[tipo] || AVISO.recurso;
+    return '<div class="en-produccion" role="status"><i class="fas ' + a[0] + '" aria-hidden="true"></i>' +
+      '<p class="ep-titulo">' + a[1] + '</p><p class="ep-detalle">' + titulo.replace(/</g,'&lt;') + '</p></div>';
+  };
+  // Botones «ir a»: llevan a una sección y, si es un acordeón, lo abren
+  document.querySelectorAll('[data-ir]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var d = document.getElementById(b.getAttribute('data-ir'));
+      if (!d) return;
+      if (d.tagName === 'DETAILS') d.open = true;
+      d.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'});
+      var s = d.querySelector('summary') || d; if (s.focus) s.focus({preventScroll:true});
+    });
+  });
+})();
+
+</script>
+</body>
+</html>

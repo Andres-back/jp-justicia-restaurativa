@@ -1,0 +1,213 @@
+/* Biblioteca de normas (Justicia restaurativa, 18/11/2026). Va después de ../comun/dae.css y escena.css.
+   Paleta oficial del curso (Samir, 18/11/2026): SOLO estos seis colores, sus tintes (con blanco) y sus mezclas.
+   Se declaran aquí, en un solo lugar; abajo se redefinen con ellos las variables del kit (dae.css, escena.css).
+   Contraste: texto y títulos en azul oscuro; el coral y el azul gris no van en letra pequeña ni bajo texto blanco;
+   el granate y la terracota oscurecida llevan letra blanca. Iframe de 1113 × 448; legible a 767 × 510 y 390 × 566. */
+:root{
+  /* ---- Paleta del curso: ajustar aquí ---- */
+  --c-rosa:#F2D1CD;      /* rosa claro: fondos claros */
+  --c-azul:#1E4260;      /* azul oscuro: texto, títulos, bordes */
+  --c-granate:#853629;   /* granate: madera del estante, con letra blanca */
+  --c-azulgris:#738CA3;  /* azul gris: líneas y fondos (solo en tinte bajo texto) */
+  --c-terracota:#B5563D; /* terracota: acentos */
+  --c-coral:#D16C4B;     /* coral: adornos (nunca letra) */
+
+  /* Tintes y mezclas */
+  --rosa-claro:color-mix(in srgb,var(--c-rosa) 50%,#fff);
+  --rosa-palido:color-mix(in srgb,var(--c-rosa) 24%,#fff);
+  --azulgris-claro:color-mix(in srgb,var(--c-azulgris) 28%,#fff);
+  --azulgris-palido:color-mix(in srgb,var(--c-azulgris) 14%,#fff);
+  --madera:var(--c-granate);
+  --madera-oscura:color-mix(in srgb,var(--c-granate) 62%,var(--c-azul));
+  --madera-clara:color-mix(in srgb,var(--c-granate) 80%,var(--c-terracota));
+  --fondo-bahia:color-mix(in srgb,var(--c-rosa) 70%,#fff);
+  --terracota-oscura:color-mix(in srgb,var(--c-terracota) 78%,var(--c-granate));
+  --texto-2:color-mix(in srgb,var(--c-azul) 86%,var(--c-azulgris));
+
+  /* Variables del kit, redefinidas con la paleta del curso */
+  --fondo:var(--rosa-claro); --oliva:var(--c-terracota); --amarillo:var(--c-rosa); --carbon:var(--c-azul);
+  --gris-titulo:var(--c-azulgris); --gris-menu:var(--c-azul); --gris-texto:var(--texto-2); --negro:var(--c-azul);
+  --naranja:var(--c-terracota); --teal:var(--c-azul); --azul-gris:var(--c-azulgris); --menta:var(--azulgris-claro);
+  --petroleo:var(--c-azulgris); --marino:var(--c-azul); --oxido:var(--c-granate); --tronco:var(--c-granate);
+  --amarillo-suave:var(--rosa-claro); --menta-suave:var(--azulgris-palido); --fondo-suave:var(--rosa-palido);
+  --oliva-suave:color-mix(in srgb,var(--c-terracota) 18%,#fff); --leida:var(--azulgris-claro); --linea:var(--c-azul);
+  --sombra:3px 3px 0 var(--c-azul);
+
+  --f-lomo:12.5px;   /* letra de los lomos; biblioteca.js la baja si un estante no cabe */
+}
+body.escena{background:var(--rosa-palido);color:var(--c-azul)}
+.esc-cab{background:#fff;border-bottom-color:var(--c-azul)}
+.esc-cab h1{font-size:.98rem;color:var(--c-azul)}
+.esc-cab .etiqueta{background:var(--c-rosa);color:var(--c-azul);border-color:var(--c-azul)}
+.esc-pie{justify-content:space-between;text-align:left;background:#fff;border-top:1px solid var(--rosa-claro)}
+.esc-pie .leyenda{display:none;align-items:center;gap:6px;font-family:var(--t-titulo);font-weight:600;color:var(--texto-2)}
+.esc-pie .leyenda .punto{width:8px;height:8px;border-radius:50%;background:var(--c-terracota);display:inline-block}
+.esc-pie .leyenda i{color:var(--c-azul);margin-left:8px}
+.esc-pie .ubicacion{margin-left:auto;font-family:var(--t-titulo);font-weight:600;color:var(--texto-2)}
+.esc-escenario{container:ova / inline-size;padding:8px 14px 8px}
+:focus-visible{outline:3px solid var(--c-terracota);outline-offset:2px}
+
+/* Botón de la presentación (entrada general) */
+.boton-presentacion{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;font-family:var(--t-titulo);font-weight:700;font-size:.74rem;
+  color:var(--c-azul);background:var(--c-rosa);border:1.5px solid var(--c-azul);border-radius:999px;padding:5px 12px;cursor:pointer;box-shadow:2px 2px 0 var(--c-azul)}
+.boton-presentacion[hidden]{display:none}
+.boton-presentacion:hover{background:var(--rosa-claro)}
+.boton-presentacion .fa-scroll{color:var(--c-granate)}
+.boton-presentacion .estado-lectura{font-size:.62rem}
+
+/* Estados de lectura (sobre fondos claros) */
+.estado-lectura::before{background:var(--c-terracota)}
+.marca-visto{display:none;color:var(--c-azul)}
+[data-estado="leido"] .marca-visto{display:inline-block}
+[data-estado="leido"] .estado-lectura::before{display:none}
+[data-estado="leido"] .estado-lectura{color:var(--c-azul)}
+@keyframes punto-late{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c-coral) 70%,transparent)}50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--c-coral) 0%,transparent)}}
+[data-estado="pendiente"] .estado-lectura::before,[data-estado="parcial"] .estado-lectura::before{animation:punto-late 2.2s ease-in-out infinite}
+@keyframes sugerido{0%,100%{outline-color:color-mix(in srgb,var(--c-coral) 0%,transparent)}50%{outline-color:var(--c-coral)}}
+.sugerido{outline:3px solid transparent;outline-offset:2px;animation:sugerido 2.4s ease-in-out infinite}
+.sugerido:focus-visible{animation:none;outline-color:var(--c-terracota)}
+
+/* ---------- Estantería ---------- */
+.bib{height:100%;min-height:0;display:flex;flex-direction:column;gap:6px}
+.estanteria{flex:1;min-height:0;display:grid;gap:7px;padding:7px;border-radius:10px;
+  background:linear-gradient(180deg,var(--madera-clara),var(--madera) 40%,var(--madera-oscura));
+  box-shadow:inset 0 0 0 2px var(--madera-oscura),3px 3px 0 var(--c-azul)}
+.bahia{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;gap:5px;padding:6px 7px 0;border-radius:5px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--c-rosa) 55%,var(--c-azulgris) 10%) 0%,var(--fondo-bahia) 60%);
+  box-shadow:inset 0 6px 10px -6px color-mix(in srgb,var(--c-azul) 45%,transparent)}
+/* piso del estante: tabla de madera al pie de cada bahía */
+.bahia::after{content:"";flex:0 0 9px;margin:0 -7px;border-radius:0 0 4px 4px;background:linear-gradient(180deg,var(--madera-clara),var(--madera-oscura))}
+.placa{flex:0 0 auto;display:flex;align-items:center;gap:7px;background:#fff;border:1.5px solid var(--c-azul);border-radius:7px;padding:4px 8px;
+  box-shadow:2px 2px 0 var(--madera-oscura)}
+.placa .num{flex:0 0 22px;height:22px;border-radius:50%;background:var(--c-azul);color:#fff;font-family:var(--t-titulo);font-weight:800;font-size:.7rem;display:flex;align-items:center;justify-content:center}
+.placa h2{flex:1;min-width:0;margin:0;font-size:.76rem;line-height:1.22;color:var(--c-azul);font-weight:800}
+.placa .cuenta{flex:0 0 auto;font-family:var(--t-titulo);font-weight:700;font-size:.62rem;color:var(--texto-2);white-space:nowrap}
+.bahia.completa .placa{background:var(--azulgris-palido)}
+.libros{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;padding-bottom:1px}
+
+/* Ficha del estante (texto que el estante trae antes de sus libros) */
+.ficha{flex:0 0 auto;display:flex;align-items:center;gap:8px;width:100%;text-align:left;cursor:pointer;font:inherit;color:var(--c-azul);
+  background:#fff;border:1.5px solid var(--c-azul);border-radius:4px 12px 4px 4px;padding:6px 9px;box-shadow:2px 2px 0 var(--c-azulgris);
+  transition:transform .15s}
+.ficha:hover{transform:translateY(-2px)}
+.ficha .ficha-ico{flex:0 0 28px;height:28px;border-radius:7px;background:var(--c-granate);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem}
+.ficha .ficha-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.ficha b{font-family:var(--t-titulo);font-size:.74rem;line-height:1.2}
+.ficha .clic{font-family:var(--t-titulo);font-size:.64rem;font-weight:600;color:var(--texto-2)}
+.ficha .estado-lectura{font-size:.6rem}
+.ficha .marca-visto{font-size:.9rem}
+/* Estante sin libros: la ficha es un volumen de frente que llena la bahía */
+.ficha.de-frente{flex:1;min-height:0;flex-direction:column;justify-content:center;text-align:center;gap:10px;border-radius:6px 14px 14px 6px;
+  background:linear-gradient(90deg,var(--madera-oscura) 0 9px,var(--c-azul) 9px);color:#fff;border:2px solid var(--c-azul);
+  box-shadow:inset 0 0 0 5px var(--c-azul),inset 0 0 0 6.5px var(--c-coral),3px 3px 0 var(--madera-oscura);padding:14px 12px 14px 20px;margin:4px 6px 0}
+.ficha.de-frente .ficha-ico{flex:0 0 auto;width:54px;height:54px;border-radius:50%;background:var(--c-rosa);color:var(--c-granate);font-size:1.5rem}
+.ficha.de-frente .ficha-tx{flex:0 0 auto;align-items:center}
+.ficha.de-frente b{font-size:.84rem;color:#fff}
+.ficha.de-frente .clic{color:var(--c-rosa)}
+.ficha.de-frente .estado-lectura{color:#fff;font-size:.66rem}
+.ficha.de-frente .marca-visto{color:var(--c-rosa);font-size:1.1rem}
+
+/* Libro acostado: el lomo mira al lector */
+.libro{--lomo:var(--c-azul);position:relative;flex:0 0 auto;display:flex;align-items:center;gap:8px;width:var(--ancho,100%);align-self:var(--lado,center);
+  min-height:30px;text-align:left;cursor:pointer;font:inherit;color:#fff;border:1.5px solid var(--c-azul);border-radius:3px 7px 7px 3px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--lomo) 82%,#fff) 0,var(--lomo) 22%,var(--lomo) 80%,color-mix(in srgb,var(--lomo) 75%,var(--c-azul)) 100%);
+  padding:4px 9px 4px 16px;box-shadow:0 2px 0 color-mix(in srgb,var(--c-azul) 50%,transparent);transition:transform .15s,filter .15s}
+/* nervios del lomo, en coral (adorno) */
+.libro::before,.libro::after{content:"";position:absolute;top:3px;bottom:3px;width:2.5px;border-radius:2px;background:var(--c-coral)}
+.libro::before{left:6px}
+.libro::after{right:6px;opacity:.55}
+.libro:hover{transform:translateX(5px)}
+.libro .rotulo{flex:1;min-width:0;font-family:var(--t-titulo);font-weight:700;font-size:var(--f-lomo);line-height:1.22;overflow-wrap:anywhere}
+.libro .estado-lectura{color:#fff;font-size:.6rem;flex:0 0 auto}
+.libro .estado-lectura::before{background:var(--c-rosa)}
+.libro .marca-visto{color:var(--c-rosa);font-size:.95rem;flex:0 0 auto}
+.libro[data-estado="leido"]{filter:saturate(.85)}
+.libro[data-estado="leido"] .estado-lectura{color:#fff}
+.libro .lado-der{flex:0 0 auto;display:flex;align-items:center;gap:5px;margin-right:4px}
+
+/* Pestañas de estantes (solo en pantalla angosta) */
+.pestanas{display:none}
+
+/* Bahías angostas (767 × 510): el estado va como punto o marca; la leyenda del pie lo explica */
+@container ova (max-width:900px){
+  .libro .estado-lectura{font-size:0;gap:0}
+  .libro .estado-lectura::before{width:9px;height:9px;flex-basis:9px}
+  .ficha:not(.de-frente) .estado-lectura{font-size:0;gap:0}
+  .placa .cuenta{display:none}
+  .placa h2{font-size:.72rem}
+  .libro{padding:4px 7px 4px 14px;gap:5px}
+}
+
+/* Celular (390 × 566): un estante a la vez, elegido con las pestañas */
+@container ova (max-width:600px){
+  .pestanas{display:grid;grid-template-columns:1fr 1fr;gap:5px;flex:0 0 auto}
+  .pestana{display:flex;align-items:center;gap:6px;text-align:left;font-family:var(--t-titulo);font-weight:700;font-size:.66rem;line-height:1.2;
+    color:var(--c-azul);background:#fff;border:1.5px solid var(--c-azul);border-radius:8px;padding:4px 7px;cursor:pointer;min-height:36px}
+  .pestana .num{flex:0 0 19px;height:19px;border-radius:50%;background:var(--c-azul);color:#fff;font-size:.62rem;display:flex;align-items:center;justify-content:center}
+  .pestana .pt{flex:1;min-width:0}
+  .pestana .fa-circle-check{display:none;color:var(--c-azul)}
+  .pestana.completa .fa-circle-check{display:inline-block}
+  .pestana[aria-pressed="true"]{background:var(--c-rosa);box-shadow:2px 2px 0 var(--c-azul)}
+  .estanteria{grid-template-columns:1fr!important}
+  .bahia{display:none}
+  .bahia.activa{display:flex}
+  .libro .estado-lectura{font-size:.6rem;gap:5px}
+  .ficha:not(.de-frente) .estado-lectura{font-size:.6rem;gap:5px}
+  .placa .cuenta{display:inline}
+}
+.aviso-bib{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;font-family:var(--t-titulo);color:var(--c-azul)}
+.aviso-bib i{font-size:2rem;color:var(--c-granate)}
+
+/* ---------- Libro abierto (ventana de lectura) ---------- */
+.ventana.ventana-libro{border-color:var(--c-azul);box-shadow:5px 5px 0 var(--c-azul);border-radius:14px}
+.ventana.ventana-libro .ventana-cab{background:var(--c-granate);border-bottom-color:var(--c-azul);border-radius:12px 12px 0 0}
+.ventana.ventana-libro .ventana-cab h2{color:#fff;font-size:1rem;line-height:1.25}
+.ventana.ventana-libro .cerrar{color:var(--c-azul);border-color:var(--c-azul)}
+.ventana.ventana-libro .ventana-cuerpo{padding:10px 18px 10px;background:var(--rosa-palido);border-radius:0 0 12px 12px}
+.libro-abierto{display:flex;flex-direction:column;min-height:0}
+.libro-abierto .estante-de{margin:0 0 6px;font-family:var(--t-titulo);font-weight:700;font-size:.72rem;line-height:1.25;color:var(--texto-2);display:flex;align-items:center;gap:6px}
+.libro-abierto .estante-de i{color:var(--c-granate)}
+.hojas{position:relative;color:var(--c-azul);line-height:1.6;background:#fff;border:1.5px solid var(--c-azulgris);border-radius:6px;
+  padding:12px 18px;column-gap:44px;column-fill:balance;text-align:left}
+.hojas.dos{column-count:2;column-rule:1.5px solid var(--c-rosa);
+  background:linear-gradient(90deg,#fff 0,#fff calc(50% - 16px),var(--rosa-palido) 50%,#fff calc(50% + 16px),#fff 100%)}
+.hojas p{margin:0 0 .6em}
+.hojas > :last-child{margin-bottom:0}
+.hojas .vinetas{margin:0 0 .6em;padding-left:1.3em}
+.hojas .vinetas li{margin:0 0 .25em}
+.hojas .vinetas li::marker{color:var(--c-terracota)}
+.hojas p.nota{font-size:.8em;line-height:1.45;color:var(--texto-2);border-top:1px solid var(--c-azulgris);padding-top:.35em;margin:.2em 0 .7em;break-inside:avoid}
+.hojas p.nota .nota-num{font-weight:700;color:var(--c-granate)}
+.libro-abierto .lector-nav{margin-top:8px;padding-top:7px;border-top:1.5px dashed var(--c-azulgris)}
+.libro-abierto .lector-nav[hidden]{display:none}
+.libro-abierto .lector-nav .boton{background:#fff;border-color:var(--c-azul);color:var(--c-azul);box-shadow:3px 3px 0 var(--c-azul)}
+.libro-abierto .lector-nav .boton.primario{background:var(--c-rosa)}
+.lector-nav .puntos span{border-color:var(--c-azul)}
+.lector-nav .puntos span.hecho{background:var(--c-granate);border-color:var(--c-granate)}
+.globo-siga::after{background:var(--c-azul)}
+
+/* Avance y aviso con la paleta */
+.esc-cab .avance .barra{background:var(--rosa-claro);border-color:var(--c-azul)}
+.esc-cab .avance .barra span{background:var(--c-granate)}
+.esc-cab .avance.completo .barra span{background:var(--c-terracota)}
+.aviso-esc{background:var(--c-azul)}
+
+@media (min-width:601px) and (max-width:900px){
+  .esc-pie .leyenda{display:inline-flex}
+  .esc-cab{flex-wrap:wrap;gap:4px 12px;padding:6px 12px 5px}
+  .esc-cab .esc-titulos{order:4;flex:1 1 100%}
+  .esc-cab .avance{margin-left:auto}
+}
+@media (max-width:600px){
+  .esc-cab .esc-titulos{order:2}
+  .boton-presentacion{order:3;font-size:.68rem;padding:4px 10px}
+  .esc-guia{font-size:.7rem}
+  .ventana.ventana-libro .ventana-cab{padding:8px 10px}
+  .ventana.ventana-libro .ventana-cab h2{font-size:.92rem}
+  .ventana.ventana-libro .ventana-cuerpo{padding:8px 10px}
+  .hojas{padding:8px 11px;line-height:1.55}
+  .libro-abierto .lector-nav{flex-wrap:nowrap;gap:6px;margin-top:6px;padding-top:6px}
+  .libro-abierto .lector-nav .parte{flex:1 1 auto;font-size:.66rem}
+  .libro-abierto .lector-nav .boton{padding:5px 9px;font-size:.72rem}
+}
+@media (prefers-reduced-motion:reduce){.sugerido,[data-estado] .estado-lectura::before{animation:none!important}.libro:hover,.ficha:hover{transform:none}}
