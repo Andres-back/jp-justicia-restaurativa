@@ -71,3 +71,12 @@ body.escena{height:100vh;overflow:hidden;display:grid;grid-template-rows:auto mi
   .lector-nav .boton{padding:6px 10px;font-size:.74rem}
   .aviso-esc{top:auto;bottom:42px}
 }
+
+/* Recurso dentro de una pestaña de su lección (?embebido=1; Justicia restaurativa, 19/11/2026: la figura de pasos quedaba con una
+   sola línea de texto): sin su cabecera ni su botón de pantalla completa (la página ya tiene título, pestañas y botón), con la
+   fuente en una línea pequeña y todo el alto para el contenido. */
+body.escena.embebido{grid-template-rows:minmax(0,1fr) auto}
+body.embebido .esc-cab{display:none}
+body.embebido .esc-escenario{padding:6px 8px}
+body.embebido .esc-pie{min-height:16px;padding:0 10px;font-size:.6rem;border-top:0}
+body.embebido .franja-pc{display:none}

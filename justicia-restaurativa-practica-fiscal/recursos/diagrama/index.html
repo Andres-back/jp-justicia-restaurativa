@@ -14,6 +14,14 @@
 <link rel="stylesheet" href="../comun/dae.css">
 <link rel="stylesheet" href="escena.css">
 <link rel="stylesheet" href="diagrama.css">
+<!-- Modo embebido (19/11/2026): la figura dentro de una pestaña de su lección no repite cabecera ni botón de pantalla completa.
+     Se activa con ?embebido=1 (el que ponen las lecciones y entiende ../comun/kit.js) y, si falta, cuando corre en un iframe de una
+     lección del curso (mismo origen con pestañas o marco de recurso, o una lección como página de origen). Insertada directamente
+     en Genially no es una lección: conserva su cabecera y su botón. -->
+<script>(function(){var inc=/[?&](embebido|incrustado)=1\b/.test(location.search);
+if(!inc&&window.parent!==window){try{var pd=window.parent.document;inc=!!pd.querySelector('.marco-recurso,.parte-tab')||/\/leccion-\d+\//.test(window.parent.location.pathname);}catch(e){}
+if(!inc&&/\/leccion-\d+\//.test(document.referrer||''))inc=true;}
+if(inc)document.documentElement.classList.add('embebido');})();</script>
 </head>
 <body class="escena" data-recurso="diagrama">
 <script>(function(){var m=location.search.match(/[?&]f=([\w-]+)/);document.body.setAttribute('data-recurso','diagrama-'+(m?m[1]:'sin-figura'));})();</script>

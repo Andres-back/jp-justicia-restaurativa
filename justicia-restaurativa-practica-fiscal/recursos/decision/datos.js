@@ -3,7 +3,7 @@ window.DECISIONES = {
  "jr-u1-l1-escalada": {
   "id": "jr-u1-l1-escalada",
   "forma": "ruta",
-  "titulo": "Relatos salvajes: el incidente en la carretera, paso a paso",
+  "titulo": "Actividad práctica: caso el incidente de la carretera",
   "personaje": null,
   "unidad": 1,
   "leccion": 1,

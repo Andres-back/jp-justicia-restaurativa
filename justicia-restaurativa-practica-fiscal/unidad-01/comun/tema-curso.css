@@ -271,9 +271,9 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 /* Tablas de leyes y sentencias con desplazamiento (Juan, 18/11/2026, 20:44: «tablitas con scroll… para que los profes no pasen de un
    escenario a otro»): todas las filas en una sola tabla, el encabezado fijo arriba y letra de lectura; la tabla se recorre
    desplazándose dentro de su caja. Es la excepción que Juan pidió a «nunca hay desplazamiento». */
-.cuadro-caja{--fs:15.5px !important;overflow-y:auto;justify-content:flex-start;scrollbar-gutter:stable;padding-right:6px;scrollbar-color:#B5563D #F7E3E1}
+.cuadro-caja{--fs:13px !important;overflow-y:auto;justify-content:flex-start;scrollbar-gutter:stable;padding-right:6px;scrollbar-color:#B5563D #F7E3E1}
 .cuadro-tabla thead th{position:sticky;top:0;z-index:2}
-.cuadro-tabla tbody th{width:24%}
+.cuadro-tabla tbody th{width:auto;min-width:9em;max-width:22%}
 /* En la tabla con desplazamiento no se parte el párrafo en tramos («…medidas que,» / «según el caso…»): se lee seguido, sin cortar la
    idea (Juan, 18/11/2026: «no corte textos, mire las ideas completas»). */
 .cuadro-tabla .lectura-texto .parr.tramo{display:inline;margin:0}
@@ -295,3 +295,22 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 /* Sin confeti al completar la exploración de una página (19/11/2026, pasada de gamificación: la DAE no admite confeti ni
    animación sin propósito). Queda el aviso «¡Tramo N superado! +25» y el distintivo «Exploración completa». */
 .confeti{display:none!important}
+
+/* Ventana amplia a la medida del texto (revisión con Juan del 19/11/2026: «un popup más grande» y menos clics): crece con el texto
+   hasta el alto de la escena y, si no cabe, se desplaza; un texto breve ya no deja la ventana medio vacía (qa_unidades, huecos). */
+.lector.amplia .lector-caja{height:auto;max-height:calc(100% - 8px)}
+.lector.amplia .hoja-texto{flex:1 1 auto}
+
+/* Lectura más compacta (Juan y Samir, 19/11/2026: «la letra un poco más pequeña… para que quepa más contenido en menos espacio»):
+   interlineado de 1,5 en las cajas de lectura; la letra va de 14 a 15 px (datos.letraMax y letraCompleta del generador). */
+.ova .lectura-texto,.ova .ruta-texto,.ova .col-lectura{line-height:1.5}
+
+/* Tablas (coordinación, 19/11/2026, revisión de la U4): letra de 13 px y, si aún se desplaza, se ve que sigue: degradado abajo y
+   «Desplace para ver más filas» mientras queden filas (clase «con-mas» del motor). */
+.cuadro{position:relative}
+.cuadro:has(.cuadro-caja.con-mas)::after{content:"Desplace para ver más filas ↓";position:absolute;left:0;right:12px;bottom:0;height:46px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 72%);font:700 12px Montserrat,Arial,sans-serif;color:#853629;pointer-events:none;border-radius:0 0 10px 10px}
+
+/* Video junto a su texto (escena.video): el video a la izquierda y el texto a la derecha, como el estándar del 08/11 (coordinación,
+   19/11/2026). */
+.contexto:has(.ctx-video){grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);grid-template-areas:"cab cab" "pun pun" "arte txt"}

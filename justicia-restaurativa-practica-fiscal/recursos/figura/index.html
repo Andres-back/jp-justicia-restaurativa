@@ -83,7 +83,18 @@ html,body{height:100%;overflow:hidden}
 .sina{grid-template-columns:minmax(0,1fr) 290px}
 .visor{background:var(--blanco)}
 @container sina (max-width:760px){.sina{grid-template-columns:1fr}.panel .entrada-fig{grid-row:1;font-size:.8rem}.panel .figura{grid-row:2}.visor{grid-row:3}.partes{grid-row:4}.controles{grid-row:5}.panel .nota-fuente{grid-row:6}.panel .leccion-fig{display:none}}
+/* Dentro de una pestaña de su lección (?embebido=1, o detectado; 19/11/2026): la pestaña ya da el título y la lección, el botón
+   de pantalla completa: aquí no se repiten. Todo el alto para la figura; la fuente, en una línea pequeña. */
+html.embebido .sina{padding:6px 8px 6px;gap:10px;grid-template-columns:minmax(0,1fr) 230px}
+html.embebido .panel .etiqueta,html.embebido .panel .leccion-fig,html.embebido .panel .figura{display:none}
+html.embebido .panel{gap:8px;justify-content:center}
+html.embebido .panel .instr{font-size:.78rem}
+html.embebido .panel .nota-fuente{margin-top:0;font-size:.62rem;line-height:1.3;color:var(--gris-texto)}
+@container sina (max-width:760px){html.embebido .sina{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto auto auto;gap:6px}
+  html.embebido .panel .instr{display:block;grid-row:1;font-size:.72rem}html.embebido .visor{grid-row:2}html.embebido .partes{grid-row:3}
+  html.embebido .controles{grid-row:4}html.embebido .panel .nota-fuente{grid-row:5}}
 </style>
+<script>(function(){var inc=/[?&](embebido|incrustado)=1\b/.test(location.search);if(!inc&&window.parent!==window){try{var pd=window.parent.document;inc=!!pd.querySelector('.marco-recurso,.parte-tab')||/\/leccion-\d+\//.test(window.parent.location.pathname);}catch(e){}if(!inc&&/\/leccion-\d+\//.test(document.referrer||''))inc=true;}if(inc)document.documentElement.classList.add('embebido');})();</script>
 </head>
 <body>
 <main class="caja"><div class="sina">
@@ -203,7 +214,8 @@ html,body{height:100%;overflow:hidden}
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !amp.hidden) cerrarAmp(); });
   img.addEventListener('load', pintar); window.addEventListener('resize', pintar);
   if (img.complete) pintar();
-  Kit.pantallaCompleta();
+  if (document.documentElement.classList.contains('embebido')) document.body.classList.add('embebido');
+  else Kit.pantallaCompleta();
 })();
 </script>
 </body>

@@ -202,5 +202,10 @@
   };
 
   window.Esc = E;
-  document.addEventListener('DOMContentLoaded', function () { Kit.pantallaCompleta(); });
+  // Embebido en una pestaña de su lección (html.embebido, lo pone index.html): la lección ya tiene su botón de pantalla completa
+  E.embebido = document.documentElement.classList.contains('embebido');
+  document.addEventListener('DOMContentLoaded', function () {
+    if (E.embebido) { document.body.classList.add('embebido'); return; }
+    Kit.pantallaCompleta();
+  });
 })();
