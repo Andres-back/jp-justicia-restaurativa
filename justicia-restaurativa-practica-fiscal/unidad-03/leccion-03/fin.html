@@ -14,11 +14,11 @@
 html,body{margin:0;height:100%;background:var(--cielo);font-family:Montserrat,Arial,sans-serif;color:var(--carbon)}
 .meta{position:relative;height:100vh;min-height:360px;overflow:hidden;container-type:inline-size}
 .fondo{position:absolute;inset:0;width:100%;height:100%}
-.nube{fill:#fff;animation:nube 28s ease-in-out infinite}.nube.b{animation-duration:38s;animation-delay:-12s}
+.nube{fill:#fff;animation:nube 14s ease-in-out 1 both}.nube.b{animation-duration:19s}
 @keyframes nube{0%,100%{transform:translateX(-46px)}50%{transform:translateX(46px)}}
-.sol{fill:#E8B5A5;transform-box:fill-box;transform-origin:center;animation:sol 5s ease-in-out infinite}
+.sol{fill:#E8B5A5;transform-box:fill-box;transform-origin:center;animation:sol 2.5s ease-in-out 2}
 @keyframes sol{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-.camino{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round;stroke-dasharray:1 16;animation:paso 1.8s linear infinite}
+.camino{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round;stroke-dasharray:1 16;animation:paso 1.8s linear 2}
 @keyframes paso{to{stroke-dashoffset:-34}}
 .caminante{offset-path:path('M300 324 C400 316 470 332 560 324 C620 318 660 322 690 314');offset-rotate:0deg;animation:llega 3s cubic-bezier(.3,.7,.3,1) .3s both}
 @keyframes llega{from{offset-distance:0%}to{offset-distance:100%}}
@@ -26,7 +26,7 @@ html,body{margin:0;height:100%;background:var(--cielo);font-family:Montserrat,Ar
 .hito{position:absolute;right:3.2%;top:6%;width:32%;aspect-ratio:1/.86;border-radius:50% 50% 16px 16px;background:#fff;border:3px solid var(--negro);box-shadow:6px 7px 0 var(--negro);overflow:hidden;display:grid;place-items:center;animation:sube .8s cubic-bezier(.2,1.25,.4,1) .2s both}
 .hito img{width:100%;height:100%;object-fit:contain;padding:12px 12px 6px;display:block}
 @keyframes sube{from{opacity:0;transform:translateY(26px) scale(.9)}to{opacity:1;transform:none}}
-.bandera{position:absolute;right:calc(3.2% + 15%);top:calc(6% - 34px);width:52px;height:56px;color:var(--naranja);transform-origin:left bottom;animation:ondea 2s ease-in-out infinite}
+.bandera{position:absolute;right:calc(3.2% + 15%);top:calc(6% - 34px);width:52px;height:56px;color:var(--naranja);transform-origin:left bottom;animation:ondea 2s ease-in-out 2}
 @keyframes ondea{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(4deg)}}
 /* Tarjeta */
 .tarjeta{position:absolute;left:3.2%;top:8%;width:55%;background:#fff;border:3px solid var(--negro);box-shadow:7px 8px 0 var(--negro);border-radius:6px;padding:20px 26px 20px;animation:sube .7s cubic-bezier(.2,1.1,.4,1) both}
@@ -45,8 +45,15 @@ h1{margin:9px 0 3px;font-size:40px;line-height:1.08;font-weight:800;color:var(--
 .tramos span.ok::after{content:"";position:absolute;inset:0;background:var(--teal);transform-origin:left;animation:llena .4s ease both;animation-delay:calc(1s + var(--i)*.07s)}
 @keyframes llena{from{transform:scaleX(0)}to{transform:none}}
 .tramos em{font-style:normal;margin-left:6px;white-space:nowrap}
-.confeti i{position:absolute;top:-16px;left:var(--x);width:8px;height:13px;border-radius:2px;background:var(--c);animation:cae 3.6s ease-in var(--d) both}
-@keyframes cae{0%{opacity:0;transform:translateY(0) rotate(0)}10%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translateY(470px) rotate(540deg)}}
+/* Escala de niveles (19/11/2026, pasada de gamificación: en lugar del confeti, que la DAE no admite, el estudiante ve dónde
+   está en la progresión del curso y cuánto le falta para el siguiente nivel). Una sola animación al llegar, sin bucles. */
+.escala{display:flex;gap:6px;margin:12px 0 0;padding:0;list-style:none}
+.escala li{flex:1;min-width:0;font-size:11.5px;font-weight:700;line-height:1.2;text-align:center;padding:5px 4px;border-radius:4px;background:#ECD5CF;color:var(--negro)}
+.escala li.ok{background:var(--negro);color:#fff}
+.escala li.aqui{box-shadow:0 0 0 2px #fff,0 0 0 4px #B5563D;animation:aqui .6s cubic-bezier(.2,1.4,.4,1) 1.6s both}
+@keyframes aqui{from{transform:scale(.85)}to{transform:none}}
+.siguiente{margin:8px 0 0;font-size:13px;font-weight:600;line-height:1.3}
+.siguiente i{color:#B5563D;margin-right:5px}
 /* Pie con el curso y la unidad (JP, 11/11/2026: «tiene que ir el nombre del curso y la unidad»; estándar de ambiental) */
 .pie{position:absolute;left:0;right:0;bottom:0;min-height:68px;background:#fff;border-top:3px solid var(--negro);display:flex;align-items:center;justify-content:space-between;gap:28px;padding:8px 3.2%}
 .pie div{display:flex;align-items:center;gap:12px;min-width:0}
@@ -56,7 +63,7 @@ h1{margin:9px 0 3px;font-size:40px;line-height:1.08;font-weight:800;color:var(--
 .pie p{margin:0;font-size:13.5px;line-height:1.25;font-weight:700;color:var(--negro)}
 @container (max-width:640px){.hito,.bandera{display:none}.tarjeta{left:12px;right:12px;width:auto;top:12px;padding:15px 16px}h1{font-size:30px}.logros{grid-template-columns:1fr}
   .pie{flex-direction:column;align-items:stretch;gap:6px;padding:8px 12px}.pie .unidad{justify-content:flex-start;text-align:left;flex-direction:row}.pie p{font-size:12.5px}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important}.caminante{offset-distance:100%}.confeti{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}.caminante{offset-distance:100%}}
 </style>
 </head>
 <body>
@@ -72,7 +79,7 @@ h1{margin:9px 0 3px;font-size:40px;line-height:1.08;font-weight:800;color:var(--
   <path class="camino" d="M300 332 C400 324 470 340 560 332 C620 326 660 330 690 322"/>
   <g class="caminante"><ellipse cx="0" cy="26" rx="13" ry="4" fill="#1E4260" opacity=".3"/><circle cx="0" cy="-16" r="8" fill="#1E4260"/><path d="M-8 24 L-5 -6 Q0 -10 5 -6 L8 24 Z" fill="#B5563D"/></g>
 </svg>
-<div class="hito"><img src="../comun/ilustraciones-restaurativa/u3-manos.webp" alt=""></div>
+<div class="hito"><img src="../comun/ilustraciones-restaurativa/jr-u3-l3-portada.webp" alt=""></div>
 <svg class="bandera" viewBox="0 0 52 56" aria-hidden="true"><path d="M4 56V4" stroke="#1E4260" stroke-width="4" stroke-linecap="round"/><path d="M6 6h40l-10 11 10 11H6z" fill="currentColor"/></svg>
 <section class="tarjeta">
   <span class="etq">Lección 3.3</span>
@@ -83,12 +90,13 @@ h1{margin:9px 0 3px;font-size:40px;line-height:1.08;font-weight:800;color:var(--
     <div class="dato"><i class="fas fa-star" aria-hidden="true"></i><div><small>Puntos de esta lección</small><b><span id="puntos">0</span></b></div></div>
   </div>
   <div class="tramos" id="tramos" role="img"></div>
+  <ol class="escala" id="escala" aria-label="Niveles del curso"></ol>
+  <p class="siguiente" id="siguiente"></p>
 </section>
 <footer class="pie">
   <div class="curso"><span class="chip">Curso</span><p>Justicia restaurativa en la práctica del fiscal</p></div>
   <div class="unidad"><span class="chip">Unidad 3</span><p>Implementación de la justicia restaurativa</p></div>
 </footer>
-<div class="confeti" id="confeti" aria-hidden="true"></div>
 </main>
 <script>
 (function(){
@@ -101,7 +109,8 @@ h1{margin:9px 0 3px;font-size:40px;line-height:1.08;font-weight:800;color:var(--
  $('tramos').innerHTML=h+'<em>'+Math.min(t,TOTAL)+' de '+TOTAL+' tramos</em>';$('tramos').setAttribute('aria-label',Math.min(t,TOTAL)+' de '+TOTAL+' tramos superados');
  var q=matchMedia('(prefers-reduced-motion:reduce)').matches;
  if(q)$('puntos').textContent=p;else{var ini=performance.now();(function c(a){var x=Math.min(1,(a-ini)/1500);$('puntos').textContent=Math.round(p*x);if(x<1)requestAnimationFrame(c)})(ini);}
- if(p>0&&!q){var C=['#B5563D','#738CA3','#1E4260','#E8B5A5'],o='';for(var j=0;j<26;j++)o+='<i style="--x:'+(j*3.9+2)+'%;--c:'+C[j%4]+';--d:'+(1.1+(j*7%13)*.09)+'s"></i>';$('confeti').innerHTML=o;}
+ var U=[0,.15,.45,.8],e='';for(var n=0;n<N.length;n++)e+='<li class="'+(n<=k?'ok':'')+(n===k?' aqui':'')+'"'+(n===k?' aria-current="step"':'')+'>'+N[n]+'</li>';$('escala').innerHTML=e;
+ $('siguiente').innerHTML=k<N.length-1?'<i class="fas fa-flag" aria-hidden="true"></i>Le faltan '+Math.max(1,Math.ceil(U[k+1]*MAX)-p)+' puntos para el nivel «'+N[k+1]+'».':'<i class="fas fa-flag-checkered" aria-hidden="true"></i>Alcanzó el nivel más alto de esta lección.';
 })();
 </script>
 </body>
