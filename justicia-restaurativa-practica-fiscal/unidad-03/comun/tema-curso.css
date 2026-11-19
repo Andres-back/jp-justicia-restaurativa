@@ -277,3 +277,5 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
    idea (Juan, 18/11/2026: «no corte textos, mire las ideas completas»). */
 .cuadro-tabla .lectura-texto .parr.tramo{display:inline;margin:0}
 .cuadro-tabla .lectura-texto .parr.tramo::before{content:" "}
+/* La nota de fuente de una tabla («Fuente: UNJR-FGN») va debajo de la tabla, no flotando sobre sus filas. */
+.layout-cuadro .escena-pie{position:static;flex:none;text-align:right;margin:4px 6px 0}
