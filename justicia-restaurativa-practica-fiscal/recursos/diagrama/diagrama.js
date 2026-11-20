@@ -5,7 +5,7 @@
                 ramas colgando de su paso), sin clics (19/11/2026);
                 con texto: el paso abierto con su texto completo (14 px o más) y un solo botón de avance; si no cabe, columnas;
      triangulo  ejes en círculos que se cruzan y una frase en cada lado del triángulo, todo a la vista;
-     matriz     tabla: fija a la vista, por fila (lista + panel con las columnas) o por casilla (lector por partes);
+     matriz     tabla: fija a la vista (Figuras 4 y 6 de la U2: partida por filas si no cabe entera), por fila (lista + panel con las columnas) o por casilla (lector por partes);
      tarjetas   puntos independientes (lista + panel);
      capas      círculos concéntricos, cada capa con sus integrantes completos (panel en columnas o ventana amplia, sin partes);
      niveles    jerarquía: recuadro superior, grupos y un bloque final, todo a la vista.
@@ -707,15 +707,28 @@
     });
   }
   /* Tabla fija a la vista, sin clics (revisión con Juan del 19/11/2026: «una tablita html común y corriente»; Figura 3: «la tabla
-     completa a la vista, fija»; Figura 4: «tabla HTML fija, sin clics»). Todas las filas y columnas con su texto literal; si no
-     caben, la tabla se desplaza y queda leída al llegar al final. */
+     completa a la vista, fija»; Figura 4: «tabla HTML fija, sin clics»). Todas las filas y columnas con su texto literal.
+     Para caber entera, la letra baja de 15 a 13 px, se prueban anchos de la primera columna y, si hace falta, un relleno más
+     estrecho (clase «densa»). Si ni así cabe:
+     - las figuras de PARTIR_FILAS (revisión final de la U2, 20/11/2026: Juan, «la tabla completa a la vista, fija», y Samir aprobó
+       partirlas) se parten por filas, en orden y sin perder ninguna casilla: «Ver filas: 1 a 4 · 5 a 7» junto al encabezado. Cada
+       parte cabe entera con la cabecera de columnas y sin desplazar; todas con la misma letra; el menor número de partes;
+     - las demás se desplazan y lo dicen (revisión de la U4, 19/11/2026: degradado y «Desplace para ver más filas», clase «con-mas»).
+     Queda leída cada parte al verla entera con el reparto vigente (o la tabla, al llegar al final). */
   function matrizFija() {
+    var PARTIR_FILAS = ['jr-u2-p56', 'jr-u2-p64'];
     guia.textContent = 'Lea la tabla completa.';
     var cols = C.columnas, vacias = C.columnas_vacias || [], caja = el('div', 'mf');
-    if (C.encabezado) caja.appendChild(el('p', 'diag-enc', md(C.encabezado)));
+    var cab = el('div', 'mf-cab');
+    if (C.encabezado) cab.appendChild(el('p', 'diag-enc', md(C.encabezado)));
+    var selector = el('div', 'mf-partes');
+    selector.setAttribute('role', 'group'); selector.setAttribute('aria-label', 'Partes de la tabla');
+    selector.hidden = true;
+    cab.appendChild(selector);
+    caja.appendChild(cab);
     var marco = el('div', 'mf-marco');
     marco.tabIndex = 0;
-    var t = '<table class="mf-tabla"><thead><tr>' + cols.map(function (c, j) { return vacias.indexOf(j) >= 0 ? '' : '<th scope="col">' + md(c) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+    var t = '<table class="mf-tabla" id="mf-tabla"><thead><tr>' + cols.map(function (c, j) { return vacias.indexOf(j) >= 0 ? '' : '<th scope="col">' + md(c) + '</th>'; }).join('') + '</tr></thead><tbody>' +
       C.filas.map(function (f) {
         return '<tr>' + f.celdas.map(function (c, j) {
           if (j && vacias.indexOf(j) >= 0) return '';
@@ -728,34 +741,101 @@
     caja.appendChild(marco);
     raiz.appendChild(caja);
     var tabla = marco.querySelector('.mf-tabla');
-    /* Revisión de la U4 (19/11/2026: la fila «Conductual» quedaba bajo el pliegue sin ninguna señal). La tabla busca caber completa:
-       la letra baja de 15 a 13 px y se prueban anchos de la primera columna. Si ni así cabe, se desplaza y lo dice: degradado abajo
-       y «Desplace para ver más filas» mientras queden filas (clase «con-mas», como las tablas del motor del curso). */
+    var filas = Array.prototype.slice.call(tabla.querySelectorAll('tbody tr'));
+    var partir = PARTIR_FILAS.indexOf(fig.id) >= 0;
     var ANCHOS = ['10%', '13%', '18%', '24%']; // de la más angosta a la más ancha: más ancho para las columnas de texto
+    var LETRAS = [15, 14.5, 14, 13.5, 13];
+    var grupos = null, actual = 0, clave = 'tabla';
     function cabeT() { return marco.scrollHeight <= marco.clientHeight + 1 && marco.scrollWidth <= marco.clientWidth + 1; }
-    function ajustar() {
-      var listo = false, t, k;
-      for (t = 15; t >= 13 && !listo; t -= 0.5) {
-        tabla.style.fontSize = t + 'px';
-        for (k = 0; k < ANCHOS.length && !listo; k++) { tabla.style.setProperty('--mf-col1', ANCHOS[k]); listo = cabeT(); }
+    function mostrarFilas(a, b) { filas.forEach(function (tr, i) { tr.hidden = i < a || i > b; }); }
+    // con esta letra, ¿algún ancho de primera columna y relleno (normal, luego estrecho) deja caber entero cada grupo de filas?
+    function cabeCon(letra, gs) {
+      tabla.style.fontSize = letra + 'px';
+      for (var d = 0; d < 2; d++) {
+        caja.classList.toggle('densa', d === 1);
+        for (var k = 0; k < ANCHOS.length; k++) {
+          tabla.style.setProperty('--mf-col1', ANCHOS[k]);
+          if (gs.every(function (g) { mostrarFilas(g[0], g[1]); return cabeT(); })) return true;
+        }
       }
-      caja.classList.remove('apilada');
-      if (!listo) {
-        // no cabe con 13 px: el ancho de primera columna que deja menos por desplazar
-        tabla.style.fontSize = '13px';
-        var menor = Infinity, mejor = ANCHOS[0];
-        ANCHOS.forEach(function (w) { tabla.style.setProperty('--mf-col1', w); if (marco.scrollWidth <= marco.clientWidth + 1 && marco.scrollHeight < menor) { menor = marco.scrollHeight; mejor = w; } });
-        tabla.style.setProperty('--mf-col1', mejor);
-        // más ancha que su caja (celular): filas apiladas, cada casilla con el nombre de su columna; nada se corta a la derecha
-        if (marco.scrollWidth > marco.clientWidth + 1) { caja.classList.add('apilada'); tabla.style.fontSize = '14px'; }
-      }
+      return false;
+    }
+    // n grupos de filas seguidas, del mismo tamaño (los primeros con una fila más)
+    function repartir(n) {
+      var gs = [], a = 0, base = Math.floor(filas.length / n), resto = filas.length % n;
+      for (var i = 0; i < n; i++) { var c = base + (i < resto ? 1 : 0); gs.push([a, a + c - 1]); a += c; }
+      return gs;
+    }
+    function claveDe(g) { return 'filas-' + (g[0] + 1) + '-' + (g[1] + 1); }
+    function rotulo(g) { var a = g[0] + 1, b = g[1] + 1; return a === b ? String(a) : b === a + 1 ? a + ' y ' + b : a + ' a ' + b; }
+    function pintarSelector(gs) {
+      selector.innerHTML = '';
+      selector.hidden = !gs;
+      if (!gs) return;
+      selector.appendChild(el('span', 'mf-partes-rot', 'Ver filas:'));
+      gs.forEach(function (g, i) {
+        var b = boton(claveDe(g), 'mf-parte', '<span>' + rotulo(g) + '</span><i class="fas fa-circle-check" aria-hidden="true"></i>');
+        b.setAttribute('aria-label', (g[0] === g[1] ? 'Ver fila ' : 'Ver filas ') + rotulo(g));
+        b.setAttribute('aria-controls', 'mf-tabla');
+        b.setAttribute('data-latir', '');
+        b.addEventListener('click', function () { mostrar(i); });
+        selector.appendChild(b);
+      });
+    }
+    function mostrar(i) {
+      actual = i;
+      var g = grupos[i];
+      mostrarFilas(g[0], g[1]);
+      clave = claveDe(g);
+      Array.prototype.forEach.call(selector.querySelectorAll('.mf-parte'), function (b, j) { b.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+      marco.scrollTop = 0;
       revisar();
     }
-    Esc.registrar(['tabla']);
+    function ajustar() {
+      var fila0 = grupos ? grupos[actual][0] : 0, hecho = false, i, n;
+      grupos = null; pintarSelector(null); mostrarFilas(0, filas.length - 1);
+      caja.classList.remove('apilada', 'densa');
+      // 1. la tabla entera, con la letra más grande con la que cabe
+      for (i = 0; i < LETRAS.length && !hecho; i++) hecho = cabeCon(LETRAS[i], [[0, filas.length - 1]]);
+      if (!hecho) {
+        caja.classList.remove('densa');
+        tabla.style.fontSize = '13px';
+        // 2. más ancha que su caja aun con 13 px (celular): filas apiladas, cada casilla con el nombre de su columna
+        var aLoAncho = ANCHOS.some(function (w) { tabla.style.setProperty('--mf-col1', w); return marco.scrollWidth <= marco.clientWidth + 1; });
+        if (!aLoAncho) caja.classList.add('apilada');
+        if (partir) {
+          // 3. partida por filas: el menor número de partes en que cada una cabe entera y, con él, la letra más grande
+          var letras = aLoAncho ? LETRAS : [14, 13.5, 13];
+          for (n = 2; n <= filas.length && !hecho; n++) {
+            var gs = repartir(n);
+            pintarSelector(gs);
+            for (i = 0; i < letras.length && !hecho; i++) if (cabeCon(letras[i], gs)) { grupos = gs; hecho = true; }
+          }
+          // ni una fila sola cabe: una fila por parte, y la que no quepa se desplaza con su señal
+          if (!hecho) { grupos = repartir(filas.length); pintarSelector(grupos); caja.classList.remove('densa'); tabla.style.fontSize = aLoAncho ? '13px' : '14px'; }
+        } else if (aLoAncho) {
+          // 4. se desplaza: el ancho de primera columna que deja menos por desplazar
+          var menor = Infinity, mejor = ANCHOS[0];
+          ANCHOS.forEach(function (w) { tabla.style.setProperty('--mf-col1', w); if (marco.scrollWidth <= marco.clientWidth + 1 && marco.scrollHeight < menor) { menor = marco.scrollHeight; mejor = w; } });
+          tabla.style.setProperty('--mf-col1', mejor);
+        } else tabla.style.fontSize = '14px';
+      }
+      Esc.registrar(grupos ? grupos.map(claveDe) : ['tabla']);
+      if (grupos) {
+        // la parte que se veía sigue a la vista (la que tenga su primera fila)
+        var k = 0;
+        grupos.forEach(function (g, j) { if (fila0 >= g[0] && fila0 <= g[1]) k = j; });
+        mostrar(k);
+      } else {
+        clave = 'tabla';
+        mostrarFilas(0, filas.length - 1);
+        revisar();
+      }
+    }
     function revisar() {
       var quedan = marco.scrollTop + marco.clientHeight < marco.scrollHeight - 4;
       caja.classList.toggle('con-mas', quedan);
-      if (!quedan) Esc.marcar('tabla');
+      if (!quedan && !Esc.leido(clave)) Esc.marcar(clave);
     }
     marco.addEventListener('scroll', revisar);
     if (window.ResizeObserver) new ResizeObserver(revisar).observe(tabla);

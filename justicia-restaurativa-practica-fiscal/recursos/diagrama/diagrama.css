@@ -419,3 +419,23 @@
 html.alto-visible .ventana-fondo{bottom:auto;height:var(--alto-visible)}
 html.alto-visible .ventana{max-height:calc(var(--alto-visible) - 36px)}
 html.alto-visible .cp-ventana .ventana{max-height:calc(var(--alto-visible) - 8px)}
+
+/* Tabla fija entera (20/11/2026, revisión final de la U2: «la tabla completa a la vista, fija»). Relleno más estrecho si con él cabe
+   entera (clase «densa»); las Figuras 4 y 6 de la U2, si ni así caben, van partidas por filas con «Ver filas:» junto al encabezado
+   (diagrama.js, PARTIR_FILAS): la parte que se ve, rellena; las que faltan, laten; las vistas, con su marca. */
+.mf-cab{flex:0 0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 14px}
+.mf-cab .diag-enc{margin:0}
+.mf-partes{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-left:auto}
+.mf-partes[hidden]{display:none}
+.mf-partes-rot{font:700 12px/1.2 Montserrat,Arial,sans-serif;color:var(--carbon)}
+.mf-parte{display:inline-flex;align-items:center;gap:4px;font:700 12px/1.2 Montserrat,Arial,sans-serif;color:var(--negro);background:var(--blanco);
+  border:1.5px solid var(--negro);border-radius:999px;padding:3px 8px 3px 10px;box-shadow:2px 2px 0 var(--negro);cursor:pointer}
+.mf-parte i{font-size:.95em;color:#853629;visibility:hidden}
+.mf-parte[data-estado="leido"] i{visibility:visible}
+.mf-parte[aria-pressed="true"]{background:var(--carbon);color:var(--blanco);border-color:var(--negro)}
+.mf-parte[aria-pressed="true"] i{color:var(--blanco)}
+.mf-parte.late{animation:latido 1.8s ease-in-out infinite}
+.mf-parte:focus-visible{outline:3px solid #853629;outline-offset:2px}
+.mf-tabla tbody tr[hidden]{display:none!important}
+.mf.densa .mf-tabla{line-height:1.25}
+.mf.densa .mf-tabla thead th,.mf.densa .mf-tabla tbody th,.mf.densa .mf-tabla td{padding-top:3px;padding-bottom:3px}
