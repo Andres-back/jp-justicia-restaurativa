@@ -1759,3 +1759,5 @@ html.en-pantalla-completa .ova{width:767px;height:510px;min-height:0;flex:none}
   .dest-arte{flex:0 0 90px}
 }
 .cuadro-cab[hidden],.cuadro-pie[hidden]{display:none !important}
+/* Ventana amplia apretada (datos.ampliaEncaja, último recurso antes de desplazar): interlineado y párrafos más juntos. */
+.lector.amplia .hoja-texto.apretada{line-height:1.36}.lector.amplia .hoja-texto.apretada .parr+.parr{margin-top:.4em}

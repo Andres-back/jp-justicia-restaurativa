@@ -280,7 +280,10 @@
     var texto = caja.querySelector('.ruta-texto');
     caja.classList.remove('apretada', 'sin-arte', 'mini');
     quitarRelleno(caja);
-    if (texto) for (var fs = topeLetra(24); fs > 14.2; fs -= 0.5) { caja.style.setProperty('--fs', fs + 'px'); if (cabe(texto, 4) && caja.scrollHeight <= caja.clientHeight + 1) { rellenar(caja, texto); return; } }
+    /* El piso de la letra sigue a datos.letraCompleta cuando el curso lo baja (Justicia restaurativa, revisión de la U2 del
+       20/11/2026: un momento de la línea salía en «Parte 1 de 2»); sin el dato, 14,2 px como siempre. */
+    var piso = datos.letraCompleta && datos.letraCompleta < 14 ? datos.letraCompleta - 0.3 : 14.2;
+    if (texto) for (var fs = topeLetra(24); fs > piso; fs -= 0.5) { caja.style.setProperty('--fs', fs + 'px'); if (cabe(texto, 4) && caja.scrollHeight <= caja.clientHeight + 1) { rellenar(caja, texto); return; } }
     caja.style.removeProperty('--fs'); ajustarLectura(caja);
   }
   function reanimar(el) { el.classList.remove('aparece'); void el.offsetWidth; el.classList.add('aparece'); }
@@ -642,7 +645,8 @@
        si el botón ya muestra completo el texto que abriría, no se abre una ventana que lo repite; queda leído en su sitio. */
     if (datos.ventanaSinRepetir && desde && !hoja) {
       var tmp = document.createElement('div'); tmp.innerHTML = rico(texto);
-      var nt = (tmp.textContent || '').replace(/\s+/g, ' ').replace(/[…]/g, '').trim().toLowerCase(), nb = (desde.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+      // La viñeta («• ») con que la ventana abre una lista no cuenta (revisión de la U4, 20/11/2026: «Ver más» repetía la frase).
+      var nt = (tmp.textContent || '').replace(/(^|\s)•\s+/g, '$1').replace(/\s+/g, ' ').replace(/[…]/g, '').trim().toLowerCase(), nb = (desde.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
       if (nt && nb.indexOf(nt) >= 0) {
         desde.classList.add('abierta', 'leida-en-sitio'); desde.dataset.pulso = String(Date.now());
         if (!quieto && desde.animate) desde.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.03)' }, { transform: 'scale(1)' }], { duration: 300 });
@@ -671,7 +675,7 @@
        Las letras se envuelven antes de medir y repartir la lectura, para que nada cambie de lugar al escribirse. */
     var lt = !hoja && !amplia && !quieto ? l.firstChild.querySelector('.lectura-texto') : null, letras = lt ? envolverLetras(lt) : null, partes = false;
     if (hoja) { leerDesplazando(l.firstChild); rellenarHoja(l.firstChild); }
-    else if (amplia) leerDesplazando(l.firstChild, true);
+    else if (amplia) { if (datos.ampliaEncaja) encajarAmplia(l.firstChild); leerDesplazando(l.firstChild, true); }
     else if (!(partes = !!dosificar(l.firstChild, function () { encajarLector(l.firstChild); }))) encajarLector(l.firstChild);
     if (!animarApertura(l, desde)) reanimar(l.firstChild);
     if (letras) escribirVentana(lt, letras, partes);
@@ -679,6 +683,19 @@
     if (desde && desde.classList) desde.classList.add('abierta');
     l.querySelector('.cerrar').onclick = cerrarLector;
     l.firstChild.focus({ preventScroll: true });
+  }
+  /* «ampliaEncaja» (Justicia restaurativa, revisión de la U1 del 20/11/2026: «Definiciones concretas» se veía al 45 % y Juan
+     pidió el texto completo): en el marco ancho, si el texto de la ventana amplia no cabe, la letra baja hasta 13 px; si aún no
+     cabe, vuelve a como estaba y se desplaza. Sin el dato, nada cambia. */
+  function encajarAmplia(caja) {
+    var t = caja.querySelector('.hoja-texto');
+    if (!t || caja.clientWidth < 600) return;
+    var desb = function () { return t.scrollHeight > t.clientHeight + 2 || t.scrollWidth > t.clientWidth + 2; };
+    if (!desb()) return;
+    var fs;
+    for (fs = 14; fs >= 13; fs -= 0.5) { t.style.fontSize = fs + 'px'; if (!desb()) return; }
+    t.classList.add('apretada'); if (!desb()) return;   // interlineado y separación de párrafos menores, con 13 px
+    t.classList.remove('apretada'); t.style.fontSize = '';
   }
   /* La ventana nace del elemento que la abre y se expande al centro con un rebote breve; su contenido entra escalonado (Esteban,
      30/10/2026: «que aparezca el modal… de forma animada, bien chévere»). Web Animations API, sin bibliotecas; nada con «reducir
@@ -2364,10 +2381,12 @@
       : '<div class="esquema-raiz"><span>' + esc(may(centroTitulo())) + '</span></div>';
     return '<div class="esquema n' + n + '"><svg class="esquema-lineas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' + lineas + '</svg>' +
       cabeza + '<div class="esquema-hijos">' + b.items.map(function (it, i) {
+        var ex = extracto(segs(it.segs), Math.max(n <= 2 ? 330 : n <= 3 ? 170 : 105, datos.extractoMin || 0));
         return '<button type="button" class="nodo-esquema' + refc(it.label) + '" data-id="' + k + '-' + i + '" data-i="' + i + '" style="--d:' + (0.3 + i * 0.08) + 's">' +
           '<span class="esquema-arte">' + svgObjeto(it.obj, 46) + '</span><span class="esquema-rotulo">' + rot(it.label) + '</span>' +
-          '<span class="esquema-extracto">' + esc(may(extracto(segs(it.segs), Math.max(n <= 2 ? 330 : n <= 3 ? 170 : 105, datos.extractoMin || 0)))) + '</span>' +
-          '<span class="esquema-marca"><span class="marca-ver">' + mano + ' Ver más</span><span class="marca-falta"><i class="fas fa-book-open" aria-hidden="true"></i> Falta leer</span>' +
+          '<span class="esquema-extracto">' + esc(may(ex)) + '</span>' +
+          /* Con «ventanaSinRepetir», la tarjeta que ya muestra todo su texto no promete más: el clic la marca leída en su sitio. */
+          '<span class="esquema-marca"><span class="marca-ver">' + mano + (datos.ventanaSinRepetir && !/…$/.test(ex) ? ' Clic para marcar como leída' : ' Ver más') + '</span><span class="marca-falta"><i class="fas fa-book-open" aria-hidden="true"></i> Falta leer</span>' +
           '<span class="marca-leida">' + visto + ' Leída</span></span></button>';
       }).join('') + '</div></div>';
   };
