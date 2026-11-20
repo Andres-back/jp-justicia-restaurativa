@@ -5,6 +5,7 @@ portables dentro del paquete de Genially y del SCORM):
 - jr-u2-cierre (Recursos académicos de la unidad 2 (3.8 Actividad de acompañamiento dirigido)): medios/jr-u2-cierre.mp4, medios/jr-u2-cierre.es.vtt, medios/jr-u2-cierre-lsc.mp4, medios/jr-u2-cierre-lsc.es.vtt
 - jr-u2-presentacion (Presentación de la unidad 2): medios/jr-u2-presentacion.mp4, medios/jr-u2-presentacion.es.vtt, medios/jr-u2-presentacion-lsc.mp4, medios/jr-u2-presentacion-lsc.es.vtt
 - jr-u2-situacion-juana (Unidad 2, Lección 2.1 · situación): medios/jr-u2-situacion-juana.mp4, medios/jr-u2-situacion-juana.es.vtt, medios/jr-u2-situacion-juana-lsc.mp4, medios/jr-u2-situacion-juana-lsc.es.vtt
+- jr-u2-evaluacion-caso-1 (Unidad 2 - Evaluación · antes de las preguntas (CASO I, p. 75)): medios/jr-u2-evaluacion-caso-1.mp4, medios/jr-u2-evaluacion-caso-1.es.vtt, medios/jr-u2-evaluacion-caso-1-lsc.mp4, medios/jr-u2-evaluacion-caso-1-lsc.es.vtt
 
 Formato previsto: video MP4 (H.264 + AAC) y subtítulos WebVTT en español (.vtt, UTF-8).
 El reproductor los toma en cuanto están aquí; mientras falten, dice «Video en producción». Los copia
