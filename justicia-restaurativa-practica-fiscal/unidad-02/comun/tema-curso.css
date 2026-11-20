@@ -328,8 +328,12 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 .cuadro.con-partes .cuadro-tabla tbody th,.cuadro.con-partes .cuadro-tabla tbody td{padding:5px 10px}
 .cuadro.con-partes .cuadro-tabla tbody th .lectura-texto{font-size:14px;line-height:1.3}
 /* Red con la ilustración de la escena en el centro (19/11/2026): el centro crece y ocupa el espacio entre los nodos. */
-.red-centro:has(.red-arte){width:32%;height:80%;justify-content:center;gap:8px;padding:12px}
-.red-centro .red-arte{flex:1 1 0;min-height:0;max-width:100%;object-fit:contain}
+@container ova (min-width:601px){
+  .red-centro:has(.red-arte){width:32%;height:80%;justify-content:center;gap:8px;padding:12px}
+  .red-centro .red-arte{flex:1 1 0;min-height:0;max-width:100%;object-fit:contain}
+}
+/* En angosto (revisión de la U4, 20/11/2026), la ilustración del centro de la red no se muestra: el centro es la franja del tema. */
+@container ova (max-width:600px){.red-centro .red-arte{display:none}}
 .ruta-lectura.historia .lectura-eyebrow{margin-bottom:2px}
 .cuadro.con-partes .cuadro-partes{gap:4px;flex-wrap:nowrap}
 .cuadro.con-partes .cuadro-tab{font-size:11.5px;line-height:1.2;padding:3px 10px 3px 3px;min-width:0}
@@ -338,3 +342,34 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 .acordeon-cab{padding:4px 12px;font-size:13px}
 .acordeon-ico svg{width:22px;height:22px}
 .ruta-lectura.apretada .lectura-eyebrow{margin-bottom:2px}
+
+/* Actividad de reflexión (revisión de la U4, 20/11/2026: «Parte 1 de 2 · Seguir leyendo» con preguntas cortas): en el marco ancho,
+   la marca «Lo tendré en cuenta» va a la derecha de la pregunta y la tarjeta es más baja, para que las preguntas quepan juntas. */
+@container ova (min-width:700px){
+  .caso-tarea{grid-template-columns:30px minmax(0,1fr) auto;align-items:center;padding:6px 10px;gap:4px 10px}
+  .caso-tarea .caso-n{grid-row:1;width:26px;height:26px;font-size:13px}
+  .caso-tarea .caso-marca,.caso-tarea .caso-visto{grid-column:3;grid-row:1;justify-self:end;white-space:nowrap}
+  .caso-tareas{gap:6px}
+}
+/* Tablas unidas (revisión de la U4, 20/11/2026: a la Tabla 3 le sobraban 31 px): encabezado y filas más bajos, sin cambiar la letra. */
+.cuadro.con-partes .cuadro-tabla thead th{padding-top:5px;padding-bottom:5px;line-height:1.15}
+.cuadro.con-partes .cuadro-tabla tbody th,.cuadro.con-partes .cuadro-tabla tbody td{padding-top:2px;padding-bottom:2px}
+/* Pirámide (revisión de la U4: el nivel 3 de «Medidas de no repetición» se desplazaba 21 px): el panel de lectura, más ancho. */
+@container ova (min-width:700px){.pir-niveles{flex-basis:38%}}
+/* Ventana amplia más alta (revisión de la U1, 20/11/2026: 8 lecturas se leían desplazando): en el marco ancho cubre toda la escena,
+   también la barra de arriba y las pestañas, para que el texto completo quepa sin desplazamiento. */
+@container ova (min-width:700px){
+  .lector.amplia{position:fixed;inset:0;z-index:60;padding:6px;border-radius:0}
+  /* La escena queda sin transformación mientras la ventana está abierta: así la ventana se mide contra todo el marco. */
+  .escenario:has(.lector.amplia:not([hidden])){transform:none !important;animation:none !important}
+}
+/* Ciclo y tabla sin desplazamiento (revisión de la U1, 20/11/2026: «Responsabilización» de las Tres R y la Tabla 2 se desplazaban). */
+@container ova (min-width:700px){
+  .ciclo-rueda{flex-basis:46%}
+  .cuadro:not(.con-partes) .cuadro-tabla tbody th,.cuadro:not(.con-partes) .cuadro-tabla tbody td{padding-top:3px;padding-bottom:3px}
+  .cuadro:not(.con-partes) .cuadro-tabla .lectura-texto{line-height:1.3}
+  .cuadro:not(.con-partes) .cuadro-tabla thead th{padding-top:4px;padding-bottom:4px;line-height:1.15}
+}
+/* Destacado sin desplazamiento (revisión, 20/11/2026: «Una circunstancia de menor punibilidad» de la L2.1 se desplazaba): la caja de
+   texto, más ancha; la ilustración, más angosta. */
+@container ova (min-width:700px){.dest-arte{flex-basis:30%}}
