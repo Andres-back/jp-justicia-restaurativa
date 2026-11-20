@@ -282,22 +282,30 @@
 @media (max-width:600px){.mf-tabla thead th,.mf-tabla tbody th,.mf-tabla td{padding:4px 7px}}
 .mf-tabla ul.vinetas{margin:0;padding-left:1.1em}.mf-tabla ul.vinetas li{margin:0 0 3px}
 
-/* ---------- Infografía de un vistazo (figuras de solo rótulos, 19/11/2026) ----------
-   Todos los pasos, en orden y con sus ramas, en columnas equilibradas (diagrama.js reparte y elige la letra). Todo en em: la letra
-   de .fv (que pone el script) escala la figura entera. */
+/* ---------- Ruta continua de un vistazo (figuras de solo rótulos; 19/11/2026) ----------
+   Juan, de la versión en columnas: «esas flechas no se entiende muy bien como va». Los pasos van en filas en zigzag, unidos por una
+   sola línea con una flecha en cada tramo (svg.fv-linea, que dibuja diagrama.js), y las ramas de cada paso cuelgan debajo de él: en
+   llave o como etiquetas. En una pantalla angosta, una sola columna con la línea a la izquierda. Todo en em: la letra de .fv (que pone
+   el script) escala la figura entera. */
 .fv{height:100%;min-height:0;display:flex;flex-direction:column;gap:.35em;font-size:15px}
 .fv .diag-enc{margin:0;font-size:.85em}
-.fv-lienzo{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:repeat(var(--k,3),minmax(0,1fr));column-gap:1.7em;align-items:start;padding:2px 3px 3px 2px}
-.fv-lienzo.desplaza{overflow-y:auto;overscroll-behavior:contain;padding-right:6px}
-.fv-col{position:relative;min-width:0;display:flex;flex-direction:column;align-items:stretch}
-.fv-paso{display:flex;flex-direction:column;align-items:center;min-width:0;text-align:center}
+.fv-lienzo{flex:1;min-height:0;overflow:hidden}
+.fv-lienzo.desplaza{overflow-y:auto;overscroll-behavior:contain}
+.fv-pista{position:relative;display:flex;flex-direction:column;gap:1.1em;padding:.2em .45em .3em .3em}
+.fv-pista.carril-d{padding-right:1.8em}
+.fv-pista.carril-i{padding-left:1.8em}
+.fv-linea{position:absolute;left:0;top:0;pointer-events:none;color:var(--carbon);overflow:visible}
+.fv-linea path{fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.fv-fila{position:relative;display:flex;align-items:flex-start;justify-content:space-between;column-gap:2.1em}
+.fv-fila.inversa{flex-direction:row-reverse}
+.fv-paso{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;text-align:center}
 .fv-rot{margin:0;display:inline-flex;align-items:center;gap:.45em;max-width:100%;font-family:var(--t-titulo);font-weight:800;font-size:.9em;line-height:1.2;background:var(--blanco);border:2px solid var(--negro);border-radius:10px;padding:.22em .75em .22em .28em;box-shadow:2px 2px 0 var(--negro);text-align:left;color:var(--negro)}
 .fv-paso.con-ramas .fv-rot{background:var(--amarillo)}
 .fv-rot.recuadro{border-style:double;border-width:4px}
 .fv-n{flex:0 0 auto;width:1.65em;height:1.65em;border-radius:50%;background:var(--carbon);color:var(--blanco);display:inline-flex;align-items:center;justify-content:center;font-size:.82em;font-weight:800}
 .fv-t{min-width:0}
-.fv-flecha{display:block;text-align:center;color:var(--carbon);font-size:.72em;line-height:1;padding:.18em 0}
-.fv-sigue{position:absolute;right:-1.45em;bottom:.15em;width:1.2em;height:1.2em;border-radius:50%;background:var(--carbon);color:var(--blanco);display:flex;align-items:center;justify-content:center;font-size:.8em}
+.fv-cuelga{width:100%;display:flex;flex-direction:column;align-items:center}
+/* en llave, como en la figura */
 .fv .ramas{margin-top:.5em;padding-top:.45em;gap:.35em}
 .fv .ramas::before{height:.4em;border-width:1.5px}
 .fv .ramas::after{top:-.5em;height:.5em;border-left-width:1.5px}
@@ -306,7 +314,24 @@
 .fv .ramas.sub:not(.uno){width:min(100%,max(62%,14em))}
 .fv .rama-txt{font-size:.8em;padding:.16em .42em;border-radius:8px;box-shadow:1.5px 1.5px 0 var(--menta);line-height:1.2}
 .fv .ramas.sub .rama-txt{font-size:.76em}
-.fv .converge{height:.4em;margin-top:.3em;border-width:1.5px}
+/* como etiquetas colgantes: una debajo de otra, colgadas de un hilo; las hijas, dentro del recuadro de su rama */
+.fv-colg{position:relative;display:flex;flex-direction:column;align-items:center;gap:.32em;margin-top:.5em;max-width:100%}
+.fv-colg::before{content:"";position:absolute;left:50%;top:-.5em;bottom:.7em;border-left:1.5px solid var(--carbon)}
+.fv-grupo{position:relative;max-width:100%;background:var(--blanco);border:1.5px solid var(--negro);border-radius:8px;box-shadow:1.5px 1.5px 0 var(--menta);padding:.14em .45em;font-family:var(--t-titulo);font-weight:700;font-size:.8em;line-height:1.2;text-align:center;color:var(--negro)}
+.fv-grupo:not(.solo){padding:.16em .3em .3em}
+.fv-tag{display:block;max-width:100%}
+.fv-hijas{display:flex;flex-wrap:wrap;justify-content:center;gap:.22em .25em;margin-top:.22em}
+.fv-tag.hija{display:inline-block;font-weight:600;font-size:.94em;background:var(--menta-suave);border:1px solid var(--negro);border-radius:6px;padding:.06em .35em}
+/* en columna (pantalla angosta): la línea baja por los números; las ramas, a la derecha de la línea, en árbol */
+.fv-pista.en-columna .fv-fila{flex-direction:column;align-items:flex-start;row-gap:.85em}
+.fv-pista.en-columna .fv-paso{flex:none;max-width:100%;align-items:flex-start;text-align:left}
+.fv-pista.en-columna .fv-cuelga{width:auto;max-width:calc(100% - 2.3em);margin-left:2.3em;align-items:flex-start}
+.fv-pista.en-columna .fv-colg{align-items:flex-start;margin-top:.35em;padding-left:.8em}
+.fv-pista.en-columna .fv-colg::before{display:none}
+.fv-pista.en-columna .fv-grupo{text-align:left}
+.fv-pista.en-columna .fv-grupo::before{content:"";position:absolute;left:-1.05em;top:-.5em;height:1.2em;width:.9em;border-left:1.5px solid var(--carbon);border-bottom:1.5px solid var(--carbon);border-bottom-left-radius:5px}
+.fv-pista.en-columna .fv-grupo:not(:last-child)::after{content:"";position:absolute;left:-1.05em;top:.7em;bottom:-.5em;border-left:1.5px solid var(--carbon)}
+.fv-pista.en-columna .fv-hijas{justify-content:flex-start}
 @media (hover:hover){.fv-paso:hover .fv-rot{box-shadow:3px 3px 0 var(--oliva)}}
 
 /* ---------- Pasos con texto en columnas (si el texto de un paso no cabe en el panel con 14 px, 19/11/2026) ---------- */
@@ -328,15 +353,6 @@
 .tri-vista .lado-l.leido:not(.activo){stroke:var(--carbon)}
 .nv-vista .nv-items{visibility:visible}
 .nv-vista p.nv-btn{cursor:default;margin:0}
-/* Ramas en árbol (la otra forma de la infografía cuando las llaves no caben: una rama debajo de otra, con su línea) */
-.fv-paso.en-arbol{align-self:center;align-items:flex-start;text-align:left;max-width:100%}
-.fv-ramas{list-style:none;margin:.15em 0 0 .85em;padding:0 0 0 .95em}
-.fv-ramas.sub{margin:0 0 0 .3em;padding-left:.9em}
-.fv-ramas li{position:relative;padding-top:.2em}
-.fv-ramas li::before{content:"";position:absolute;left:-.8em;top:0;height:.82em;width:.62em;border-left:1.5px solid var(--carbon);border-bottom:1.5px solid var(--carbon);border-bottom-left-radius:5px}
-.fv-ramas li:not(:last-child)::after{content:"";position:absolute;left:-.8em;top:.82em;bottom:0;border-left:1.5px solid var(--carbon)}
-.fv-rama{display:inline-block;max-width:100%;font-family:var(--t-titulo);font-weight:700;font-size:.84em;line-height:1.2;background:var(--blanco);border:1.5px solid var(--negro);border-radius:8px;padding:.12em .45em;box-shadow:1.5px 1.5px 0 var(--menta);text-align:left;vertical-align:top}
-.fv-ramas.sub .fv-rama{font-weight:600;font-size:.8em;background:var(--menta-suave)}
 
 /* Lista de puntos muy baja (p. ej. 1079 × 248): el rótulo del punto no pasa del alto de su botón; si no cabe, se acorta por palabras
    con «…» (diagrama.js, Esc.encajar) y se lee completo en el panel al abrirlo. */

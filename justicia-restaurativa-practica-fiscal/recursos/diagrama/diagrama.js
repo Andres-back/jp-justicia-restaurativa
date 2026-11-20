@@ -1,7 +1,8 @@
 /* Diagramas interactivos de las figuras de la ficha (Justicia restaurativa, 18/11/2026). Un recurso dirigido por datos:
    index.html?f=<id> lee la figura de window.FIGURAS_TEXTO (datos.js, copia de plan/figuras-texto.json) y la dibuja
    según su tipo:
-     ruta       de solo rótulos: infografía de un vistazo, todos los pasos con sus ramas a la vista, sin clics (19/11/2026);
+     ruta       de solo rótulos: ruta continua numerada de un vistazo (filas en zigzag unidas por una línea con flechas, las
+                ramas colgando de su paso), sin clics (19/11/2026);
                 con texto: el paso abierto con su texto completo (14 px o más) y un solo botón de avance; si no cabe, columnas;
      triangulo  ejes en círculos que se cruzan y una frase en cada lado del triángulo, todo a la vista;
      matriz     tabla: fija a la vista, por fila (lista + panel con las columnas) o por casilla (lector por partes);
@@ -228,128 +229,208 @@
     if (soloRotulo) vistazo(P); else rutaTexto(P);
   }
 
-  /* Infografía de un vistazo (figuras de solo rótulos, como jr-u1-p18; revisión del 19/11/2026: 13 clics para leer rótulos de una o
-     dos palabras, y el paso abierto no mostraba sus ramas; Juan, del diagrama de «Repensar el delito»: «está buenísimo… en un solo
-     paquete»). Todos los pasos, en orden y con sus ramas, a la vista: se reparten en las columnas que quepan (alturas medidas,
-     columnas equilibradas) con la letra más grande que entre. Ningún clic obligatorio: la figura queda vista al abrirse. Si ni con
-     la letra más pequeña cabe (celular), la figura se desplaza dentro de su caja, con letra de 14 px, y queda vista al final. */
+  /* Infografía de un vistazo (figuras de solo rótulos, como jr-u1-p18). Revisión del 19/11/2026: 13 clics para leer rótulos de una o
+     dos palabras → todo a la vista, sin clics. Después Juan, de la versión en columnas con flechas sueltas al pie: «esas flechas no se
+     entiende muy bien como va, busquemos como organizarlo mejor». Ahora es una ruta continua numerada: los pasos van en filas (1 a 7 y
+     8 a 13; en tres filas si así cabe con letra más grande) unidas por una sola línea con una flecha en cada tramo, en zigzag (la fila
+     siguiente vuelve por el otro lado, como un camino). Las ramas de cada paso cuelgan debajo de él: en llave, como en la figura, o,
+     si no caben a lo ancho, como etiquetas una debajo de otra. En una pantalla angosta la ruta baja en una sola columna, con la línea
+     a la izquierda, y si no cabe se desplaza dentro de su caja con «Desplace para ver más». Ningún clic obligatorio: queda vista al
+     abrirse (o al llegar al final, si se desplaza). */
   function vistazo(P) {
     sinAviso = true;
-    guia.textContent = 'Lea la figura completa: los pasos van en orden, cada uno con sus ramas.';
+    var N = P.length;
+    guia.textContent = 'Siga la ruta en orden, del 1 al ' + N + '; las ramas de cada paso van debajo de él.';
     var caja = el('div', 'fv');
     if (C.encabezado) caja.appendChild(el('p', 'diag-enc', md(T(C.encabezado))));
     var lienzo = el('div', 'fv-lienzo');
-    lienzo.setAttribute('role', 'list');
-    lienzo.setAttribute('aria-label', plano(fig.titulo));
-    caja.appendChild(lienzo);
-    raiz.appendChild(caja);
-    // Dos dibujos de las ramas: «llaves» (fila de ramas bajo una llave, como en la figura; el que Juan aprobó) y «árbol» (ramas una
-    // debajo de otra, más angosto). Cada paso va con llaves si sus ramas caben en fila al ancho de la columna y, si no, en árbol.
-    function arbolHTML(ramas) {
-      return '<ul class="fv-ramas">' + ramas.map(function (r) {
-        return '<li><span class="fv-rama">' + md(T(r)) + '</span>' + (r.ramas ? arbolHTML(r.ramas).replace('fv-ramas', 'fv-ramas sub') : '') + '</li>';
-      }).join('') + '</ul>';
+    var pista = el('div', 'fv-pista');
+    pista.setAttribute('role', 'list');
+    pista.setAttribute('aria-label', plano(fig.titulo));
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'fv-linea'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('focusable', 'false');
+    svg.innerHTML = '<defs><marker id="fv-punta" viewBox="0 0 10 10" refX="8.5" refY="5" markerUnits="userSpaceOnUse" orient="auto">' +
+      '<path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs><g class="fv-trazos"></g>';
+    lienzo.appendChild(pista); caja.appendChild(lienzo); raiz.appendChild(caja);
+
+    // Ramas como etiquetas colgantes: cada rama en su recuadro; una rama con hijas las lleva dentro, debajo de su nombre
+    function etiqueta(r, hija) { return '<span class="fv-tag' + (hija ? ' hija' : '') + '">' + md(T(r)) + '</span>'; }
+    function colganteHTML(ramas) {
+      return '<div class="fv-colg">' + ramas.map(function (r) {
+        if (!r.ramas) return '<div class="fv-grupo solo">' + etiqueta(r) + '</div>';
+        return '<div class="fv-grupo">' + etiqueta(r) + '<div class="fv-hijas">' + r.ramas.map(function (s) { return etiqueta(s, true); }).join('') + '</div></div>';
+      }).join('') + '</div>';
     }
-    function bloque(p, i, estilo) {
-      var b = el('div', 'fv-paso' + (p.ramas ? ' con-ramas' : '') + (p.ramas && estilo === 'arbol' ? ' en-arbol' : ''));
+    function paso(p, i, estilo) {
+      var b = el('div', 'fv-paso' + (p.ramas ? ' con-ramas' : ''));
       b.setAttribute('role', 'listitem');
-      var ramas = '';
-      if (p.ramas) {
-        ramas = estilo === 'arbol' ? arbolHTML(p.ramas)
-          : ramasHTML(p.ramas) + (p.convergen ? '<div class="converge" style="--r:' + p.ramas.length + '" aria-hidden="true"></div>' : '');
-      }
       b.innerHTML = '<p class="fv-rot' + (p.recuadro ? ' recuadro' : '') + '"><span class="fv-n" aria-hidden="true">' + esc(p.numero || (i + 1)) +
-        '</span><span class="fv-t">' + md(T(p.rotulo)) + '</span></p>' + ramas;
+        '</span><span class="fv-t">' + md(T(p.rotulo)) + '</span></p>' +
+        (p.ramas ? '<div class="fv-cuelga ' + estilo + '">' + (estilo === 'llaves' ? ramasHTML(p.ramas) : colganteHTML(p.ramas)) + '</div>' : '');
       return b;
     }
-    var bloques = { llaves: [], arbol: [] };
-    P.forEach(function (p, i) { bloques.llaves.push(bloque(p, i, 'llaves')); bloques.arbol.push(bloque(p, i, 'arbol')); });
-    var usados = bloques.llaves;
-    function colocar(grupos) {
-      lienzo.innerHTML = '';
-      lienzo.style.setProperty('--k', grupos.length);
-      grupos.forEach(function (g, c) {
-        var col = el('div', 'fv-col');
-        g.forEach(function (i, n) {
-          if (n) col.appendChild(el('span', 'fv-flecha', '<i class="fas fa-arrow-down" aria-hidden="true"></i>'));
-          col.appendChild(usados[i]);
-        });
-        if (c < grupos.length - 1 && g.length) col.appendChild(el('span', 'fv-sigue', '<i class="fas fa-arrow-right" aria-hidden="true"></i>'));
-        lienzo.appendChild(col);
+    // cada paso en sus dos formas (un paso sin ramas es el mismo en las dos)
+    var V = { llaves: [], colgante: [] };
+    P.forEach(function (p, i) { V.llaves.push(paso(p, i, 'llaves')); V.colgante.push(p.ramas ? paso(p, i, 'colgante') : V.llaves[i]); });
+
+    // Repartos en filas que se prueban, de menos a más filas (como mucho 7 pasos por fila), y en cada número de filas los que llevan
+    // un paso de más en la primera, en la del medio o en la última: 13 → 7 + 6, 6 + 7, 5 + 4 + 4, 4 + 5 + 4 y 4 + 4 + 5
+    var REPARTOS = [];
+    for (var R = 1; R <= 3; R++) {
+      if (Math.ceil(N / R) > 7 || (R > 1 && N < R * 2)) continue;
+      var q = Math.floor(N / R), r = N % R, vistos = {};
+      for (var c = 0; c < R; c++) {
+        var a = []; for (var j = 0; j < R; j++) a.push(q + ((j - c + R) % R < r ? 1 : 0));
+        if (!vistos[a]) { vistos[a] = 1; REPARTOS.push(a); }
+      }
+    }
+    if (!REPARTOS.length) REPARTOS.push([Math.ceil(N / 3), Math.ceil(N / 3), N - 2 * Math.ceil(N / 3)]);
+
+    var estilo = [], filas = [];
+    function armar(rep) {
+      pista.innerHTML = ''; pista.appendChild(svg); filas = [];
+      var i0 = 0;
+      rep.forEach(function (n, r) {
+        var f = el('div', 'fv-fila' + (r % 2 ? ' inversa' : ''));
+        f.setAttribute('role', 'none');
+        for (var i = i0; i < i0 + n; i++) { V.llaves[i].querySelector('.fv-rot').style.minHeight = V.colgante[i].querySelector('.fv-rot').style.minHeight = ''; f.appendChild(V[estilo[i]][i]); }
+        pista.appendChild(f); filas.push({ el: f, ini: i0, n: n, inversa: r % 2 === 1 }); i0 += n;
       });
     }
-    // Reparte los pasos, en orden, en k columnas con la menor altura máxima posible (alturas medidas al ancho de una columna)
-    function repartir(k) {
-      var todos = P.map(function (_, i) { return i; }), resto = [], c;
-      for (c = 1; c < k; c++) resto.push([]);
-      usados = bloques.llaves.slice();
-      colocar([todos].concat(resto));
-      // al ancho de esta columna: las ramas que no caben en fila van en árbol
-      usados = usados.map(function (b, i) {
-        return Array.prototype.some.call(b.querySelectorAll('.rama-txt'), function (e) { return sale(e); }) ? bloques.arbol[i] : b;
+    // un texto se sale a lo ancho de su caja (rótulo del paso, rama o etiqueta; la etiqueta de una rama, de su recuadro)
+    function sale(e) {
+      var caja = e.classList.contains('fv-t') ? e.parentNode : e.classList.contains('fv-tag') && !e.classList.contains('hija') ? e.parentNode : e;
+      var r = caja.getBoundingClientRect(), g = document.createRange(); g.selectNodeContents(e);
+      var t = g.getBoundingClientRect();
+      return t.width > 0 && (t.left < r.left - 0.5 || t.right > r.right + 0.5);
+    }
+    // Cabe a lo ancho: cada paso dentro de su fila y cada pieza dentro de su paso, comparando cajas (en la fila que vuelve de derecha a
+    // izquierda lo que sobra sale por la izquierda, donde el ancho desplazable no lo cuenta), y ningún texto fuera de su recuadro
+    function dentro(a, b) { return a.left >= b.left - 0.5 && a.right <= b.right + 0.5; }
+    function anchoFila(f) {
+      var rf = f.getBoundingClientRect();
+      var ok = Array.prototype.every.call(f.children, function (p) {
+        var rp = p.getBoundingClientRect();
+        return dentro(rp, rf) && Array.prototype.every.call(p.querySelectorAll('.fv-rot,.fv-cuelga,.ramas,.rama-txt,.fv-grupo,.fv-tag.hija'), function (e) {
+          return dentro(e.getBoundingClientRect(), rp);
+        });
       });
-      colocar([todos].concat(resto));
-      var h = usados.map(function (b) { return b.getBoundingClientRect().height; });
-      var f = lienzo.querySelector('.fv-flecha'), a = f ? f.getBoundingClientRect().height : 0;
-      var N = h.length;
-      function alto(i, j) { var s = (j - i) * a; for (var t = i; t <= j; t++) s += h[t]; return s; }
-      var mejor = [], corte = [];
-      for (c = 1; c <= k; c++) {
-        mejor[c] = []; corte[c] = [];
-        for (var j = 0; j < N; j++) {
-          if (c === 1) { mejor[1][j] = alto(0, j); corte[1][j] = -1; continue; }
-          mejor[c][j] = Infinity; corte[c][j] = j - 1;
-          for (var i = c - 2; i < j; i++) {
-            var v = Math.max(mejor[c - 1][i], alto(i + 1, j));
-            if (v < mejor[c][j]) { mejor[c][j] = v; corte[c][j] = i; }
-          }
+      return ok && !Array.prototype.some.call(f.querySelectorAll('.rama-txt,.fv-tag,.fv-t'), sale);
+    }
+    // Una fila con las ramas en etiquetas (lo más angosto) tiene que caber a lo ancho. Después, del paso más alto al más bajo, sus
+    // ramas pasan a llave (como en la figura) si así la fila sigue cabiendo a lo ancho y no queda más alta.
+    function ajustarFila(f) {
+      if (!anchoFila(f.el)) return false;
+      var orden = [];
+      for (var i = f.ini; i < f.ini + f.n; i++) if (P[i].ramas) orden.push(i);
+      orden.sort(function (a, b) { return V.colgante[b].offsetHeight - V.colgante[a].offsetHeight; });
+      orden.forEach(function (i) {
+        var alto = f.el.offsetHeight;
+        f.el.replaceChild(V.llaves[i], V.colgante[i]);
+        if (anchoFila(f.el) && f.el.offsetHeight <= alto) estilo[i] = 'llaves';
+        else f.el.replaceChild(V.colgante[i], V.llaves[i]);
+      });
+      return true;
+    }
+    // los rótulos de una fila, del mismo alto: la línea pasa por el centro de todos
+    function igualar() {
+      filas.forEach(function (f) {
+        var rots = Array.prototype.map.call(f.el.children, function (p) { var r = p.querySelector('.fv-rot'); r.style.minHeight = ''; return r; });
+        if (pista.classList.contains('en-columna')) return;
+        var h = Math.max.apply(null, rots.map(function (r) { return r.getBoundingClientRect().height; }));
+        rots.forEach(function (r) { r.style.minHeight = h + 'px'; });
+      });
+    }
+    function cabeAlto() { return pista.offsetHeight <= lienzo.clientHeight + 1; }
+    // 0: no cabe a lo ancho; 1: cabe a lo ancho, no a lo alto; 2: cabe
+    function enFilas(rep, t) {
+      caja.style.fontSize = t + 'px';
+      pista.className = 'fv-pista en-filas' + (rep.length > 1 ? ' carril-d' : '') + (rep.length > 2 ? ' carril-i' : '');
+      for (var i = 0; i < N; i++) estilo[i] = 'colgante';
+      armar(rep);
+      for (var r = 0; r < filas.length; r++) if (!ajustarFila(filas[r])) return 0;
+      igualar();
+      return cabeAlto() ? 2 : 1;
+    }
+    function enColumna(t) {
+      caja.style.fontSize = t + 'px';
+      pista.className = 'fv-pista en-columna';
+      for (var i = 0; i < N; i++) estilo[i] = 'colgante';
+      armar([N]);
+      igualar();
+      return anchoFila(filas[0].el) && cabeAlto();
+    }
+
+    // La línea de la ruta: un tramo con flecha de cada paso al siguiente; entre filas, la vuelta por el carril del lado
+    function dibujar() {
+      var g = svg.querySelector('.fv-trazos');
+      var base = pista.getBoundingClientRect(), W = pista.offsetWidth, H = pista.offsetHeight;
+      svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      var fs = parseFloat(getComputedStyle(caja).fontSize), cs = getComputedStyle(pista);
+      var m = svg.querySelector('marker'), pt = Math.max(7, Math.round(fs * 0.62));
+      m.setAttribute('markerWidth', pt); m.setAttribute('markerHeight', pt);
+      function R(e) { var r = e.getBoundingClientRect(); return { l: r.left - base.left, r: r.right - base.left, t: r.top - base.top, b: r.bottom - base.top, cy: (r.top + r.bottom) / 2 - base.top }; }
+      var rots = Array.prototype.map.call(pista.querySelectorAll('.fv-rot'), R);
+      var nums = Array.prototype.map.call(pista.querySelectorAll('.fv-n'), R);
+      var fila = [];
+      filas.forEach(function (f, k) { for (var i = f.ini; i < f.ini + f.n; i++) fila[i] = k; });
+      var columna = pista.classList.contains('en-columna'), sep = 2, d = [];
+      var cd = W - parseFloat(cs.paddingRight) / 2, ci = parseFloat(cs.paddingLeft) / 2;
+      for (var i = 0; i < N - 1; i++) {
+        var a = rots[i], b = rots[i + 1];
+        if (columna) {
+          var x = (nums[i].l + nums[i].r) / 2;
+          d.push('M' + x + ' ' + (a.b + sep) + 'V' + (b.t - sep));
+        } else if (fila[i] === fila[i + 1]) {
+          d.push(filas[fila[i]].inversa ? 'M' + (a.l - sep) + ' ' + a.cy + 'H' + (b.r + sep) : 'M' + (a.r + sep) + ' ' + a.cy + 'H' + (b.l - sep));
+        } else {
+          var der = !filas[fila[i]].inversa, y1 = a.cy, y2 = b.cy, rr = Math.min(fs * 0.7, (y2 - y1) / 2);
+          if (der) d.push('M' + (a.r + sep) + ' ' + y1 + 'H' + (cd - rr) + 'Q' + cd + ' ' + y1 + ' ' + cd + ' ' + (y1 + rr) + 'V' + (y2 - rr) +
+            'Q' + cd + ' ' + y2 + ' ' + (cd - rr) + ' ' + y2 + 'H' + (b.r + sep));
+          else d.push('M' + (a.l - sep) + ' ' + y1 + 'H' + (ci + rr) + 'Q' + ci + ' ' + y1 + ' ' + ci + ' ' + (y1 + rr) + 'V' + (y2 - rr) +
+            'Q' + ci + ' ' + y2 + ' ' + (ci + rr) + ' ' + y2 + 'H' + (b.l - sep));
         }
       }
-      var grupos = [], fin = N - 1;
-      for (c = k; c >= 1; c--) {
-        var ini = c === 1 ? -1 : corte[c][fin], g = [];
-        for (var t = ini + 1; t <= fin; t++) g.push(t);
-        grupos.unshift(g); fin = ini;
-      }
-      colocar(grupos);
+      g.innerHTML = d.map(function (x) { return '<path d="' + x + '" marker-end="url(#fv-punta)"/>'; }).join('');
     }
-    // un texto se sale de su caja (rótulo del paso o rama)
-    function sale(e, caja) {
-      var r = (caja || e).getBoundingClientRect(), g = document.createRange(); g.selectNodeContents(e);
-      var t = g.getBoundingClientRect();
-      return t.width > 0 && (t.left < r.left - 0.5 || t.right > r.right + 0.5 || t.top < r.top - 0.5 || t.bottom > r.bottom + 0.5);
-    }
-    function anchoBien() {
-      if (lienzo.scrollWidth > lienzo.clientWidth + 1) return false;
-      return !Array.prototype.some.call(lienzo.querySelectorAll('.rama-txt,.fv-rama,.fv-t'), function (e) {
-        return sale(e, e.classList.contains('fv-t') ? e.parentNode : null);
-      });
-    }
-    function cabeVz() { return lienzo.scrollHeight <= lienzo.clientHeight + 1 && anchoBien(); }
+
+    var LETRAS = [];
+    for (var lt = 16; lt >= 11.5; lt -= 0.5) LETRAS.push(lt);
     var primera = true;
     function componer() {
-      lienzo.classList.remove('desplaza');
-      var kmax = Math.max(1, Math.min(6, P.length, Math.floor(lienzo.clientWidth / 175)));
-      var listo = false;
-      for (var t = 17; t >= 12.5 && !listo; t -= 0.5) {
-        caja.style.fontSize = t + 'px';
-        for (var k = 1; k <= kmax && !listo; k++) { repartir(k); listo = cabeVz(); }
+      lienzo.classList.remove('desplaza'); lienzo.scrollTop = 0;
+      var listo = false, t, k, ancho = lienzo.clientWidth >= 560;
+      // en cada reparto, la letra más grande con la que la ruta cabe completa (búsqueda binaria de 16 a 11,5 px); gana la más grande
+      // y, con la misma letra, el reparto de menos filas (y el de la fila más larga primero: 7 + 6)
+      if (ancho) {
+        var mejor = null;
+        REPARTOS.forEach(function (rep) {
+          var lo = 0, hi = LETRAS.length - 1;
+          if (mejor) hi = mejor.i - 1;
+          if (hi < 0 || enFilas(rep, LETRAS[hi]) !== 2) return;
+          while (lo < hi) { var mid = (lo + hi) >> 1; if (enFilas(rep, LETRAS[mid]) === 2) hi = mid; else lo = mid + 1; }
+          mejor = { rep: rep, i: hi };
+        });
+        if (mejor) { enFilas(mejor.rep, LETRAS[mejor.i]); listo = true; }
       }
+      if (!listo) for (t = 16; t >= 12.5 && !listo; t -= 0.5) listo = enColumna(t);
       if (!listo) {
-        // ni con la letra más pequeña cabe (celular): la figura se lee desplazándola dentro de su caja, con letra de 14 px
-        caja.style.fontSize = '14px';
-        repartir(kmax);
+        // ni así cabe: con letra de 14 px, la ruta se desplaza dentro de su caja (en filas si cabe a lo ancho; si no, en columna)
         lienzo.classList.add('desplaza');
+        var hecho = false;
+        if (ancho) for (k = 0; k < REPARTOS.length && !hecho; k++) hecho = enFilas(REPARTOS[k], 14) > 0;
+        if (!hecho) enColumna(14);
       }
+      dibujar();
       revisar();
       if (primera && !reducido) {
-        Array.prototype.forEach.call(lienzo.querySelectorAll('.fv-paso'), function (b, i) {
+        Array.prototype.forEach.call(pista.querySelectorAll('.fv-paso'), function (b, i) {
           if (b.animate) b.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 200, delay: i * 12, fill: 'backwards' });
         });
       }
       primera = false;
     }
-    // se desplaza: «Desplace para ver más» mientras quede figura abajo; vista al llegar al final
+    // se desplaza: «Desplace para ver más» mientras quede ruta abajo; vista al llegar al final
     function revisar() {
       var quedan = lienzo.classList.contains('desplaza') && lienzo.scrollTop + lienzo.clientHeight < lienzo.scrollHeight - 4;
       caja.classList.toggle('con-mas', quedan);
