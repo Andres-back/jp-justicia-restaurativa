@@ -102,7 +102,7 @@
     this.nav.hidden = true;
     c.style.minHeight = '';
     var max = o.max || 20, min = o.min || 14, t;
-    c.classList.remove('partido');
+    c.classList.remove('partido', 'desplaza'); c.onscroll = null; c.scrollTop = 0; this.sec.classList.remove('con-mas');
     for (t = max; t >= min; t -= 1) {
       c.style.fontSize = t + 'px'; c.innerHTML = o.bloques.join('');
       if (cabe(c)) { this.paginas = [o.bloques]; this.ver(0); return; }
@@ -123,9 +123,27 @@
       if (hoja.length) pags.push(hoja);
       return pags.every(function (p) { c.innerHTML = p.join(''); return cabe(c); });
     }
-    while (!repartir() && t > 12) { t -= 1; c.style.fontSize = t + 'px'; }
+    var ok = repartir();
+    while (!ok && t > 12) { t -= 1; c.style.fontSize = t + 'px'; ok = repartir(); }
+    if (!ok) { this.desplazar(o); return; }
     this.paginas = pags;
     this.ver(0);
+  };
+  /* Ni por partes cabe (celular, con el alto que se ve del marco; qa_cortes del 19/11/2026: una oración no cabía ni con 12 px): el
+     texto completo, con 14 px, se desplaza dentro del panel con «Desplace para ver más»; queda leído al llegar al final. */
+  Panel.prototype.desplazar = function (o) {
+    var c = this.cuerpo, yo = this;
+    c.classList.remove('partido'); c.classList.add('desplaza');
+    this.nav.hidden = true;
+    c.style.fontSize = '14px';
+    c.innerHTML = o.bloques.join('');
+    this.paginas = [o.bloques]; this.i = 0;
+    function revisar() {
+      var quedan = c.scrollTop + c.clientHeight < c.scrollHeight - 4;
+      yo.sec.classList.toggle('con-mas', quedan);
+      if (!quedan && yo.clave && !Esc.leido(yo.clave)) { Esc.marcar(yo.clave); if (yo.alFin) yo.alFin(); }
+    }
+    c.onscroll = revisar; c.scrollTop = 0; revisar();
   };
   Panel.prototype.ver = function (i) {
     var n = this.paginas.length;
@@ -137,7 +155,8 @@
       this.parte.textContent = 'Parte ' + (i + 1) + ' de ' + n;
       this.ant.hidden = i === 0;
       this.sig.hidden = i >= n - 1;
-      this.sig.classList.toggle('globo-siga', i < n - 1);
+      // «¡Siga aquí!» solo en la primera parte: después, a su lado está «Anterior» y lo taparía
+      this.sig.classList.toggle('globo-siga', i === 0 && n > 1);
     }
     if (!reducido && this.cuerpo.animate) this.cuerpo.animate([{ opacity: 0, transform: 'translateY(5px)' }, { opacity: 1, transform: 'none' }], { duration: 230 });
     if (i >= n - 1 && this.clave) {
@@ -170,11 +189,17 @@
   }
   var alRedimensionar = [];
   var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { alRedimensionar.forEach(function (f) { f(); }); }, 140); });
+  // en la lección angosta cambió lo que se ve del marco (index.html): se recompone en el acto, sin esperar
+  window.addEventListener('alto-visible', function () { clearTimeout(rt); alRedimensionar.forEach(function (f) { f(); }); });
   // al quedar algo «Leído» cambian la marca y el estado de los botones: se vuelven a encajar sus rótulos (sin reabrir nada)
   var alLeer = [];
   document.addEventListener('esc:leido', function () { alLeer.forEach(function (f) { f(); }); });
   // con las fuentes del kit ya cargadas, las medidas cambian: se vuelve a encajar todo
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { alRedimensionar.forEach(function (f) { f(); }); });
+  // una fuente que llega después (Montserrat, Roboto) cambia las medidas: se vuelve a encajar todo
+  if (document.fonts && document.fonts.addEventListener) {
+    var rf; document.fonts.addEventListener('loadingdone', function () { clearTimeout(rf); rf = setTimeout(function () { alRedimensionar.forEach(function (f) { f(); }); }, 60); });
+  }
   document.addEventListener('esc:completo', function () { if (!INCR && !sinAviso) Esc.aviso('Ha explorado toda la figura.', 3600); });
 
   var C = fig.contenido;
@@ -324,8 +349,11 @@
       }
       primera = false;
     }
+    // se desplaza: «Desplace para ver más» mientras quede figura abajo; vista al llegar al final
     function revisar() {
-      if (!lienzo.classList.contains('desplaza') || lienzo.scrollTop + lienzo.clientHeight >= lienzo.scrollHeight - 4) Esc.marcar('figura');
+      var quedan = lienzo.classList.contains('desplaza') && lienzo.scrollTop + lienzo.clientHeight < lienzo.scrollHeight - 4;
+      caja.classList.toggle('con-mas', quedan);
+      if (!quedan) Esc.marcar('figura');
     }
     lienzo.addEventListener('scroll', revisar);
     alRedimensionar.push(componer);
@@ -450,9 +478,13 @@
       Esc.registrar(['columnas']);
       revisarCols();
     }
-    function revisarCols() { if (!cols.classList.contains('desplaza') || cols.scrollTop + cols.clientHeight >= cols.scrollHeight - 4) Esc.marcar('columnas'); }
+    function revisarCols() {
+      var quedan = cols.classList.contains('desplaza') && cols.scrollTop + cols.clientHeight < cols.scrollHeight - 4;
+      caja.classList.toggle('con-mas', quedan);
+      if (!quedan) Esc.marcar('columnas');
+    }
     function componer() {
-      caja.classList.remove('en-columnas');
+      caja.classList.remove('en-columnas', 'con-mas');
       // primero la cinta con los nombres; si el texto de algún paso no cabe, la cinta solo con los círculos; si tampoco, columnas
       for (var vuelta = 0; vuelta < 2; vuelta++) {
         compactar(vuelta === 1);
@@ -607,7 +639,8 @@
         return '<tr>' + f.celdas.map(function (c, j) {
           if (j && vacias.indexOf(j) >= 0) return '';
           var html = Array.isArray(c) ? (c.length ? '<ul class="vinetas">' + c.map(function (x) { return '<li>' + md(x) + '</li>'; }).join('') + '</ul>' : '') : md(c);
-          return j ? '<td>' + html + '</td>' : '<th scope="row">' + html + '</th>';
+          // el nombre de la columna va también en la casilla: solo se ve con la tabla apilada (celular), donde no hay cabecera
+          return j ? '<td><span class="mf-col">' + md(cols[j]) + '</span>' + html + '</td>' : '<th scope="row"><span class="mf-col">' + md(cols[0]) + '</span>' + html + '</th>';
         }).join('') + '</tr>';
       }).join('') + '</tbody></table>';
     marco.innerHTML = t;
@@ -625,12 +658,15 @@
         tabla.style.fontSize = t + 'px';
         for (k = 0; k < ANCHOS.length && !listo; k++) { tabla.style.setProperty('--mf-col1', ANCHOS[k]); listo = cabeT(); }
       }
+      caja.classList.remove('apilada');
       if (!listo) {
         // no cabe con 13 px: el ancho de primera columna que deja menos por desplazar
         tabla.style.fontSize = '13px';
         var menor = Infinity, mejor = ANCHOS[0];
-        ANCHOS.forEach(function (w) { tabla.style.setProperty('--mf-col1', w); if (marco.scrollHeight < menor) { menor = marco.scrollHeight; mejor = w; } });
+        ANCHOS.forEach(function (w) { tabla.style.setProperty('--mf-col1', w); if (marco.scrollWidth <= marco.clientWidth + 1 && marco.scrollHeight < menor) { menor = marco.scrollHeight; mejor = w; } });
         tabla.style.setProperty('--mf-col1', mejor);
+        // más ancha que su caja (celular): filas apiladas, cada casilla con el nombre de su columna; nada se corta a la derecha
+        if (marco.scrollWidth > marco.clientWidth + 1) { caja.classList.add('apilada'); tabla.style.fontSize = '14px'; }
       }
       revisar();
     }
@@ -641,6 +677,7 @@
       if (!quedan) Esc.marcar('tabla');
     }
     marco.addEventListener('scroll', revisar);
+    if (window.ResizeObserver) new ResizeObserver(revisar).observe(tabla);
     alRedimensionar.push(ajustar);
     ajustar();
   }

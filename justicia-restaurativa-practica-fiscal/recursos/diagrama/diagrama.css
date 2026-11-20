@@ -348,3 +348,32 @@
    (salida/unidad-0N/comun/tema-curso.css): degradado abajo y «Desplace para ver más filas» mientras queden filas. */
 .mf.con-mas::after{content:"Desplace para ver más filas ↓";position:absolute;left:2px;right:14px;bottom:2px;height:46px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;
   background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 72%);font:700 12px Montserrat,Arial,sans-serif;color:#853629;pointer-events:none;border-radius:0 0 10px 10px}
+
+/* Tabla apilada (celular, 19/11/2026): cuando ni con 13 px cabe a lo ancho, cada fila va como un bloque y cada casilla con el nombre
+   de su columna; se desplaza hacia abajo con la misma señal de «Desplace para ver más filas». */
+.mf-col{display:none}
+.mf.apilada .mf-tabla,.mf.apilada .mf-tabla tbody,.mf.apilada .mf-tabla tr,.mf.apilada .mf-tabla th,.mf.apilada .mf-tabla td{display:block;width:auto}
+.mf.apilada .mf-tabla thead{display:none}
+.mf.apilada .mf-tabla tbody tr{border-bottom:2px solid #1E4260}
+.mf.apilada .mf-tabla tbody th{width:auto;padding:5px 9px}
+.mf.apilada .mf-tabla td{border-top:0;padding:4px 9px 6px}
+.mf.apilada .mf-col{display:block;font:700 1em/1.3 Montserrat,Arial,sans-serif;color:#1E4260;margin:0 0 2px}
+.mf.apilada .mf-tabla tbody th .mf-col{font-weight:600;color:#853629}
+
+/* Figura que se desplaza dentro de su caja (celular): se ve que sigue, como las tablas (19/11/2026) */
+.fv,.ruta{position:relative}
+.fv.con-mas::after,.ruta.con-mas::after{content:"Desplace para ver más ↓";position:absolute;left:0;right:12px;bottom:0;height:46px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 72%);font:700 12px Montserrat,Arial,sans-serif;color:#853629;pointer-events:none}
+
+/* «¡Siga aquí!» del panel, al lado del botón y no encima (en el celular tapaba la última línea del texto; qa_cortes, 19/11/2026) */
+.panel-nav .globo-siga::after{bottom:auto;top:50%;right:calc(100% + 8px);transform:translateY(-50%)}
+
+/* Panel que no cabe ni por partes (celular): el texto se desplaza con su señal; los botones de la lectura por partes bajan de línea
+   en vez de pisarse (qa_cortes, 19/11/2026) */
+.panel{position:relative}
+.panel-cuerpo.desplaza{overflow-y:auto;overscroll-behavior:contain;padding-right:4px}
+.panel.con-mas::after{content:"Desplace para ver más ↓";position:absolute;left:12px;right:16px;bottom:8px;height:42px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),var(--fondo-suave,#fff) 72%);font:700 12px Montserrat,Arial,sans-serif;color:#853629;pointer-events:none}
+.panel-nav{flex-wrap:wrap;row-gap:6px}
+.panel-nav .boton{flex:0 0 auto}
+@media (max-width:600px){.panel-nav .globo-siga::after{display:none}}

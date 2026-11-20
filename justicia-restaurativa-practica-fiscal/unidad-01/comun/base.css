@@ -1652,3 +1652,7 @@ html.en-pantalla-completa .ova{width:767px;height:510px;min-height:0;flex:none}
 /* Frase de entrada a la vista (datos.entradaVisible, 19/11/2026). */
 .entrada-visible{flex:none;padding:6px 14px;border-left:5px solid var(--oxido);border-radius:10px;background:var(--blanco)}
 .entrada-visible .lectura-texto{font-size:14.5px;line-height:1.45;margin:0;text-align:left}
+/* Cortes por pestaña (QA de cortes, 19/11/2026): el aviso fijo del relato no tapa su última línea, y en angosto muchas pestañas se
+   reparten en dos filas en lugar de montarse. */
+.rv-texto .lectura-texto{padding-bottom:30px}
+@container ova (max-width:600px){.partes{flex-wrap:wrap}.partes .parte-tab{flex:0 0 auto;min-width:30px}}

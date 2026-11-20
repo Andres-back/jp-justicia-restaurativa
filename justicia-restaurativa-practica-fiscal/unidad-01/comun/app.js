@@ -621,6 +621,17 @@
   var alCerrarLector = null;
   function leer(titulo, texto, obj, desde, hoja) {
     var l = raiz.querySelector('.lector');
+    /* «ventanaSinRepetir» (Justicia restaurativa, Samir, 19/11/2026: «estos textos te dije que no iban… que ninguna más tenga eso»):
+       si el botón ya muestra completo el texto que abriría, no se abre una ventana que lo repite; queda leído en su sitio. */
+    if (datos.ventanaSinRepetir && desde && !hoja) {
+      var tmp = document.createElement('div'); tmp.innerHTML = rico(texto);
+      var nt = (tmp.textContent || '').replace(/\s+/g, ' ').replace(/[…]/g, '').trim().toLowerCase(), nb = (desde.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+      if (nt && nb.indexOf(nt) >= 0) {
+        desde.classList.add('abierta', 'leida-en-sitio');
+        if (!quieto && desde.animate) desde.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.03)' }, { transform: 'scale(1)' }], { duration: 300 });
+        return;
+      }
+    }
     if (alCerrarLector && !hoja) { var f0 = alCerrarLector; alCerrarLector = null; f0(); }
     retornoFoco = desde || null;
     /* «hoja»: {izq}, la ventana como hoja de cuaderno a la derecha de la tarjeta que se abre (B.giro). */
@@ -1175,6 +1186,8 @@
       for (fs = 12; fs >= 10.5; fs -= 0.5) { r.style.fontSize = fs + 'px'; if (cabe()) return; }
     })();
   }
+  /* «extractoMin» (Justicia restaurativa, 19/11/2026): el nodo muestra hasta ese largo; si el texto cabe entero, no se abre ventana
+     (ventanaSinRepetir). Opcional por datos. */
   function extracto(s, lim) {
     var t = String(s).replace(/\s*\n\s*/g, ' ').replace(/\[\^\d+\]/g, '').replace(/^• /, '').replace(/\*\*/g, '');
     return t.length > lim + 5 ? t.slice(0, lim).replace(/\s+\S*$/, '') + '…' : t;
@@ -2014,7 +2027,7 @@
       lineas += '<path d="M50 50 C ' + (der ? 60 : 40) + ' 50, ' + (der ? 60 : 40) + ' ' + y.toFixed(1) + ', ' + borde + ' ' + y.toFixed(1) + '" style="--d:' + (0.15 + i * 0.1) + 's"/>';
       nodos += '<button type="button" class="rama-mental' + (der ? ' der' : '') + refc(it.label) + '" data-id="' + k + '-' + i + '" data-i="' + i + '" style="left:' + x + '%;top:' + y.toFixed(1) + '%;--d:' + (0.3 + i * 0.1) + 's">' +
         '<span class="rama-arte">' + svgObjeto(it.obj, 40) + '</span><span class="rama-rotulo">' + rot(it.label) + '</span><span class="rama-marca">' + mano + visto + '</span>' +
-        (conTexto ? '<span class="rama-extracto">' + esc(may(extracto(segs(it.segs), n <= 2 ? 330 : 130))) + '</span>' : '') + estado + '</button>';
+        (conTexto ? '<span class="rama-extracto">' + esc(may(extracto(segs(it.segs), Math.max(n <= 2 ? 330 : 130, datos.extractoMin || 0)))) + '</span>' : '') + estado + '</button>';
     });
     return '<div class="mental n' + n + (conTexto ? ' con-extracto' : '') + '"><svg class="mental-lineas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' + lineas + '</svg>' +
       '<div class="mental-centro">' + (arteEn('centro') ? '<img class="mental-arte" src="' + srcImagen(escena.arte.img) + '" alt="">' : '<i class="fas fa-lightbulb" aria-hidden="true"></i>') +
@@ -2287,7 +2300,7 @@
       var x = n === 1 ? 50 : m + i * (100 - 2 * m) / (n - 1);
       return '<button type="button" class="nodo-esquema esq-parada' + refc(it.label) + '" data-id="' + k + '-' + i + '" data-i="' + i + '" style="--d:' + (0.25 + i * 0.12) + 's;--x:' + x.toFixed(2) + '%;--y:' + caminoY(forma, x).toFixed(2) + '%">' +
         '<span class="esq-tarjeta"><span class="esquema-arte">' + svgObjeto(it.obj, 46) + '</span><span class="esquema-rotulo">' + rot(it.label) + '</span>' +
-        '<span class="esquema-extracto">' + esc(may(extracto(segs(it.segs), 60))) + '</span>' +
+        '<span class="esquema-extracto">' + esc(may(extracto(segs(it.segs), Math.max(60, datos.extractoMin || 0)))) + '</span>' +
         '<span class="esquema-marca"><span class="marca-ver">' + mano + ' Explorar</span><span class="marca-falta"><i class="fas fa-book-open" aria-hidden="true"></i> Falta leer</span>' +
         '<span class="marca-leida">' + visto + ' +10</span></span></span><span class="esq-pin" aria-hidden="true"><b>' + (escena.sinOrden ? '' : (i + 1)) + '</b></span>' +
         '<span class="esq-clic" aria-hidden="true"><i class="fas fa-hand-pointer"></i> Clic aquí</span></button>';
@@ -2321,7 +2334,7 @@
       cabeza + '<div class="esquema-hijos">' + b.items.map(function (it, i) {
         return '<button type="button" class="nodo-esquema' + refc(it.label) + '" data-id="' + k + '-' + i + '" data-i="' + i + '" style="--d:' + (0.3 + i * 0.08) + 's">' +
           '<span class="esquema-arte">' + svgObjeto(it.obj, 46) + '</span><span class="esquema-rotulo">' + rot(it.label) + '</span>' +
-          '<span class="esquema-extracto">' + esc(may(extracto(segs(it.segs), n <= 2 ? 330 : n <= 3 ? 170 : 105))) + '</span>' +
+          '<span class="esquema-extracto">' + esc(may(extracto(segs(it.segs), Math.max(n <= 2 ? 330 : n <= 3 ? 170 : 105, datos.extractoMin || 0)))) + '</span>' +
           '<span class="esquema-marca"><span class="marca-ver">' + mano + ' Ver más</span><span class="marca-falta"><i class="fas fa-book-open" aria-hidden="true"></i> Falta leer</span>' +
           '<span class="marca-leida">' + visto + ' Leída</span></span></button>';
       }).join('') + '</div></div>';
@@ -3084,7 +3097,7 @@
       marcar(it.id); /* marcar primero: «Exploración completa» cambia la altura */
       /* Texto junto a su video o figura (escena.video / escena.recurso, 19/11/2026): completo, con letra de lectura y desplazamiento,
          sin partes («si aparece el texto mejor que aparezca completo»). */
-      if (escena.recurso || escena.video) {
+      if (escena.recurso || escena.video || escena.desplazar) {
         caja.classList.remove('ctx-desplazable'); encajarTexto(cont, caja, 14);
         if (caja.scrollHeight > caja.clientHeight + 2) { caja.classList.add('ctx-desplazable'); caja.style.setProperty('--fs', '14.5px'); }
       }

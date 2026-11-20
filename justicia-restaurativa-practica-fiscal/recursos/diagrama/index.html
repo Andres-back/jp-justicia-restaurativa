@@ -21,7 +21,19 @@
 <script>(function(){var inc=/[?&](embebido|incrustado)=1\b/.test(location.search);
 if(!inc&&window.parent!==window){try{var pd=window.parent.document;inc=!!pd.querySelector('.marco-recurso,.parte-tab')||/\/leccion-\d+\//.test(window.parent.location.pathname);}catch(e){}
 if(!inc&&/\/leccion-\d+\//.test(document.referrer||''))inc=true;}
-if(inc)document.documentElement.classList.add('embebido');})();</script>
+if(inc)document.documentElement.classList.add('embebido');
+/* Alto visible del marco (19/11/2026, qa_cortes de la U1 a 390 x 566): en la lección angosta el iframe es más alto que lo que deja
+   ver el escenario; la figura se compone en el alto que de verdad se ve (--alto-visible) y lo demás se desplaza con su señal. Se vuelve a medir cuando
+   cambian el marco o los contenedores de la lección (la cabecera crece con los puntos y el nivel), y cada segundo por si acaso. */
+function visible(){try{var fe=window.frameElement;if(!fe)return 0;var r=fe.getBoundingClientRect();if(r.height<40)return 0;
+var w=fe.ownerDocument.defaultView,b=Math.min(r.bottom,w.innerHeight);
+for(var a=fe.parentElement;a&&a.nodeType===1&&a!==fe.ownerDocument.documentElement;a=a.parentElement){if(/hidden|clip|auto|scroll/.test(w.getComputedStyle(a).overflowY))b=Math.min(b,a.getBoundingClientRect().bottom);}
+var h=Math.floor(b-r.top)-2;return h>=120&&h<r.height-2?h:0;}catch(e){return 0;}}
+var ultimo=-1;function aplicar(avisar){var h=visible(),d=document.documentElement;if(h===ultimo)return;ultimo=h;d.classList.toggle('alto-visible',!!h);
+if(h)d.style.setProperty('--alto-visible',h+'px');else d.style.removeProperty('--alto-visible');if(avisar)window.dispatchEvent(new Event('alto-visible'));}
+if(inc){aplicar(false);window.addEventListener('resize',function(){aplicar(false);});setInterval(function(){aplicar(true);},1000);
+try{var fe=window.frameElement,w=fe&&fe.ownerDocument.defaultView;if(w&&w.ResizeObserver){var ro=new w.ResizeObserver(function(){aplicar(true);});ro.observe(fe);for(var a=fe.parentElement;a&&a.nodeType===1;a=a.parentElement){if(/hidden|clip|auto|scroll/.test(w.getComputedStyle(a).overflowY))ro.observe(a);}}}catch(e){}}
+})();</script>
 </head>
 <body class="escena" data-recurso="diagrama">
 <script>(function(){var m=location.search.match(/[?&]f=([\w-]+)/);document.body.setAttribute('data-recurso','diagrama-'+(m?m[1]:'sin-figura'));})();</script>

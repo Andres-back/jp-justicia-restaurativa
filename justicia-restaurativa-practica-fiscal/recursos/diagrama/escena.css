@@ -82,3 +82,6 @@ html.embebido .esc-pie,body.embebido .esc-pie{min-height:0;padding:1px 10px 2px;
 html.embebido .esc-pie::after,body.embebido .esc-pie::after{display:none}
 html.embebido .franja-pc,body.embebido .franja-pc{display:none}
 html.embebido .boton-original,body.embebido .boton-original{position:static;font-size:.6rem;padding:2px 8px;box-shadow:1.5px 1.5px 0 var(--negro)}
+
+/* En la lección angosta, solo el alto del marco que se ve (index.html: --alto-visible); el resto del iframe queda en blanco */
+html.alto-visible body.escena{height:var(--alto-visible)}

@@ -314,3 +314,6 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 /* Video junto a su texto (escena.video): el video a la izquierda y el texto a la derecha, como el estándar del 08/11 (coordinación,
    19/11/2026). */
 .contexto:has(.ctx-video){grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);grid-template-areas:"cab cab" "pun pun" "arte txt"}
+
+/* Ventana amplia con letra de lectura de 14,5 px (revisión de la U1, 19/11/2026: «el principio a. solo muestra el 46 %»). */
+.lector.amplia .hoja-texto{font-size:14.5px;line-height:1.45}
