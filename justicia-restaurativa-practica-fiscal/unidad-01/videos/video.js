@@ -320,6 +320,9 @@
     actualizar();
   }
   function cargarTranscripcion(v) {
+    /* ?embebido=1: el reproductor va dentro de una página que muestra la transcripción en su propio panel (Justicia restaurativa,
+       Samir, 19/11/2026: «aprovechar el espacio para el video»): aquí solo el video. */
+    if (/[?&]embebido=1(?:&|$)/.test(location.search)) { document.body.classList.add('embebido'); return; }
     if (!v.id || trans || location.protocol === 'file:') return;
     fetch(v.transcripcion || ('medios/' + v.id + '.transcripcion.json'), { cache: 'no-cache' })
       .then(function (r) { return r.ok ? r.json() : null; })
@@ -332,6 +335,9 @@
     /* La pestaña lleva el título del video, no un rótulo genérico (aula, 12/11/2026: la presentación de la unidad se titulaba
        «Video del caso · Unidad 1»). Sin título de JP, su ubicación (lección y apartado); sin ninguno, el de la plantilla. */
     if (v.titulo || v.ubicacion) document.title = v.titulo || v.ubicacion;
+    /* Video con el texto ya incrustado en la imagen (subtitulos_incrustados): la pista arranca apagada para no duplicarlo; se puede
+       encender con su botón (Samir, 19/11/2026: «queda doble subtitulado»). */
+    if (v.subtIncrustados) conSubtitulos = false;
     cargarTranscripcion(v);
     if (revision) {
       raiz.querySelector('.video-cab').hidden = false;

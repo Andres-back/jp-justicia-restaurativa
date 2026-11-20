@@ -1665,3 +1665,17 @@ html.en-pantalla-completa .ova{width:767px;height:510px;min-height:0;flex:none}
 .art-enlace{cursor:pointer;border-bottom:2px dotted var(--oxido);border-radius:2px}
 .art-enlace:hover mark,.art-enlace:focus-visible mark{background:var(--crema)}
 .art-enlace:focus-visible{outline:2px solid var(--oxido);outline-offset:1px}
+/* Panel «Texto / Transcripción» junto a un video (19/11/2026). */
+.vt-tabs{flex:none;display:flex;gap:6px;margin:0 0 6px}
+.vt-tab{border:2px solid var(--marino);border-radius:99px;background:var(--blanco);color:var(--marino);font:700 11.5px/1 Montserrat,Arial,sans-serif;padding:4px 12px;cursor:pointer}
+.vt-tab[aria-selected=true]{background:var(--marino);color:var(--blanco)}
+.con-vt.viendo-trans>:not(.vt-tabs):not(.vt-trans){display:none !important}
+.vt-trans{flex:1;min-height:0;overflow-y:auto;font-size:14.5px;line-height:1.55;text-align:left}
+.vt-frase{cursor:pointer;color:color-mix(in srgb,var(--tinta) 55%,transparent)}
+.vt-frase.dicha{color:var(--tinta)}
+.vt-frase.actual{background:var(--crema);color:var(--marino);border-radius:4px}
+.ctx-texto.con-vt{justify-content:flex-start !important;align-content:start !important}
+.vt-panel{display:flex;flex-direction:column;min-height:0;min-width:0}
+.vt-panel.vt-ctx{grid-area:txt}
+.vt-panel>.ctx-texto,.vt-panel>.rv-texto{flex:1;min-height:0}
+.vt-panel>.vt-trans{padding:10px 14px;border-radius:14px;background:var(--blanco);border-left:6px solid var(--marino)}

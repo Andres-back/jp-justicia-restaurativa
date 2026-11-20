@@ -1054,6 +1054,7 @@
     }
     a.addEventListener('scroll', revisar);
     setTimeout(revisar, 600);
+    panelTranscripcion(el.querySelector('.rv-texto'), el.querySelector('.rv-video iframe'));
   };
   B.mapa = function (b, k) {
     var centro = b.items.filter(function (x) { return x.centro; })[0], ramas = b.items.filter(function (x) { return !x.centro; });
@@ -3120,6 +3121,7 @@
     }
     botones.forEach(function (o) { o.addEventListener('click', function () { abrir(Number(o.dataset.i)); }); });
     abrir(0); /* la escena nunca empieza en blanco */
+    if (escena.video) panelTranscripcion(caja, el.querySelector('.ctx-video iframe'));
     if (document.fonts) document.fonts.ready.then(function () { encajarTexto(cont, caja); });
     window.addEventListener('resize', function () { encajarTexto(cont, caja); });
     var img = el.querySelector('.ctx-arte img');
@@ -3142,6 +3144,63 @@
       return '<button type="button" role="tab" class="parte-tab' + (sel ? ' activa' : '') + (s.t[j] ? ' hecha' : '') + '" data-parte="' + k + '" aria-selected="' + sel + '" title="' + esc(r) + '" aria-label="' + (marca === '•' ? '' : esc(marca) + '. ') + esc(r) + '">' +
         '<span class="parte-letra">' + esc(marca) + '</span><span class="parte-rotulo">' + esc(r) + '</span><span class="parte-visto">' + visto + '</span></button>';
     }).join('') + '</nav>';
+  }
+
+
+  /* Panel «Texto / Transcripción» junto a un video (Justicia restaurativa, Samir, 19/11/2026: «el texto… debe desaparecer al iniciar
+     el video y debe iniciar la transcripción ahí»). «panel» es la caja del texto de la ficha; «iframe», el reproductor (su
+     ?video=<id> da la transcripción medios/<id>.transcripcion.json). Antes de reproducir se ve el texto; al dar play el panel pasa
+     solo a la transcripción, que resalta la frase que suena y lleva al video a la que se toca. Las dos pestañas permiten volver.
+     Sin transcripción o sin acceso al video (archivo local), el panel queda como estaba. */
+  function panelTranscripcion(panel, iframe) {
+    if (!panel || !iframe || panel.dataset.trans) return;
+    panel.dataset.trans = '1';
+    var src = iframe.getAttribute('src') || '', m = /^(.*\/)index\.html\?(?:.*&)?video=([^&]+)/.exec(src);
+    if (!m || location.protocol === 'file:') return;
+    fetch(m[1] + 'medios/' + m[2] + '.transcripcion.json', { cache: 'no-cache' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (d && d.lineas && d.lineas.length) montar(d.lineas); })
+      .catch(function () {});
+    function montar(lineas) {
+      var tabs = document.createElement('div');
+      tabs.className = 'vt-tabs'; tabs.setAttribute('role', 'tablist');
+      tabs.innerHTML = '<button type="button" role="tab" class="vt-tab" data-vt="texto" aria-selected="true">Texto</button>' +
+        '<button type="button" role="tab" class="vt-tab" data-vt="trans" aria-selected="false">Transcripción</button>';
+      var caja = document.createElement('div');
+      caja.className = 'vt-trans lectura-texto'; caja.hidden = true; caja.tabIndex = 0;
+      caja.innerHTML = lineas.map(function (l, k) { return '<span class="vt-frase" data-k="' + k + '" role="button" tabindex="-1">' + esc(l.t) + ' </span>'; }).join('');
+      /* Envoltura propia: la caja del texto se reescribe al cambiar de punto y las pestañas no deben perderse. */
+      var env = document.createElement('div');
+      env.className = 'vt-panel ' + (panel.classList.contains('ctx-texto') ? 'vt-ctx' : 'vt-rel');
+      panel.parentNode.insertBefore(env, panel);
+      env.appendChild(tabs); env.appendChild(panel); env.appendChild(caja);
+      panel = env;
+      panel.classList.add('con-vt');
+      function ver(cual) {
+        tabs.querySelectorAll('.vt-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.vt === cual)); });
+        panel.classList.toggle('viendo-trans', cual === 'trans');
+        caja.hidden = cual !== 'trans';
+      }
+      tabs.addEventListener('click', function (e) { var b = e.target.closest('.vt-tab'); if (b) ver(b.dataset.vt); });
+      var video = null;
+      function enlazar() {
+        try { video = iframe.contentDocument && iframe.contentDocument.querySelector('video'); } catch (e) { video = null; }
+        if (!video || video.dataset.vt) return;
+        video.dataset.vt = '1';
+        video.addEventListener('play', function () { ver('trans'); });
+        video.addEventListener('timeupdate', function () {
+          var t = video.currentTime, act = -1;
+          lineas.forEach(function (l, k) { if (l.i <= t + 0.05 && t < l.f) act = k; });
+          caja.querySelectorAll('.vt-frase').forEach(function (e, k) { e.classList.toggle('actual', k === act); e.classList.toggle('dicha', lineas[k].i <= t); });
+          var a = caja.querySelector('.vt-frase.actual');
+          if (a && !caja.hidden) { var top = a.offsetTop - caja.offsetTop; if (top < caja.scrollTop || top > caja.scrollTop + caja.clientHeight - 30) caja.scrollTop = Math.max(0, top - caja.clientHeight * 0.35); }
+        });
+        caja.addEventListener('click', function (e) { var f = e.target.closest('.vt-frase'); if (!f || !video) return; video.currentTime = lineas[Number(f.dataset.k)].i + 0.01; if (video.paused) video.play(); });
+      }
+      iframe.addEventListener('load', enlazar);
+      enlazar();
+      setTimeout(enlazar, 1500);
+    }
   }
 
   /* ---------- Escena ---------- */
