@@ -1871,9 +1871,10 @@
       }).join('') + '</div>' : '') +
       '<div class="cuadro-caja"><table class="cuadro-tabla">' + (cap ? '<caption class="sr-only">' + esc(may(cap)) + '</caption>' : '') +
       '<thead>' + cabeza + '</thead><tbody>' + filas + '</tbody></table></div>' + pies +
-      (partes ? '<div class="cuadro-nav"><button type="button" class="cuadro-ant"><i class="fas fa-arrow-left" aria-hidden="true"></i> ' + (b.multi ? 'Tabla anterior' : 'Anterior') + '</button>' +
+      /* Con «multi» el selector de tablas basta: sin la barra «Anterior / Seguir leyendo», la tabla gana su alto. */
+      (partes && !b.multi ? '<div class="cuadro-nav"><button type="button" class="cuadro-ant"><i class="fas fa-arrow-left" aria-hidden="true"></i> Anterior</button>' +
         '<span class="cuadro-donde" aria-live="polite"></span>' +
-        '<button type="button" class="cuadro-sig">' + (b.multi ? 'Tabla siguiente' : 'Seguir leyendo') + ' <i class="fas fa-arrow-right" aria-hidden="true"></i></button></div>' : '') + '</div>';
+        '<button type="button" class="cuadro-sig">Seguir leyendo <i class="fas fa-arrow-right" aria-hidden="true"></i></button></div>' : '') + '</div>';
   };
   /* La letra crece hasta 19 px si la parte es breve y baja de a medio punto (hasta 11,5 px) hasta caber: nunca desplazamiento. */
   function encajarCuadro(el) {
@@ -2392,7 +2393,8 @@
         (it.papel ? '<span class="red-papel"><span class="red-pista">Ábrala para completar la red</span><span class="red-revela">' + esc(may(it.papel)) + '</span></span>' : '') + '</button>';
     });
     return '<div class="red n' + n + '"><svg class="red-lineas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' + lineas + '</svg>' +
-      '<div class="red-centro"><i class="fas fa-sitemap" aria-hidden="true"></i><span>' + esc(may(b.centro || centroTitulo())) + '</span></div>' + nodos + '</div>';
+      '<div class="red-centro">' + (datos.redArte && datos.ilustraciones && escena.ilustracion ? '<img class="red-arte" src="' + srcImagen(escena.ilustracion) + '" alt="">'   // «redArte»: dato del curso
+        : '<i class="fas fa-sitemap" aria-hidden="true"></i>') + '<span>' + esc(may(b.centro || centroTitulo())) + '</span></div>' + nodos + '</div>';
   };
   B.red.activar = function (b, k, el) { abreLector(el, b); };
 
@@ -2520,7 +2522,7 @@
     p.classList.remove('panel-desplaza');
     /* La letra crece si el texto es breve (hasta 19 px) y baja hasta 13 px para caber. */
     var sinEscena = !!p.closest('.carrusel, .destacado');
-    for (var fs = 19; fs >= 13; fs -= 0.5) { p.style.setProperty('--fs', fs + 'px'); if (entra(p)) { rellenarForma(p.parentNode, sinEscena); return; } }
+    for (var fs = p.closest('.destacado') ? 22 : p.closest('.carrusel') ? 21 : 19; fs >= 13; fs -= 0.5) { p.style.setProperty('--fs', fs + 'px'); if (entra(p)) { rellenarForma(p.parentNode, sinEscena); return; } }
     p.style.setProperty('--fs', '13.5px');
     p.classList.add('panel-desplaza');
   }
