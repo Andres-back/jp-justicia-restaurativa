@@ -1656,3 +1656,8 @@ html.en-pantalla-completa .ova{width:767px;height:510px;min-height:0;flex:none}
    reparten en dos filas en lugar de montarse. */
 .rv-texto .lectura-texto{padding-bottom:30px}
 @container ova (max-width:600px){.partes{flex-wrap:wrap}.partes .parte-tab{flex:0 0 auto;min-width:30px}}
+/* El relato se desplaza dentro de su texto y el aviso queda abajo, fuera de él: no tapa ninguna línea (QA de cortes, 19/11/2026). */
+.rv-texto{display:flex;flex-direction:column;overflow:hidden}
+.rv-texto .lectura-texto{flex:1;min-height:0;overflow-y:auto;padding-bottom:6px;padding-right:6px}
+.rv-pie{position:static;flex:none;margin:6px 0 0;padding:4px 0 0;background:none;border-top:1px solid color-mix(in srgb,var(--oxido) 25%,transparent)}
+.ctx-texto.ctx-desplazable{justify-content:flex-start !important;align-content:start !important}

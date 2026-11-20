@@ -317,3 +317,10 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 
 /* Ventana amplia con letra de lectura de 14,5 px (revisión de la U1, 19/11/2026: «el principio a. solo muestra el 46 %»). */
 .lector.amplia .hoja-texto{font-size:14.5px;line-height:1.45}
+
+/* «¡Siga aquí!» a la izquierda del botón, en su misma fila: encima tapaba la última línea del texto (QA de cortes, 19/11/2026). */
+.pag-siguiente.sigue-aqui::after{right:calc(100% + 10px);bottom:auto;top:50%;transform:translateY(-50%);animation:none}
+/* En angosto, los nodos del mapa conceptual crecen con su rótulo y sus marcas (QA de cortes: 56 nodos recortados a 390 × 566). */
+@container ova (max-width:600px){.esquema .nodo-esquema{height:auto !important;min-height:0;max-height:none !important;overflow:visible}
+  .esquema .esquema-rotulo{white-space:normal;overflow:visible;-webkit-line-clamp:unset;display:block}}
+@container ova (max-width:600px){.esquema .esquema-hijos{grid-template-rows:none !important;grid-auto-rows:auto !important;flex:none}.esquema{height:auto !important;flex:none}}

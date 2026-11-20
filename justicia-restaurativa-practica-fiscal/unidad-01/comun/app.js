@@ -1034,7 +1034,7 @@
       '</div><p class="rv-pie" aria-live="polite">Desplace para leer todo el relato ↓</p></article></div>';
   };
   B.relato.activar = function (b, k, el) {
-    var a = el.querySelector('.rv-texto'), pie = el.querySelector('.rv-pie');
+    var a = el.querySelector('.rv-texto .lectura-texto'), pie = el.querySelector('.rv-pie');
     function revisar() {
       var fin = a.scrollTop + a.clientHeight >= a.scrollHeight - 6;
       if (fin) { marcar(k + '-0'); pie.textContent = 'Relato leído completo'; }
