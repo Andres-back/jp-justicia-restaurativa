@@ -7,7 +7,7 @@
      triangulo  ejes en círculos que se cruzan y una frase en cada lado del triángulo, todo a la vista;
      matriz     tabla: fija a la vista, por fila (lista + panel con las columnas) o por casilla (lector por partes);
      tarjetas   puntos independientes (lista + panel);
-     capas      círculos concéntricos, cada capa con sus integrantes;
+     capas      círculos concéntricos, cada capa con sus integrantes completos (panel en columnas o ventana amplia, sin partes);
      niveles    jerarquía: recuadro superior, grupos y un bloque final, todo a la vista.
    Dentro de una pestaña de su lección (?embebido=1 o detectado; index.html y escena.js) va sin cabecera, sin botón
    propio de pantalla completa y sin avisos propios, con la fuente en una línea pequeña y todo el alto para la figura.
@@ -826,11 +826,19 @@
   }
 
   /* ======================= CAPAS ======================= */
+  /* Cada capa se lee completa, sin partes ni desplazamiento (Samir, 20/11/2026: «no podemos dejar información incompleta o
+     cortada»; antes «Nivel interinstitucional» salía en «Parte 1 de 3» y, en el celular, «FGN articula el modelo» también).
+     - Los círculos ocupan solo el ancho que pide su alto; el panel se queda con el resto y reparte los integrantes de la capa en las
+       columnas que hagan falta, con la letra más grande que entre (de 20 a 13 px). El detalle de la capa va junto a su nombre.
+     - Si alguna capa no cabe así (pantalla angosta), los círculos se quedan con todo el espacio y cada capa se abre en una ventana
+       amplia, con el mismo ajuste. Solo si ni así cabe con 13 px, la ventana se desplaza con «Desplace para ver más». */
   function capas() {
     guia.textContent = 'Haga clic en cada círculo, del centro hacia afuera, para leer su contenido.';
     var K = C.capas;
     var caja = el('div', 'cp');
     if (C.encabezado) caja.appendChild(el('p', 'diag-enc', md(C.encabezado)));
+    var pista = el('p', 'cp-pista', 'Haga clic en cada círculo, del centro hacia afuera.');
+    caja.appendChild(pista);
     var anillos = el('div', 'cp-anillos', '<svg viewBox="0 0 400 400" aria-hidden="true" focusable="false">' +
       '<circle class="cp-c" data-capa="' + esc(K[2].id) + '" cx="200" cy="200" r="196"/>' +
       '<circle class="cp-c" data-capa="' + esc(K[1].id) + '" cx="200" cy="200" r="142"/>' +
@@ -850,8 +858,9 @@
     var np = nuevoPanel();
     caja.appendChild(np.sec);
     raiz.appendChild(caja);
-    var panel = new Panel(np.sec);
-    inicioPanel(np.sec, '<i class="fas fa-circle-nodes" aria-hidden="true"></i><p>Haga clic en el círculo central para empezar.</p>');
+    var cab = np.sec.querySelector('.panel-cab'), cuerpo = np.sec.querySelector('.panel-cuerpo');
+    var INICIO = '<i class="fas fa-circle-nodes" aria-hidden="true"></i><p>Haga clic en el círculo central para empezar.</p>';
+    inicioPanel(np.sec, INICIO);
     function miembro(e) {
       var h = '<div class="miembro">';
       if (e.seguido) h += '<p><b>' + md(e.nombre) + '</b> ' + e.lineas.map(md).join(' ') + '</p>';
@@ -862,16 +871,68 @@
       }
       return h + '</div>';
     }
-    function abrir(i) {
+    function titulo(k) { return k.nombre.map(md).join(' '); }
+    function miembros(k) { return '<div class="miembros">' + k.elementos.map(miembro).join('') + '</div>'; }
+    // La letra más grande (20 a 13 px) y las columnas (de 1 a tantas como integrantes, de 9,5 em o más) con las que la capa cabe
+    // completa en su caja; con la misma letra, menos columnas. 0 si no cabe ni con 13 px.
+    function ajustar(c, k) {
+      var n = k.elementos.length, W = c.clientWidth;
+      for (var t = 20; t >= 13; t -= 0.5) {
+        c.style.fontSize = t + 'px';
+        for (var cols = 1; cols <= n; cols++) {
+          if (cols > 1 && W / cols < 9.5 * t) break;
+          c.style.setProperty('--cols', cols);
+          if (cabe(c)) return t;
+        }
+      }
+      c.style.fontSize = '13px'; c.style.setProperty('--cols', 1);
+      return 0;
+    }
+    function pintarPanel(k) {
+      cab.innerHTML = '<h2 class="panel-tit">' + titulo(k) + '</h2>' + (k.detalle ? '<p class="cp-detalle">' + md(k.detalle) + '</p>' : '');
+      cab.hidden = false;
+      cuerpo.innerHTML = miembros(k);
+      return ajustar(cuerpo, k);
+    }
+    // ¿caben todas las capas en el panel? Si no, cada capa se abre en una ventana
+    var enVentana = false, activa = -1;
+    function decidir() {
+      caja.classList.remove('en-ventana');
+      // los círculos, del ancho de su alto (como mucho la mitad): el panel se queda con el resto
+      var r = marco.getBoundingClientRect();
+      caja.style.setProperty('--cp-izq', Math.round(Math.min(r.height, caja.clientWidth * 0.5)) + 'px');
+      enVentana = !K.every(pintarPanel);
+      caja.classList.toggle('en-ventana', enVentana);
+      if (enVentana || activa < 0) inicioPanel(np.sec, INICIO);
+      else mostrarEnPanel(activa);
+    }
+    function mostrarEnPanel(i) {
+      pintarPanel(K[i]);
+      if (!reducido && cuerpo.animate) cuerpo.animate([{ opacity: 0, transform: 'translateY(5px)' }, { opacity: 1, transform: 'none' }], { duration: 230 });
+      Esc.marcar(K[i].id);
+    }
+    function mostrarEnVentana(i) {
       var k = K[i];
-      caja.setAttribute('data-activo', k.id);
+      var c = Kit.ventana(plano(k.nombre.join(' ')), (k.detalle ? '<p class="cp-detalle">' + md(k.detalle) + '</p>' : '') + miembros(k), {
+        alCerrar: function () { fondo.classList.remove('cp-ventana'); c.onscroll = null; v.classList.remove('con-mas'); }
+      });
+      var fondo = c.closest('.ventana-fondo'), v = c.closest('.ventana');
+      fondo.classList.add('cp-ventana');
+      ajustar(c, k);
+      function revisar() {
+        var quedan = c.scrollTop + c.clientHeight < c.scrollHeight - 2;
+        v.classList.toggle('con-mas', quedan);
+        if (!quedan) Esc.marcar(k.id);
+      }
+      c.scrollTop = 0; c.onscroll = revisar; revisar();
+    }
+    function abrir(i) {
+      activa = i;
+      caja.setAttribute('data-activo', K[i].id);
       Array.prototype.forEach.call(anillos.querySelectorAll('.cp-btn'), function (b, j) { b.classList.toggle('activo', j === i); });
-      Array.prototype.forEach.call(anillos.querySelectorAll('.cp-c'), function (c) { c.classList.toggle('activo', c.getAttribute('data-capa') === k.id); });
-      var det = k.detalle ? '<p class="cp-detalle">' + md(k.detalle) + '</p>' : '';
-      var ms = k.elementos.map(miembro);
-      panel.mostrar({ clave: k.id, cab: '<h2 class="panel-tit">' + k.nombre.map(md).join(' ') + '</h2>',
-        bloques: [det + '<div class="miembros' + (ms.length > 2 ? ' dos' : '') + '">' + ms.join('') + '</div>'],
-        alternos: (det ? [det] : []).concat(ms), max: 24, min: 13, alFin: pintar });
+      Array.prototype.forEach.call(anillos.querySelectorAll('.cp-c'), function (c) { c.classList.toggle('activo', c.getAttribute('data-capa') === K[i].id); });
+      if (enVentana) mostrarEnVentana(i); else mostrarEnPanel(i);
+      pintar();
     }
     function pintar() {
       var sig = -1; K.forEach(function (k, i) { if (sig < 0 && !Esc.leido(k.id)) sig = i; });
@@ -882,8 +943,9 @@
       Array.prototype.forEach.call(anillos.querySelectorAll('.cp-c'), function (c) { c.classList.toggle('leido', Esc.leido(c.getAttribute('data-capa'))); });
     }
     document.addEventListener('esc:leido', pintar);
-    alRedimensionar.push(function () { var a = caja.getAttribute('data-activo'); K.forEach(function (k, i) { if (k.id === a) abrir(i); }); });
+    alRedimensionar.push(decidir);
     Esc.registrar(K.map(function (k) { return k.id; }));
+    decidir();
     pintar();
   }
 

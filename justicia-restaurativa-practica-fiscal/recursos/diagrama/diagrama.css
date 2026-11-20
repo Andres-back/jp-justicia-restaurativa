@@ -166,7 +166,7 @@
 .mz-celda[data-estado="leido"]:not(.activo){background:var(--menta-suave)}
 
 /* ---------- CAPAS ---------- */
-.cp{height:100%;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:auto minmax(0,1fr);gap:4px 14px;min-height:0}
+.cp{height:100%;display:grid;grid-template-columns:minmax(0,var(--cp-izq,.9fr)) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:4px 14px;min-height:0}
 .cp .diag-enc{grid-column:1 / -1;margin:0}
 .cp-marco{min-height:0;min-width:0;display:flex;align-items:center;justify-content:center;container-type:size}
 .cp-anillos{position:relative;aspect-ratio:1;width:min(100cqw,100cqh)}
@@ -187,8 +187,7 @@
 .cp-btn.late{animation:latido 1.8s ease-in-out infinite}
 .cp .panel{grid-row:2;grid-column:2}
 .cp-detalle{font-family:var(--t-titulo);font-weight:600;color:var(--carbon)}
-.miembros{display:grid;gap:8px 14px}
-.miembros.dos{grid-template-columns:repeat(2,minmax(0,1fr))}
+.miembros{display:grid;gap:8px 14px;grid-template-columns:repeat(var(--cols,1),minmax(0,1fr))}
 .miembro{min-width:0;border-left:3px solid var(--oliva);padding-left:9px}
 .miembro p{margin:0 0 .15em}
 .miembro .vinetas{margin:0}
@@ -267,7 +266,6 @@
   .esc-pie::after{content:"";flex:1 1 100%;height:30px}
   .boton-original{position:fixed;right:8px;bottom:4px;font-size:.62rem;padding:4px 9px}
   .cp .panel{grid-row:3;grid-column:1}
-  .miembros.dos{grid-template-columns:1fr}
 }
 
 /* Tabla fija (abrir: "fija"; revisión con Juan del 19/11/2026): todas las filas a la vista, sin clics. */
@@ -393,3 +391,31 @@
 .panel-nav{flex-wrap:wrap;row-gap:6px}
 .panel-nav .boton{flex:0 0 auto}
 @media (max-width:600px){.panel-nav .globo-siga::after{display:none}}
+
+/* Capas completas, sin partes (Samir, 20/11/2026: «no podemos dejar información incompleta o cortada»). Los círculos, del ancho de
+   su alto (--cp-izq, diagrama.js); el detalle de la capa junto a su nombre; los integrantes en las columnas que hagan falta (--cols).
+   Si alguna capa no cabe en el panel (pantalla angosta): círculos en todo el espacio y cada capa en una ventana amplia. */
+.cp .panel-cab{flex-wrap:wrap;align-items:baseline;column-gap:.6em;row-gap:0}
+.cp .panel-cab .cp-detalle{margin:0;font-size:.86rem}
+.cp-pista{display:none;grid-column:1 / -1;margin:0;font-family:var(--t-titulo);font-size:.72rem;font-weight:600;color:var(--carbon);text-align:center}
+.cp.en-ventana{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr)}
+.cp.en-ventana .cp-pista{display:block}
+.cp.en-ventana .panel{display:none}
+.cp.en-ventana .cp-marco{grid-column:1 / -1}
+/* la ventana de la capa aprovecha el alto (en el celular, la lección deja ver unos 394 px del marco): poco marco y poco aire */
+.cp-ventana{padding:4px}
+.cp-ventana .ventana{position:relative;max-height:calc(100vh - 8px)}
+.cp-ventana .ventana-cab{padding:5px 8px 5px 12px;gap:8px}
+.cp-ventana .ventana-cab h2{font-size:.95rem}
+.cp-ventana .cerrar{width:30px;height:30px;font-size:.9rem}
+.cp-ventana .ventana-cuerpo{padding:7px 10px 8px;line-height:1.38;color:var(--negro)}
+.cp-ventana .miembros{gap:5px 12px}
+.cp-ventana .miembro{padding-left:7px}
+.cp-ventana .cp-detalle{margin:0 0 .3em}
+.cp-ventana .miembro .rotulo{font-family:var(--t-titulo);font-weight:700;color:var(--carbon);margin-bottom:.2em}
+.cp-ventana .ventana.con-mas::after{content:"Desplace para ver más ↓";position:absolute;left:12px;right:16px;bottom:8px;height:42px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 72%);font:700 12px Montserrat,Arial,sans-serif;color:#853629;pointer-events:none}
+/* En la lección angosta, la ventana va en el alto que se ve del marco (index.html: --alto-visible) */
+html.alto-visible .ventana-fondo{bottom:auto;height:var(--alto-visible)}
+html.alto-visible .ventana{max-height:calc(var(--alto-visible) - 36px)}
+html.alto-visible .cp-ventana .ventana{max-height:calc(var(--alto-visible) - 8px)}
