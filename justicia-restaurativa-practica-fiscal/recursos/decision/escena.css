@@ -80,3 +80,8 @@ body.embebido .esc-cab{display:none}
 body.embebido .esc-escenario{padding:6px 8px}
 body.embebido .esc-pie{min-height:16px;padding:0 10px;font-size:.6rem;border-top:0}
 body.embebido .franja-pc{display:none}
+/* Dentro de la pestaña la tarjeta de la decisión es más baja (QA de cortes, 19/11/2026: «Clic en la señal que elija» quedaba fuera
+   en la parada 3, con opciones largas): menos separación y el aviso en una línea compacta. */
+body.embebido .c-cont{gap:.3em}
+body.embebido .c-aviso{font-size:.82em;line-height:1.25;margin:0;padding-top:0}
+body.embebido .senales{gap:.35em}

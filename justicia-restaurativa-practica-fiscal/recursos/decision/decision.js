@@ -514,6 +514,9 @@
       } else {
         est.err[pos] = (est.err[pos] || 0) + 1; est.prob[pos] = est.prob[pos] || {}; est.prob[pos][j] = true; guardar();
         pintarCruce(true);
+        /* La señal marcada con su «×» puede ocupar otra línea: se vuelve a encajar el cruce (QA de cortes, 19/11/2026: el aviso
+           «Clic en la señal que elija» quedaba fuera de la tarjeta en la parada 3). */
+        encajar();
         boton.classList.remove('sacude'); void boton.offsetWidth; boton.classList.add('sacude');
         lectura({ titulo: 'Esa no es la señal', tono: 'mal', antes: antes, unidades: retroMal(p, o),
           boton: { texto: 'Vuelva a intentarlo', icono: 'fa-rotate-left' } });
