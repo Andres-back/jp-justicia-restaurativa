@@ -15,12 +15,19 @@
   /* Colores del curso para los objetos dibujados (Bienes, 27/10/2026: los de su plantilla de Genially). Sin «paleta» en los
      datos, los objetos conservan la de JP. */
   if (datos.paleta) Object.keys(datos.paleta).forEach(function (k) { O.C[k] = datos.paleta[k]; });
-  var fijo = Number(new URLSearchParams(location.search).get('escena'));
-  var embebido = Number.isInteger(fijo) && fijo >= 1 && fijo <= datos.scenes.length;
+  /* Una página por subtítulo numerado (Justicia restaurativa, revisión con Juan del 19/11/2026: «cada subtítulo tenga su propia
+     diapositiva y la información»; «que las partes no se desagreguen entre varias diapositivas»). Con «datos.paginas»
+     ([[índices de escena], …]) las escenas de un mismo subtítulo son una sola página de Genially (?escena=P) y se recorren con
+     pestañas A, B, C arriba de la mediación (&parte=K abre la pestaña K). Sin «paginas», cada escena es su página, como antes. */
+  var PAGINAS = datos.paginas || datos.scenes.map(function (_, i) { return [i]; });
+  var consulta = new URLSearchParams(location.search);
+  var fijo = Number(consulta.get('escena')), parteFija = Number(consulta.get('parte')) || 1;
+  var embebido = Number.isInteger(fijo) && fijo >= 1 && fijo <= PAGINAS.length;
+  function paginaDe(i) { for (var p = 0; p < PAGINAS.length; p++) if (PAGINAS[p].indexOf(i) >= 0) return p; return 0; }
   /* Dentro del SCORM del aula, la lección tiene su propio botón «Pantalla completa» en el centro del pie, en todas las páginas
      (JP, 14/11/2026: «navegar en pantalla completa siempre»): el de la escena, que hacía lo mismo, no se repite. */
   /* (la clase «pc-leccion» se pone al pintar la escena, con las demás de la raíz) */
-  var actual = embebido ? fijo - 1 : 0;
+  var actual = embebido ? PAGINAS[fijo - 1][Math.max(1, Math.min(parteFija, PAGINAS[fijo - 1].length)) - 1] : 0;
   var escena, vistos, total, retornoFoco = null;
   var esc = function (s) {
     return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
@@ -52,7 +59,9 @@
     red: 'Abra cada institución de la red: al leerla se revela su papel en el sistema.',
     conexiones: 'Lea cada fragmento: cada uno revela una conexión del mapa.',
     condiciones: 'Lea los fragmentos y marque si cada requisito se cumple: la consecuencia cambia.',
-    actividad: 'Elija una respuesta: si no es la correcta, lea la retroalimentación e inténtelo de nuevo.'
+    actividad: 'Elija una respuesta: si no es la correcta, lea la retroalimentación e inténtelo de nuevo.',
+    marco: 'Recorra el recurso de esta sección.',
+    relato: 'Vea el video y lea el relato completo de la situación: el panel de la derecha se desplaza.'
   };
   // Con datos.puntosSoloLeyenda (ver B.puntos), lo que se toca son los rótulos de la derecha.
   if (datos.puntosSoloLeyenda) guias.puntos = 'Toque cada rótulo de la derecha; su número señala el lugar en la ilustración.';
@@ -71,8 +80,21 @@
   function refc(s) { return esRef(s) ? ' ref' : ''; }
   function rot(s) { return (esRef(s) ? '<i class="fas fa-book-open ref-ico" aria-hidden="true"></i>' : '') + esc(may(s)); }
   /* Cada línea es un párrafo de la fuente; «[^n] …» al inicio es una nota al pie y «[^n]» en el texto, su llamada. */
+  /* Artículos con su ventana de consulta («datos.articulos», Justicia restaurativa, 19/11/2026: «si dice artículo 519… al darle clic…
+     muestre la información»): la cita de la ficha se vuelve un enlace discreto, con el mismo resaltado. Opcional por datos. */
+  var ARTS = (datos.articulos || []).map(function (a, i) { return { i: i, forma: esc(a.forma), seg: esc(a.seg || a.forma) }; });
   function marcado(s) {
-    return esc(s).replace(REF, function (m) { return '<mark class="ref-texto">' + m + '</mark>'; })
+    var e = esc(s), puestos = [];
+    ARTS.forEach(function (a) {
+      var p = e.indexOf(a.forma); if (p < 0) return;
+      var q = e.indexOf(a.seg, p); if (q < 0 || q > p + a.forma.length) return;
+      puestos.push(a.i);
+      e = e.slice(0, q) + '\u0001' + (puestos.length - 1) + '\u0002' + e.slice(q + a.seg.length);
+    });
+    e = e.replace(REF, function (m) { return '<mark class="ref-texto">' + m + '</mark>'; });
+    e = e.replace(/\u0001(\d+)\u0002/g, function (_, k) { var a = ARTS[puestos[Number(k)]];
+      return '<span class="art-enlace" role="button" tabindex="0" data-art="' + a.i + '" title="Clic para ver qué dice el curso de este artículo"><mark class="ref-texto">' + a.seg + '</mark></span>'; });
+    return e
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\[\^(\d+)\]/g, '<sup class="llamada">$1</sup>');
   }
   /* Párrafos con aire (Bienes, revisión de Juan: «que haga respirar un poquitico el párrafo»): con datos.respiro (caracteres
@@ -199,7 +221,9 @@
      «Pantalla completa» sin permiso) no cambia de composición (revisión de choques, 30/10/2026). */
   function marcoAncho() { return !!(datos.marco && datos.marco[0] >= 900); }
   function anchoReal() { return marcoAncho() && raiz.clientWidth >= 900; }
-  function topeLetra(normal) { return datos.sinHuecos ? Math.max(normal, 25) : normal; }
+  /* «letraMax» (Justicia restaurativa, Juan y Samir, 19/11/2026: «hagamos la letra un poco más pequeña… para que quepa más contenido
+     en menos espacio»): tope de la letra de lectura; opcional por datos. */
+  function topeLetra(normal) { var t = datos.sinHuecos ? Math.max(normal, 25) : normal; return datos.letraMax ? Math.min(t, datos.letraMax) : t; }
   /* Holgura del encaje: con datos.sinHuecos se deja 4 px libres, porque otro navegador dibuja la misma fuente 1–3 px más alta y
      el panel abriría una barra de desplazamiento. */
   function holgura() { return datos.sinHuecos ? -3 : 1; }
@@ -305,6 +329,10 @@
   var IMAGEN = datos.scenes.map(function (e) { return conFigura(e) ? tema(e) : null; });
   IMAGEN.forEach(function (t, i) { if (t && i && IMAGEN[i - 1] === t) IMAGEN[i] = null; });
   function figura(objs, acomp) {
+    /* «escena.video» (Justicia restaurativa, 19/11/2026: «el texto y, enseguida, el reproductor… a la derecha, en lugar de la
+       ilustración»): el reproductor del caso va junto a su texto, en la misma pestaña. Opcional por datos. */
+    if (escena.recurso) return '<figure class="ctx-arte ctx-recurso"><iframe src="' + esc(escena.recurso) + '" title="' + esc(may(escena.video_titulo || 'Figura')) + '" allow="fullscreen" allowfullscreen></iframe></figure>';
+    if (escena.video) return '<figure class="ctx-arte ctx-video"><iframe src="' + esc(escena.video) + '" title="' + esc(may(escena.video_titulo || 'Video')) + '" allow="fullscreen; autoplay" allowfullscreen></iframe></figure>';
     var t = IMAGEN[actual];
     if (t) return '<figure class="ctx-arte foto" aria-hidden="true"><img src="' + srcImagen(t) + '" alt=""></figure>';
     var C = O.C, n = Math.min(objs.length, 3), xs = [[150], [98, 206], [66, 150, 236]][n - 1], s = [1.85, 1.25, 0.95][n - 1];
@@ -323,6 +351,7 @@
      punto en grande; si con él el texto quedaría por debajo de 16 px, el objeto se retira; si ni así cabe, la imagen. */
   /* «minimo»: letra más pequeña aceptable (12,5 px por omisión); la bitácora del marco ancho pide 14 y, si no cabe, se reparte en partes. */
   function encajarTexto(cont, caja, minimo) {
+    if (caja.classList.contains('ctx-desplazable')) return;   // texto junto a video o figura: letra fija y desplazamiento
     quitarRelleno(caja);
     encajarTextoBase(cont, caja, minimo);
     rellenar(caja);
@@ -356,8 +385,9 @@
   function juegoHtml() {
     if (!datos.juego) return '';
     var s = juegoEstado(), p = juegoPuntos(s);
-    return '<div class="juego" role="status"><span class="j-tramos" title="Página ' + (actual + 1) + ' de ' + datos.scenes.length + ' de la lección. El punto se marca al leer todo el contenido de la página." aria-label="Tramo ' + (actual + 1) + ' de ' + datos.scenes.length + '">' + datos.scenes.map(function (_, i) {
-      return '<i class="' + (s.t[i] ? 'hecho' : '') + (i === actual ? ' aqui' : '') + '"></i>'; }).join('') + '</span>' +
+    var pa = paginaDe(actual);
+    return '<div class="juego" role="status"><span class="j-tramos" title="Página ' + (pa + 1) + ' de ' + PAGINAS.length + ' de la lección. El punto se marca al leer todo el contenido de la página." aria-label="Tramo ' + (pa + 1) + ' de ' + PAGINAS.length + '">' + PAGINAS.map(function (ix, i) {
+      return '<i class="' + (ix.every(function (j) { return s.t[j]; }) ? 'hecho' : '') + (i === pa ? ' aqui' : '') + '"></i>'; }).join('') + '</span>' +
       '<span class="j-nivel"><i class="fas fa-medal" aria-hidden="true"></i> <b>' + esc(datos.juego.niveles[juegoNivel(p)]) + '</b></span>' +
       '<span class="j-puntos"><i class="fas fa-star" aria-hidden="true"></i> <output>' + p + '</output> pts</span></div>';
   }
@@ -381,8 +411,10 @@
     if (!datos.juego) return;
     var s = juegoEstado(); if (s.t[actual]) return;
     var antes = juegoPuntos(s); s.t[actual] = 1; juegoSuma(s, antes);
-    var d = raiz.querySelectorAll('.j-tramos i')[actual]; if (d) d.classList.add('hecho');
-    juegoAviso('¡Tramo ' + (actual + 1) + ' superado! +25');
+    var pa = paginaDe(actual), ix = PAGINAS[pa], hecha = ix.every(function (j) { return s.t[j]; });
+    var d = raiz.querySelectorAll('.j-tramos i')[pa]; if (d && hecha) d.classList.add('hecho');
+    var pe = raiz.querySelector('.parte-tab[data-parte="' + ix.indexOf(actual) + '"]'); if (pe) pe.classList.add('hecha');
+    juegoAviso(ix.length > 1 && !hecha ? '¡Sección ' + (ix.indexOf(actual) + 1) + ' de ' + ix.length + ' superada! +25' : '¡Tramo ' + (pa + 1) + ' superado! +25');
   }
   function marcar(id) {
     if (vistos[id]) return;
@@ -452,6 +484,14 @@
     var partes = [].slice.call(t.querySelectorAll('.parr')), total = 0;
     partes.forEach(function (x) { x.hidden = false; total += x.textContent.length; });
     if (total <= lim * 1.08) return false;
+    /* «partesSiNoCabe» (Justicia restaurativa, revisión con Juan del 19/11/2026: «si aparece el texto mejor que aparezca completo»;
+       «esto puede caber en un popup más grande»): antes de partir se prueba el texto completo; si cabe en su caja con letra de
+       14 px o más (datos.letraCompleta), sin desbordarse, se lee de una vez y no hay «Seguir leyendo». Si no cabe, las partes de siempre. */
+    if (datos.partesSiNoCabe && ajustar && caja.clientHeight > 0) {
+      ajustar();
+      var letra = parseFloat(getComputedStyle(t).fontSize) || 0;
+      if (letra >= (datos.letraCompleta || 14) && caja.scrollHeight <= caja.clientHeight + 2 && t.scrollHeight <= t.clientHeight + 2 && caja.scrollWidth <= caja.clientWidth + 2) return false;
+    }
     var paginas = [[]], largo = 0;
     partes.forEach(function (x) {
       var L = x.textContent.length;
@@ -594,6 +634,17 @@
   var alCerrarLector = null;
   function leer(titulo, texto, obj, desde, hoja) {
     var l = raiz.querySelector('.lector');
+    /* «ventanaSinRepetir» (Justicia restaurativa, Samir, 19/11/2026: «estos textos te dije que no iban… que ninguna más tenga eso»):
+       si el botón ya muestra completo el texto que abriría, no se abre una ventana que lo repite; queda leído en su sitio. */
+    if (datos.ventanaSinRepetir && desde && !hoja) {
+      var tmp = document.createElement('div'); tmp.innerHTML = rico(texto);
+      var nt = (tmp.textContent || '').replace(/\s+/g, ' ').replace(/[…]/g, '').trim().toLowerCase(), nb = (desde.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+      if (nt && nb.indexOf(nt) >= 0) {
+        desde.classList.add('abierta', 'leida-en-sitio');
+        if (!quieto && desde.animate) desde.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.03)' }, { transform: 'scale(1)' }], { duration: 300 });
+        return;
+      }
+    }
     if (alCerrarLector && !hoja) { var f0 = alCerrarLector; alCerrarLector = null; f0(); }
     retornoFoco = desde || null;
     /* «hoja»: {izq}, la ventana como hoja de cuaderno a la derecha de la tarjeta que se abre (B.giro). */
@@ -973,6 +1024,38 @@
   /* ---------- Bloques ---------- */
   var B = {};
 
+  /* Recurso de la lección dentro de su página (Justicia restaurativa, 19/11/2026: «si yo quiero revisar la lección 1 toda debe estar
+     en la genially de la lección 1»; cada subtítulo con todo lo suyo): el video, la actividad o la figura que antes eran páginas
+     aparte van en una pestaña, en su propio marco (b.src, relativo a la lección), con pantalla completa permitida. Queda visto al
+     cargar. Opcional por datos: solo existe donde el generador pone un bloque «marco». */
+  B.marco = function (b, k) {
+    return '<div class="marco-recurso"><iframe src="' + esc(b.src) + '" title="' + esc(may(b.nombre || '')) + '" data-id="' + k + '-0" allow="fullscreen; autoplay" allowfullscreen loading="eager"></iframe></div>';
+  };
+  B.marco.activar = function (b, k, el) {
+    var f = el.querySelector('iframe'), listo = false;
+    function ver() { if (listo) return; listo = true; setTimeout(function () { marcar(k + '-0'); }, 1200); }
+    f.addEventListener('load', ver);
+    try { if (f.contentDocument && f.contentDocument.readyState === 'complete' && f.contentDocument.URL !== 'about:blank') ver(); } catch (e) { /* otro origen */ }
+  };
+  /* Video de una situación y su relato literal completo (Justicia restaurativa, 19/11/2026: «video a la izquierda y, a la derecha, el
+     relato literal completo en un panel de lectura… sin “Seguir leyendo”; si es largo, el panel se desplaza»). b.textos: los
+     párrafos de la ficha que cuenta el video; b.titulos: cuáles son subtítulos. Queda visto al llegar al final del relato. */
+  B.relato = function (b, k) {
+    return '<div class="relato-video"><div class="rv-video"><iframe src="' + esc(b.src) + '" title="' + esc(may(b.nombre || 'Video')) + '" allow="fullscreen; autoplay" allowfullscreen></iframe></div>' +
+      '<article class="rv-texto" tabindex="0" data-id="' + k + '-0" aria-label="Relato de la situación"><p class="lectura-eyebrow">Relato de la situación</p><div class="lectura-texto">' +
+      (b.textos || []).map(function (t, i) { return (b.titulos || [])[i] ? '<p class="rv-tit">' + esc(may(t)) + '</p>' : '<p class="parr">' + esc(may(t)) + '</p>'; }).join('') +
+      '</div><p class="rv-pie" aria-live="polite">Desplace para leer todo el relato ↓</p></article></div>';
+  };
+  B.relato.activar = function (b, k, el) {
+    var a = el.querySelector('.rv-texto .lectura-texto'), pie = el.querySelector('.rv-pie');
+    function revisar() {
+      var fin = a.scrollTop + a.clientHeight >= a.scrollHeight - 6;
+      if (fin) { marcar(k + '-0'); pie.textContent = 'Relato leído completo'; }
+    }
+    a.addEventListener('scroll', revisar);
+    setTimeout(revisar, 600);
+    panelTranscripcion(el.querySelector('.rv-texto'), el.querySelector('.rv-video iframe'));
+  };
   B.mapa = function (b, k) {
     var centro = b.items.filter(function (x) { return x.centro; })[0], ramas = b.items.filter(function (x) { return !x.centro; });
     var n = ramas.length, nodos = '', lineas = '';
@@ -1117,6 +1200,8 @@
       for (fs = 12; fs >= 10.5; fs -= 0.5) { r.style.fontSize = fs + 'px'; if (cabe()) return; }
     })();
   }
+  /* «extractoMin» (Justicia restaurativa, 19/11/2026): el nodo muestra hasta ese largo; si el texto cabe entero, no se abre ventana
+     (ventanaSinRepetir). Opcional por datos. */
   function extracto(s, lim) {
     var t = String(s).replace(/\s*\n\s*/g, ' ').replace(/\[\^\d+\]/g, '').replace(/^• /, '').replace(/\*\*/g, '');
     return t.length > lim + 5 ? t.slice(0, lim).replace(/\s+\S*$/, '') + '…' : t;
@@ -1783,6 +1868,11 @@
     for (var fs = 19; fs >= 11.5; fs -= 0.5) { c.style.setProperty('--fs', fs + 'px'); if (c.scrollHeight <= c.clientHeight + 1) break; }
   }
   B.cuadro.activar = function (b, k, el) {
+    /* Señal de que la tabla sigue (clase «con-mas» mientras queden filas abajo): la usa el tema del curso que deja desplazar la
+       tabla (Justicia restaurativa, 19/11/2026: «que se vea claramente que sigue»). Sin estilos para ella, no cambia nada. */
+    var cajaC = el.querySelector('.cuadro-caja');
+    function pistaMas() { if (cajaC) cajaC.classList.toggle('con-mas', cajaC.scrollTop + cajaC.clientHeight < cajaC.scrollHeight - 4); }
+    if (cajaC) { cajaC.addEventListener('scroll', pistaMas); window.addEventListener('resize', pistaMas); setTimeout(pistaMas, 300); setTimeout(pistaMas, 1500); }
     var actualP = 0, tabs = el.querySelectorAll('.cuadro-tab'), ant = el.querySelector('.cuadro-ant'), sig = el.querySelector('.cuadro-sig'), donde = el.querySelector('.cuadro-donde');
     function mostrar(i) {
       actualP = i;
@@ -1951,7 +2041,7 @@
       lineas += '<path d="M50 50 C ' + (der ? 60 : 40) + ' 50, ' + (der ? 60 : 40) + ' ' + y.toFixed(1) + ', ' + borde + ' ' + y.toFixed(1) + '" style="--d:' + (0.15 + i * 0.1) + 's"/>';
       nodos += '<button type="button" class="rama-mental' + (der ? ' der' : '') + refc(it.label) + '" data-id="' + k + '-' + i + '" data-i="' + i + '" style="left:' + x + '%;top:' + y.toFixed(1) + '%;--d:' + (0.3 + i * 0.1) + 's">' +
         '<span class="rama-arte">' + svgObjeto(it.obj, 40) + '</span><span class="rama-rotulo">' + rot(it.label) + '</span><span class="rama-marca">' + mano + visto + '</span>' +
-        (conTexto ? '<span class="rama-extracto">' + esc(may(extracto(segs(it.segs), n <= 2 ? 330 : 130))) + '</span>' : '') + estado + '</button>';
+        (conTexto ? '<span class="rama-extracto">' + esc(may(extracto(segs(it.segs), Math.max(n <= 2 ? 330 : 130, datos.extractoMin || 0)))) + '</span>' : '') + estado + '</button>';
     });
     return '<div class="mental n' + n + (conTexto ? ' con-extracto' : '') + '"><svg class="mental-lineas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' + lineas + '</svg>' +
       '<div class="mental-centro">' + (arteEn('centro') ? '<img class="mental-arte" src="' + srcImagen(escena.arte.img) + '" alt="">' : '<i class="fas fa-lightbulb" aria-hidden="true"></i>') +
@@ -2218,13 +2308,15 @@
   function esquemaEscenario(b, k) {
     var n = b.items.length, m = n <= 2 ? 21 : n === 3 ? 16 : 11.5, forma = escena.escenario.camino;
     var lamina = n === 2 && datos.ilustraciones && escena.ilustracion ? '<span class="esq-lamina" aria-hidden="true"><img src="' + srcImagen(escena.ilustracion) + '" alt=""></span>' : '';
+    /* «escena.sinOrden» (Justicia restaurativa, 19/11/2026: los tipos de práctica «no son necesariamente excluyentes ni… en un orden
+       determinado»): las paradas van sin número. Opcional por datos. */
     return '<div class="esquema esq-esc n' + n + '">' + paisajeEscena(escena.escenario) + lamina + '<div class="esquema-hijos">' + b.items.map(function (it, i) {
       var x = n === 1 ? 50 : m + i * (100 - 2 * m) / (n - 1);
       return '<button type="button" class="nodo-esquema esq-parada' + refc(it.label) + '" data-id="' + k + '-' + i + '" data-i="' + i + '" style="--d:' + (0.25 + i * 0.12) + 's;--x:' + x.toFixed(2) + '%;--y:' + caminoY(forma, x).toFixed(2) + '%">' +
         '<span class="esq-tarjeta"><span class="esquema-arte">' + svgObjeto(it.obj, 46) + '</span><span class="esquema-rotulo">' + rot(it.label) + '</span>' +
-        '<span class="esquema-extracto">' + esc(may(extracto(segs(it.segs), 60))) + '</span>' +
+        '<span class="esquema-extracto">' + esc(may(extracto(segs(it.segs), Math.max(60, datos.extractoMin || 0)))) + '</span>' +
         '<span class="esquema-marca"><span class="marca-ver">' + mano + ' Explorar</span><span class="marca-falta"><i class="fas fa-book-open" aria-hidden="true"></i> Falta leer</span>' +
-        '<span class="marca-leida">' + visto + ' +10</span></span></span><span class="esq-pin" aria-hidden="true"><b>' + (i + 1) + '</b></span>' +
+        '<span class="marca-leida">' + visto + ' +10</span></span></span><span class="esq-pin" aria-hidden="true"><b>' + (escena.sinOrden ? '' : (i + 1)) + '</b></span>' +
         '<span class="esq-clic" aria-hidden="true"><i class="fas fa-hand-pointer"></i> Clic aquí</span></button>';
     }).join('') + '<span class="esq-yo" aria-hidden="true"><svg viewBox="0 0 30 44"><circle cx="15" cy="9" r="7"/><path d="M6 22 Q15 13 24 22 L22 34 H8 Z"/><path class="pierna" d="M11 34 V43 M19 34 V43"/></svg></span></div></div>';
   }
@@ -2256,7 +2348,7 @@
       cabeza + '<div class="esquema-hijos">' + b.items.map(function (it, i) {
         return '<button type="button" class="nodo-esquema' + refc(it.label) + '" data-id="' + k + '-' + i + '" data-i="' + i + '" style="--d:' + (0.3 + i * 0.08) + 's">' +
           '<span class="esquema-arte">' + svgObjeto(it.obj, 46) + '</span><span class="esquema-rotulo">' + rot(it.label) + '</span>' +
-          '<span class="esquema-extracto">' + esc(may(extracto(segs(it.segs), n <= 2 ? 330 : n <= 3 ? 170 : 105))) + '</span>' +
+          '<span class="esquema-extracto">' + esc(may(extracto(segs(it.segs), Math.max(n <= 2 ? 330 : n <= 3 ? 170 : 105, datos.extractoMin || 0)))) + '</span>' +
           '<span class="esquema-marca"><span class="marca-ver">' + mano + ' Ver más</span><span class="marca-falta"><i class="fas fa-book-open" aria-hidden="true"></i> Falta leer</span>' +
           '<span class="marca-leida">' + visto + ' Leída</span></span></button>';
       }).join('') + '</div></div>';
@@ -3017,16 +3109,98 @@
       /* El texto se escribe letra por letra, como en las fichas (Esteban, 31/10/2026: detalles en las 5 unidades). */
       var lt = caja.querySelector('.lectura-texto'), letras = quieto || !lt ? null : envolverLetras(lt);
       marcar(it.id); /* marcar primero: «Exploración completa» cambia la altura */
-      if (!dosificar(caja, function () { encajarTexto(cont, caja); })) encajarTexto(cont, caja);
+      /* Texto junto a su video o figura (escena.video / escena.recurso, 19/11/2026): completo, con letra de lectura y desplazamiento,
+         sin partes («si aparece el texto mejor que aparezca completo»). */
+      if (escena.recurso || escena.video || escena.desplazar) {
+        caja.classList.remove('ctx-desplazable'); encajarTexto(cont, caja, 14);
+        if (caja.scrollHeight > caja.clientHeight + 2) { caja.classList.add('ctx-desplazable'); caja.style.setProperty('--fs', '14.5px'); }
+      }
+      else if (!dosificar(caja, function () { encajarTexto(cont, caja); })) encajarTexto(cont, caja);
       reanimar(caja);
       if (letras) escribirLetras(lt, letras, function () {});
     }
     botones.forEach(function (o) { o.addEventListener('click', function () { abrir(Number(o.dataset.i)); }); });
     abrir(0); /* la escena nunca empieza en blanco */
+    if (escena.video) panelTranscripcion(caja, el.querySelector('.ctx-video iframe'));
     if (document.fonts) document.fonts.ready.then(function () { encajarTexto(cont, caja); });
     window.addEventListener('resize', function () { encajarTexto(cont, caja); });
     var img = el.querySelector('.ctx-arte img');
     if (img && !img.complete) img.addEventListener('load', function () { encajarTexto(cont, caja); });
+  }
+
+  /* Pestañas de la página (datos.paginas): una por escena del subtítulo, con su letra y su subtítulo de la ficha («pestana»); la
+     que ya se leyó completa lleva el visto. La escena abierta muestra su subtítulo completo en la pestaña; las demás, en angosto,
+     solo la letra (el subtítulo va en su «title» y en su nombre accesible). */
+  var LETRAS = 'ABCDEFGHIJKL';
+  function pestanasPagina() {
+    var ix = PAGINAS[paginaDe(actual)];
+    if (ix.length < 2) return '';
+    var s = datos.juego ? juegoEstado() : { t: {} };
+    /* Con la letra o el numeral de la ficha («a.», «b.», «2.1.2.1.») en alguna pestaña, esas marcas son las que se ven y las demás
+       pestañas, que desarrollan el subtítulo anterior, llevan un punto; sin ninguna, las letras A, B, C. */
+    var mixta = ix.some(function (j) { return datos.scenes[j].letra; });
+    return '<nav class="partes n' + ix.length + '" role="tablist" aria-label="Secciones de la página">' + ix.map(function (j, k) {
+      var e = datos.scenes[j], r = may(e.pestana || e.titulo_genially || ''), sel = j === actual, marca = e.letra || (mixta ? '•' : LETRAS[k]);
+      return '<button type="button" role="tab" class="parte-tab' + (sel ? ' activa' : '') + (s.t[j] ? ' hecha' : '') + '" data-parte="' + k + '" aria-selected="' + sel + '" title="' + esc(r) + '" aria-label="' + (marca === '•' ? '' : esc(marca) + '. ') + esc(r) + '">' +
+        '<span class="parte-letra">' + esc(marca) + '</span><span class="parte-rotulo">' + esc(r) + '</span><span class="parte-visto">' + visto + '</span></button>';
+    }).join('') + '</nav>';
+  }
+
+
+  /* Panel «Texto / Transcripción» junto a un video (Justicia restaurativa, Samir, 19/11/2026: «el texto… debe desaparecer al iniciar
+     el video y debe iniciar la transcripción ahí»). «panel» es la caja del texto de la ficha; «iframe», el reproductor (su
+     ?video=<id> da la transcripción medios/<id>.transcripcion.json). Antes de reproducir se ve el texto; al dar play el panel pasa
+     solo a la transcripción, que resalta la frase que suena y lleva al video a la que se toca. Las dos pestañas permiten volver.
+     Sin transcripción o sin acceso al video (archivo local), el panel queda como estaba. */
+  function panelTranscripcion(panel, iframe) {
+    if (!panel || !iframe || panel.dataset.trans) return;
+    panel.dataset.trans = '1';
+    var src = iframe.getAttribute('src') || '', m = /^(.*\/)index\.html\?(?:.*&)?video=([^&]+)/.exec(src);
+    if (!m || location.protocol === 'file:') return;
+    fetch(m[1] + 'medios/' + m[2] + '.transcripcion.json', { cache: 'no-cache' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (d && d.lineas && d.lineas.length) montar(d.lineas); })
+      .catch(function () {});
+    function montar(lineas) {
+      var tabs = document.createElement('div');
+      tabs.className = 'vt-tabs'; tabs.setAttribute('role', 'tablist');
+      tabs.innerHTML = '<button type="button" role="tab" class="vt-tab" data-vt="texto" aria-selected="true">Texto</button>' +
+        '<button type="button" role="tab" class="vt-tab" data-vt="trans" aria-selected="false">Transcripción</button>';
+      var caja = document.createElement('div');
+      caja.className = 'vt-trans lectura-texto'; caja.hidden = true; caja.tabIndex = 0;
+      caja.innerHTML = lineas.map(function (l, k) { return '<span class="vt-frase" data-k="' + k + '" role="button" tabindex="-1">' + esc(l.t) + ' </span>'; }).join('');
+      /* Envoltura propia: la caja del texto se reescribe al cambiar de punto y las pestañas no deben perderse. */
+      var env = document.createElement('div');
+      env.className = 'vt-panel ' + (panel.classList.contains('ctx-texto') ? 'vt-ctx' : 'vt-rel');
+      panel.parentNode.insertBefore(env, panel);
+      env.appendChild(tabs); env.appendChild(panel); env.appendChild(caja);
+      panel = env;
+      panel.classList.add('con-vt');
+      function ver(cual) {
+        tabs.querySelectorAll('.vt-tab').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.vt === cual)); });
+        panel.classList.toggle('viendo-trans', cual === 'trans');
+        caja.hidden = cual !== 'trans';
+      }
+      tabs.addEventListener('click', function (e) { var b = e.target.closest('.vt-tab'); if (b) ver(b.dataset.vt); });
+      var video = null;
+      function enlazar() {
+        try { video = iframe.contentDocument && iframe.contentDocument.querySelector('video'); } catch (e) { video = null; }
+        if (!video || video.dataset.vt) return;
+        video.dataset.vt = '1';
+        video.addEventListener('play', function () { ver('trans'); });
+        video.addEventListener('timeupdate', function () {
+          var t = video.currentTime, act = -1;
+          lineas.forEach(function (l, k) { if (l.i <= t + 0.05 && t < l.f) act = k; });
+          caja.querySelectorAll('.vt-frase').forEach(function (e, k) { e.classList.toggle('actual', k === act); e.classList.toggle('dicha', lineas[k].i <= t); });
+          var a = caja.querySelector('.vt-frase.actual');
+          if (a && !caja.hidden) { var top = a.offsetTop - caja.offsetTop; if (top < caja.scrollTop || top > caja.scrollTop + caja.clientHeight - 30) caja.scrollTop = Math.max(0, top - caja.clientHeight * 0.35); }
+        });
+        caja.addEventListener('click', function (e) { var f = e.target.closest('.vt-frase'); if (!f || !video) return; video.currentTime = lineas[Number(f.dataset.k)].i + 0.01; if (video.paused) video.play(); });
+      }
+      iframe.addEventListener('load', enlazar);
+      enlazar();
+      setTimeout(enlazar, 1500);
+    }
   }
 
   /* ---------- Escena ---------- */
@@ -3051,7 +3225,10 @@
     if (escena.lead.length && !ctx) {
       var primero = seg(escena.lead[0]), rotLead = escena.rotulo || (primero.length <= 70 ? primero : primerasPalabras(primero));
       var objLead = (escena.bloques[0].items && escena.bloques[0].items[0] && escena.bloques[0].items[0].obj) || 'documento';
-      cuerpo += fichaIntro('lead', rotLead, segs(escena.lead), objLead);
+      /* «entradaVisible» (Justicia restaurativa, Samir, 19/11/2026: «este botón es innecesario… para abrir ese texto»): la frase de
+         entrada va a la vista, arriba de la mediación, sin botón ni ventana, y cuenta como leída. Opcional por datos. */
+      cuerpo += datos.entradaVisible ? '<div class="entrada-visible" data-id="lead"><p class="lectura-texto">' + rico(segs(escena.lead)) + '</p></div>'
+        : fichaIntro('lead', rotLead, segs(escena.lead), objLead);
     }
     cuerpo += ctx ? '<div class="bloque bloque-contexto" data-k="0">' + ctx.html + '</div>' :
       escena.bloques.map(function (b, k) { return '<div class="bloque bloque-' + tipo(b) + (b.compacto ? ' es-compacto' : '') + '" data-k="' + k + '">' + B[tipo(b)](b, k) + '</div>'; }).join('');
@@ -3081,7 +3258,7 @@
       cuerpo = '<figure class="arte-escena arte-fondo-fig" aria-hidden="true"><img src="' + srcImagen(escena.arte.img) + '" alt=""></figure>' + cuerpo;
       claseArte = ' arte-fondo';
     }
-    raiz.innerHTML = cab + '<section class="escenario' + claseArte + '" aria-label="Escena ' + (actual + 1) + '">' + cuerpo + '<div class="lector" hidden></div></section>' +
+    raiz.innerHTML = cab + pestanasPagina() + '<section class="escenario' + claseArte + '" aria-label="Escena ' + (actual + 1) + '">' + cuerpo + '<div class="lector" hidden></div></section>' +
       (embebido ? '' : '<nav class="nav-local" aria-label="Escenas de la lección"><button type="button" data-ir="-1"><i class="fas fa-arrow-left" aria-hidden="true"></i> Anterior</button>' +
         '<span>' + (actual + 1) + ' de ' + datos.scenes.length + '</span><button type="button" data-ir="1">Siguiente <i class="fas fa-arrow-right" aria-hidden="true"></i></button></nav>');
     if (!conAvance) setTimeout(juegoTramo, 1200);
@@ -3101,11 +3278,22 @@
       });
       restaurando = false;
     }
+    if (datos.entradaVisible && raiz.querySelector('.entrada-visible')) setTimeout(function () { marcarYa('lead'); }, 0);
     raiz.querySelectorAll('.intro').forEach(function (b) {
       b.addEventListener('click', function () { leer(b.dataset.rotulo, b.dataset.texto, b.dataset.obj, b); marcar(b.dataset.id); });
     });
     raiz.querySelector('.lector').addEventListener('click', function (e) { if (e.target.classList.contains('lector')) cerrarLector(); });
     raiz.querySelector('.pantalla-completa').addEventListener('click', pantallaCompleta);
+    raiz.querySelectorAll('.parte-tab').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var ix = PAGINAS[paginaDe(actual)], j = ix[Number(b.dataset.parte)];
+        if (j === actual) return;
+        completarEscrituras(); actual = j;
+        if (embebido && history.replaceState) try { var q = new URLSearchParams(location.search); q.set('parte', String(ix.indexOf(j) + 1)); history.replaceState(null, '', '?' + q.toString()); } catch (e) { /* sin historial */ }
+        render();
+        var t = raiz.querySelector('.parte-tab[aria-selected="true"]'); if (t) t.focus({ preventScroll: true });
+      });
+    });
     /* «Escritura animada» / «Texto inmediato» (revisores, 10/11/2026): la preferencia vale para todo el curso en este navegador.
        Revisión de la Fiscalía del 13/11/2026 (Jennifer: «le coloquemos ahí texto fijo… o texto animado… bajar un poquito el tamaño
        de la fuente y escribirle allí: clic para texto animado, clic para texto fijo»; «siempre mencionar el clic»): el botón dice
@@ -3145,5 +3333,14 @@
     }
   }
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') cerrarLector(); });
+  /* Ventana de consulta de un artículo: no suma puntos ni cuenta como leído. */
+  function abrirArticulo(el) {
+    var a = (datos.articulos || [])[Number(el.dataset.art)]; if (!a) return;
+    var texto = 'Lo que dice este curso:\n' + a.explicaciones.map(function (x) { return x.leccion + ': ' + x.texto; }).join('\n') +
+      '\nTambién se cita en: ' + a.tambien.join(', ') + '.';
+    leer(a.titulo, texto, 'documento', el);
+  }
+  raiz.addEventListener('click', function (e) { var el = e.target.closest('.art-enlace'); if (!el) return; e.stopPropagation(); e.preventDefault(); abrirArticulo(el); }, true);
+  raiz.addEventListener('keydown', function (e) { var el = e.target.closest && e.target.closest('.art-enlace'); if (!el || (e.key !== 'Enter' && e.key !== ' ')) return; e.preventDefault(); abrirArticulo(el); });
   render();
 })();
