@@ -3362,8 +3362,11 @@
         return '<button type="button" role="tab" class="parte-tab grupo' + (hecho ? ' hecha' : '') + '" data-parte="' + run.ks[0] + '" aria-selected="false" title="' + esc(may(run.g)) + '" aria-label="' + esc(may(run.g)) + '">' +
           '<span class="parte-letra">' + esc(lr[0]) + '</span><span class="parte-rotulo">' + esc(lr[1]) + '</span><span class="parte-visto">' + visto + '</span></button>';
       }
-      return '<span class="parte-grupo" role="presentation"><span class="parte-letra">' + esc(lr[0]) + '</span><span class="grupo-rotulo">' + esc(lr[1]) + '</span>' +
-        run.ks.map(function (k, i) { var j = ix[k]; return boton(j, k, String(i + 1), may(datos.scenes[j].pestana || ''), ' sub'); }).join('') + '</span>';
+      /* El grupo abierto, en una sola altura: su letra, sus pestañas numeradas y, en dos líneas, el rótulo del grupo y el de la abierta. */
+      var abierta = ix[run.ks.filter(function (k) { return ix[k] === actual; })[0]];
+      return '<span class="parte-grupo" role="presentation"><span class="parte-letra">' + esc(lr[0]) + '</span>' +
+        run.ks.map(function (k, i) { var j = ix[k]; return boton(j, k, String(i + 1), may(datos.scenes[j].pestana || ''), ' sub'); }).join('') +
+        '<span class="grupo-texto"><span class="grupo-rotulo">' + esc(lr[1]) + '</span><span class="grupo-actual">' + esc(may(datos.scenes[abierta].pestana || '')) + '</span></span></span>';
     }).join('') + '</nav>';
   }
 

@@ -3327,6 +3327,7 @@
     /* Con la letra o el numeral de la ficha («a.», «b.», «2.1.2.1.») en alguna pestaña, esas marcas son las que se ven y las demás
        pestañas, que desarrollan el subtítulo anterior, llevan un punto; sin ninguna, las letras A, B, C. */
     var mixta = ix.some(function (j) { return datos.scenes[j].letra; });
+    if (ix.some(function (j) { return datos.scenes[j].grupo_pestana; })) return pestanasAgrupadas(ix, s, mixta);
     return '<nav class="partes n' + ix.length + '" role="tablist" aria-label="Secciones de la página">' + ix.map(function (j, k) {
       var e = datos.scenes[j], r = may(e.pestana || e.titulo_genially || ''), sel = j === actual, marca = e.letra || (mixta ? '•' : LETRAS[k]);
       return '<button type="button" role="tab" class="parte-tab' + (sel ? ' activa' : '') + (s.t[j] ? ' hecha' : '') + '" data-parte="' + k + '" aria-selected="' + sel + '" title="' + esc(r) + '" aria-label="' + (marca === '•' ? '' : esc(marca) + '. ') + esc(r) + '">' +
@@ -3334,6 +3335,40 @@
     }).join('') + '</nav>';
   }
 
+
+  /* Pestañas agrupadas («grupo_pestana» en las escenas; Justicia restaurativa, L2.1 «2.1.4.3», 20/11/2026: «ni 15 pestañas con solo
+     letras»): las pestañas seguidas de un mismo grupo (un literal de la ficha, «A. El principio de oportunidad») son un solo botón
+     con su rótulo completo; el grupo abierto muestra sus pestañas numeradas y el rótulo de la que está abierta. Sin el dato, nada cambia. */
+  function pestanasAgrupadas(ix, s, mixta) {
+    var runs = [];
+    ix.forEach(function (j, k) {
+      var g = datos.scenes[j].grupo_pestana || null, ult = runs[runs.length - 1];
+      if (g && ult && ult.g === g) ult.ks.push(k); else runs.push({ g: g, ks: [k] });
+    });
+    var letraDe = function (t) { var m = /^([A-Za-z]|[ivx]{1,4}|\d{1,2}(?:\.\d{1,2}){0,3})[.)]\s*/.exec(t); return m ? [m[1], t.slice(m[0].length)] : ['•', t]; };
+    var boton = function (j, k, marca, r, clase) {
+      var sel = j === actual;
+      return '<button type="button" role="tab" class="parte-tab' + (clase || '') + (sel ? ' activa' : '') + (s.t[j] ? ' hecha' : '') + '" data-parte="' + k + '" aria-selected="' + sel + '" title="' + esc(r) + '" aria-label="' + (marca === '•' ? '' : esc(marca) + '. ') + esc(r) + '">' +
+        '<span class="parte-letra">' + esc(marca) + '</span><span class="parte-rotulo">' + esc(r) + '</span><span class="parte-visto">' + visto + '</span></button>';
+    };
+    return '<nav class="partes con-grupos n' + runs.length + '" role="tablist" aria-label="Secciones de la página">' + runs.map(function (run, q) {
+      if (!run.g) {
+        var j = ix[run.ks[0]], e = datos.scenes[j];
+        return boton(j, run.ks[0], e.letra || (mixta ? '•' : LETRAS[q]), may(e.pestana || e.titulo_genially || ''), ' sola');
+      }
+      var lr = letraDe(may(run.g)), abierto = run.ks.some(function (k) { return ix[k] === actual; });
+      if (!abierto) {
+        var hecho = run.ks.every(function (k) { return s.t[ix[k]]; });
+        return '<button type="button" role="tab" class="parte-tab grupo' + (hecho ? ' hecha' : '') + '" data-parte="' + run.ks[0] + '" aria-selected="false" title="' + esc(may(run.g)) + '" aria-label="' + esc(may(run.g)) + '">' +
+          '<span class="parte-letra">' + esc(lr[0]) + '</span><span class="parte-rotulo">' + esc(lr[1]) + '</span><span class="parte-visto">' + visto + '</span></button>';
+      }
+      /* El grupo abierto, en una sola altura: su letra, sus pestañas numeradas y, en dos líneas, el rótulo del grupo y el de la abierta. */
+      var abierta = ix[run.ks.filter(function (k) { return ix[k] === actual; })[0]];
+      return '<span class="parte-grupo" role="presentation"><span class="parte-letra">' + esc(lr[0]) + '</span>' +
+        run.ks.map(function (k, i) { var j = ix[k]; return boton(j, k, String(i + 1), may(datos.scenes[j].pestana || ''), ' sub'); }).join('') +
+        '<span class="grupo-texto"><span class="grupo-rotulo">' + esc(lr[1]) + '</span><span class="grupo-actual">' + esc(may(datos.scenes[abierta].pestana || '')) + '</span></span></span>';
+    }).join('') + '</nav>';
+  }
 
   /* Panel «Texto / Transcripción» junto a un video (Justicia restaurativa, Samir, 19/11/2026: «el texto… debe desaparecer al iniciar
      el video y debe iniciar la transcripción ahí»). «panel» es la caja del texto de la ficha; «iframe», el reproductor (su

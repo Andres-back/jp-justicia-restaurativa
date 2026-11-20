@@ -346,16 +346,21 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 /* Actividad de reflexión (revisión de la U4, 20/11/2026: «Parte 1 de 2 · Seguir leyendo» con preguntas cortas): en el marco ancho,
    la marca «Lo tendré en cuenta» va a la derecha de la pregunta y la tarjeta es más baja, para que las preguntas quepan juntas. */
 @container ova (min-width:700px){
-  .caso-tarea{grid-template-columns:30px minmax(0,1fr) auto;align-items:center;padding:6px 10px;gap:4px 10px}
+  .caso-tarea{grid-template-columns:30px minmax(0,1fr) auto;align-items:center;padding:3px 10px;gap:2px 10px;border-width:1.5px}
+  .caso-tarea .lectura-texto{line-height:1.35}
   .caso-tarea .caso-n{grid-row:1;width:26px;height:26px;font-size:13px}
   .caso-tarea .caso-marca,.caso-tarea .caso-visto{grid-column:3;grid-row:1;justify-self:end;white-space:nowrap}
-  .caso-tareas{gap:6px}
+  .caso-tareas{gap:4px}
 }
 /* Tablas unidas (revisión de la U4, 20/11/2026: a la Tabla 3 le sobraban 31 px): encabezado y filas más bajos, sin cambiar la letra. */
 .cuadro.con-partes .cuadro-tabla thead th{padding-top:5px;padding-bottom:5px;line-height:1.15}
 .cuadro.con-partes .cuadro-tabla tbody th,.cuadro.con-partes .cuadro-tabla tbody td{padding-top:2px;padding-bottom:2px}
 /* Pirámide (revisión de la U4: el nivel 3 de «Medidas de no repetición» se desplazaba 21 px): el panel de lectura, más ancho. */
-@container ova (min-width:700px){.pir-niveles{flex-basis:38%}}
+@container ova (min-width:700px){
+  .pir-niveles{flex-basis:33%}
+  .pir-panel{padding:8px 14px;gap:6px}
+  .pir-texto .lectura-texto{line-height:1.4}
+}
 /* Ventana amplia más alta (revisión de la U1, 20/11/2026: 8 lecturas se leían desplazando): en el marco ancho cubre toda la escena,
    también la barra de arriba y las pestañas, para que el texto completo quepa sin desplazamiento. */
 @container ova (min-width:700px){
@@ -373,3 +378,19 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 /* Destacado sin desplazamiento (revisión, 20/11/2026: «Una circunstancia de menor punibilidad» de la L2.1 se desplazaba): la caja de
    texto, más ancha; la ilustración, más angosta. */
 @container ova (min-width:700px){.dest-arte{flex-basis:30%}}
+/* La fuente de cada tabla unida va debajo de la tabla y no sobre su última fila (revisión de la U4, 20/11/2026). */
+.ova.embebido .cuadro .cuadro-pie{position:static;margin:2px 6px 0}
+.cuadro.con-partes .cuadro-tabla tbody th .lectura-texto{font-size:13.5px !important;line-height:1.2}
+.cuadro.con-partes .cuadro-tabla{border-spacing:0 2px}
+.cuadro.con-partes .cuadro-tabla td .lectura-texto{line-height:1.32;font-size:13.5px !important}
+/* Tabla partida con la ilustración al lado: la ilustración, más angosta, para que cada parte quepa completa (revisión del 20/11/2026). */
+@container ova (min-width:700px){.escenario:has(.cuadro.con-partes) > .arte-escena{flex:0 0 200px;width:200px;max-width:200px}}
+/* Avisos del juego abajo a la derecha, sobre la franja del pie (coordinación y revisión de la U1, N11, 20/11/2026: «¡Sección 1 de 3
+   superada!» tapaba el texto que se estaba leyendo). Más pequeños; el de nivel y el de logro, en la misma franja, más al centro. */
+.j-aviso,.j-aviso.nivel,.j-aviso.logro{left:auto;right:12px;top:auto;bottom:5px;transform:none;font-size:13px;padding:5px 14px;border-width:2px;border-radius:10px;animation:j-aviso-pie 2.6s ease both}
+.j-aviso.nivel,.j-aviso.logro{right:300px}
+@keyframes j-aviso-pie{0%{opacity:0;transform:translateY(8px)}12%,80%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-6px)}}
+/* Acordeón en una página con pestañas agrupadas (L2.1, 2.1.4.3 «C. En preclusión por reparación», 20/11/2026): sin la ilustración
+   de al lado, para que el apartado abierto tenga alto y se lea completo. */
+@container ova (min-width:700px){.ova:has(.partes.con-grupos) .escenario:has(.acordeon) > .arte-escena{display:none}}
+@container ova (min-width:700px){.ova:has(.partes.con-grupos) .acordeon-cab{padding:1px 12px}.ova:has(.partes.con-grupos) .acordeon{gap:3px}.ova:has(.partes.con-grupos) .acordeon-ico svg{width:18px;height:18px}}

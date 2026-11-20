@@ -1761,3 +1761,19 @@ html.en-pantalla-completa .ova{width:767px;height:510px;min-height:0;flex:none}
 .cuadro-cab[hidden],.cuadro-pie[hidden]{display:none !important}
 /* Ventana amplia apretada (datos.ampliaEncaja, último recurso antes de desplazar): interlineado y párrafos más juntos. */
 .lector.amplia .hoja-texto.apretada{line-height:1.36}.lector.amplia .hoja-texto.apretada .parr+.parr{margin-top:.4em}
+/* Pestañas agrupadas («grupo_pestana», 20/11/2026): cada grupo cerrado es un botón con su rótulo completo; el abierto, en una sola
+   altura, lleva su letra, sus pestañas numeradas y, en dos líneas, su rótulo y el de la pestaña abierta. */
+.partes.con-grupos .parte-tab:not(.sub){flex:1 1 0;min-width:0;justify-content:flex-start;gap:3px;padding:2px 4px 2px 2px;font-size:9.5px;line-height:1.12;overflow-wrap:anywhere}
+.partes.con-grupos .parte-tab:not(.sub) .parte-rotulo{display:block !important}
+.parte-grupo{flex:0 0 auto;min-width:0;max-width:52%;display:flex;align-items:center;gap:2px;padding:2px 6px 2px 3px;border-radius:10px;background:var(--marino);color:#fff}
+.parte-grupo > .parte-letra{flex:none;background:#fff;color:var(--marino)}
+.parte-grupo .parte-tab.sub{flex:0 0 auto;padding:1px;border-color:color-mix(in srgb,#fff 45%,transparent);background:transparent;color:#fff;animation:none}
+.parte-grupo .parte-tab.sub .parte-rotulo,.parte-grupo .parte-tab.sub .parte-visto{display:none !important}
+.parte-grupo .parte-tab.sub .parte-letra{min-width:18px;width:18px;height:18px;font-size:10px;background:color-mix(in srgb,#fff 18%,transparent);color:#fff}
+.parte-grupo .parte-tab.sub.hecha .parte-letra{box-shadow:inset 0 0 0 2px var(--coral)}
+.parte-grupo .parte-tab.sub.activa{background:#fff;border-color:#fff}
+.parte-grupo .parte-tab.sub.activa .parte-letra{background:var(--coral);color:#fff}
+.grupo-texto{flex:0 1 175px;width:175px;min-width:0;display:flex;flex-direction:column;gap:1px;margin-left:4px;font-family:Montserrat,Arial,sans-serif;line-height:1.12}
+.grupo-texto .grupo-rotulo{font-weight:700;font-size:9.5px;opacity:.85}
+.grupo-texto .grupo-actual{font-weight:800;font-size:11px}
+@container ova (max-width:600px){.partes.con-grupos .parte-tab:not(.sub) .parte-rotulo{display:none !important}.parte-grupo{flex:1 1 100%}}

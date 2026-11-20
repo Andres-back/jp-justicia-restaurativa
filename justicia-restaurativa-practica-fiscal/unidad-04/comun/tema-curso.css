@@ -385,3 +385,11 @@ html.en-pantalla-completa .ova{width:1113px;height:448px}
 .cuadro.con-partes .cuadro-tabla td .lectura-texto{line-height:1.32;font-size:13.5px !important}
 /* Tabla partida con la ilustración al lado: la ilustración, más angosta, para que cada parte quepa completa (revisión del 20/11/2026). */
 @container ova (min-width:700px){.escenario:has(.cuadro.con-partes) > .arte-escena{flex:0 0 200px;width:200px;max-width:200px}}
+/* Avisos del juego abajo a la derecha, sobre la franja del pie (coordinación y revisión de la U1, N11, 20/11/2026: «¡Sección 1 de 3
+   superada!» tapaba el texto que se estaba leyendo). Más pequeños; el de nivel y el de logro, en la misma franja, más al centro. */
+.j-aviso,.j-aviso.nivel,.j-aviso.logro{left:auto;right:12px;top:auto;bottom:5px;transform:none;font-size:13px;padding:5px 14px;border-width:2px;border-radius:10px;animation:j-aviso-pie 2.6s ease both}
+.j-aviso.nivel,.j-aviso.logro{right:300px}
+@keyframes j-aviso-pie{0%{opacity:0;transform:translateY(8px)}12%,80%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-6px)}}
+/* Acordeón en una página con pestañas agrupadas (L2.1, 2.1.4.3 «C. En preclusión por reparación», 20/11/2026): sin la ilustración
+   de al lado, para que el apartado abierto tenga alto y se lea completo. */
+@container ova (min-width:700px){.ova:has(.partes.con-grupos) .escenario:has(.acordeon) > .arte-escena{display:none}}
