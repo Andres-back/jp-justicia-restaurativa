@@ -1680,3 +1680,82 @@ html.en-pantalla-completa .ova{width:767px;height:510px;min-height:0;flex:none}
 .vt-panel>.ctx-texto,.vt-panel>.rv-texto{flex:1;min-height:0}
 .vt-panel>.vt-trans{padding:10px 14px;border-radius:14px;background:var(--blanco);border-left:6px solid var(--marino)}
 .vt-frase.elegida{outline:2px solid var(--oxido);outline-offset:1px;border-radius:4px}
+/* Carrusel, pirámide, ciclo y destacado (Justicia restaurativa, 19/11/2026: más variedad, texto completo a la vista). Solo los usa
+   el curso que los pide en sus datos. */
+.panel-desplaza{overflow-y:auto !important;scrollbar-gutter:stable;padding-right:6px}
+.carrusel,.piramide,.ciclo,.destacado{flex:1;min-height:0;display:flex;gap:12px}
+.carrusel{flex-direction:column;outline:0}
+.carrusel:focus-visible{box-shadow:0 0 0 3px var(--teal);border-radius:14px}
+.car-pista{flex:1;min-height:0;display:flex}
+.car-diapo{flex:1;min-height:0;display:grid;grid-template-columns:minmax(150px,38%) minmax(0,1fr);gap:16px;align-items:stretch;padding:12px 16px;border:2px solid var(--niebla);border-radius:16px;background:var(--blanco);animation:carEntra .45s ease both}
+.car-diapo.desde-izq{animation-name:carEntraIzq}
+@keyframes carEntra{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes carEntraIzq{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+.car-arte{margin:0;display:flex;align-items:center;justify-content:center;min-height:0;border-radius:12px;background:var(--hielo);overflow:hidden}
+.car-arte img{width:100%;height:100%;object-fit:contain}
+.car-arte svg{width:72%;max-height:92%;height:auto}
+.car-cuerpo{min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:safe center;gap:10px}
+.car-rotulo{flex:none;margin:0;display:flex;align-items:baseline;gap:8px;font:800 16px/1.3 Montserrat,Arial,sans-serif;color:var(--marino)}
+.car-n{flex:none;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--oxido);color:var(--blanco);font-size:13px}
+.car-texto{flex:0 1 auto;min-height:0;overflow:hidden;text-align:left}
+.car-texto .lectura-texto,.pir-texto .lectura-texto,.ciclo-texto .lectura-texto,.dest-texto .lectura-texto{margin:0;font-size:var(--fs,15px);line-height:1.5;color:var(--tinta)}
+.car-nav{flex:none;display:flex;align-items:center;justify-content:center;gap:12px}
+.car-flecha{width:36px;height:36px;border-radius:50%;border:2px solid var(--marino);background:var(--blanco);color:var(--marino);cursor:pointer;font-size:14px}
+.car-flecha:disabled{opacity:.35;cursor:default}
+.car-flecha.late:not(:disabled){animation:latidoBorde 1.6s ease-in-out infinite}
+.car-puntos{display:flex;gap:8px}
+.car-punto{width:16px;height:16px;padding:0;border-radius:50%;border:2px solid var(--marino);background:var(--blanco);cursor:pointer}
+.car-punto.visto{background:var(--niebla)}
+.car-punto.actual{background:var(--marino);transform:scale(1.15)}
+.car-punto-visto{display:none}
+.car-donde{min-width:52px;font:700 12px/1 Montserrat,Arial,sans-serif;color:var(--teal)}
+.piramide{align-items:stretch}
+.pir-niveles{flex:0 0 46%;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.pir-nivel{--w:calc(46% + 54% * (var(--n) - var(--j)) / var(--n));align-self:center;width:var(--w);flex:1;max-height:84px;min-height:0;display:flex;align-items:center;gap:8px;padding:6px 18px;border:0;border-radius:10px;
+  background:color-mix(in srgb,var(--teal) calc(100% - 60% * var(--j) / var(--n)),var(--marino));color:var(--blanco);font:800 13.5px/1.25 Montserrat,Arial,sans-serif;text-align:left;cursor:pointer;
+  clip-path:polygon(3% 0,97% 0,100% 100%,0 100%);animation:subir .4s ease both;animation-delay:var(--d)}
+.pir-n{flex:none;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--blanco);color:var(--marino);font-size:12px}
+.pir-rotulo{flex:1;min-width:0}
+.pir-marca{display:none;flex:none}
+.pir-nivel.visto .pir-marca{display:inline}
+.pir-nivel.actual{background:var(--oxido)}
+.pir-nivel:focus-visible,.ciclo-nodo:focus-visible{outline:3px solid var(--oxido);outline-offset:2px}
+.pir-panel,.ciclo-panel{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:safe center;gap:10px;padding:12px 16px;border:2px solid var(--niebla);border-radius:16px;background:var(--blanco)}
+.pir-cab,.ciclo-cab{flex:none;margin:0;display:flex;flex-direction:column;gap:3px;font:800 16px/1.3 Montserrat,Arial,sans-serif;color:var(--marino)}
+.pir-cab-n,.ciclo-cab-n{font:700 11.5px/1 Montserrat,Arial,sans-serif;color:var(--oxido)}
+.pir-texto,.ciclo-texto{flex:0 1 auto;min-height:0;overflow:hidden;text-align:left}
+.ciclo{align-items:stretch}
+.ciclo-rueda{position:relative;flex:0 0 54%;min-width:0;min-height:0;align-self:stretch}
+.ciclo-arcos{position:absolute;inset:0;width:100%;height:100%}
+.ciclo-arcos path{fill:none;stroke:var(--teal);stroke-width:2.5;vector-effect:non-scaling-stroke}
+.ciclo-arcos marker path{fill:var(--teal);stroke:none}
+.ciclo-centro{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:24%;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font:800 12px/1.25 Montserrat,Arial,sans-serif;color:var(--marino)}
+.ciclo-centro i{font-size:22px;color:var(--oxido)}
+.ciclo-nodo{position:absolute;translate:-50% -50%;width:34%;min-height:40px;display:flex;align-items:center;gap:6px;padding:6px 8px;border:2px solid var(--marino);border-radius:12px;background:var(--blanco);color:var(--marino);
+  font:800 11.5px/1.2 Montserrat,Arial,sans-serif;text-align:left;cursor:pointer;animation:subir .4s ease both;animation-delay:var(--d)}
+.ciclo-n{flex:none;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--marino);color:var(--blanco);font-size:11px}
+.ciclo-rotulo{flex:1;min-width:0}
+.ciclo-marca{display:none;flex:none;color:var(--teal)}
+.ciclo-nodo.visto .ciclo-marca{display:inline}
+.ciclo-nodo.actual{background:var(--marino);color:var(--blanco)}
+.ciclo-nodo.actual .ciclo-n{background:var(--blanco);color:var(--marino)}
+.ciclo-nodo.actual .ciclo-marca{color:var(--blanco)}
+.destacado{align-items:stretch}
+.dest-arte{flex:0 0 30%;margin:0;display:flex;align-items:center;justify-content:center;min-height:0;overflow:hidden}
+.dest-arte img{width:100%;height:100%;object-fit:contain}
+.dest-caja{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:safe center;gap:10px;padding:16px 20px;border:3px solid var(--clave-borde);border-radius:18px;background:var(--clave-fondo)}
+.dest-rotulo{flex:none;margin:0;display:flex;align-items:baseline;gap:8px;font:800 16px/1.3 Montserrat,Arial,sans-serif;color:var(--marino)}
+.dest-rotulo i{color:var(--clave-borde)}
+.dest-texto{flex:0 1 auto;min-height:0;overflow:hidden;text-align:left}
+@container ova (max-width:600px){
+  .car-diapo{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);padding:10px 12px;gap:8px}
+  .car-arte{height:90px}
+  .piramide,.ciclo,.destacado{flex-direction:column}
+  .pir-niveles{flex:none;gap:4px}
+  .pir-nivel{flex:none;min-height:38px;max-height:none;font-size:12.5px}
+  .ciclo-rueda{flex:none;width:100%;display:flex;flex-wrap:wrap;gap:6px}
+  .ciclo-arcos,.ciclo-centro{display:none}
+  .ciclo-nodo{position:static;translate:none;width:calc(50% - 3px)}
+  .dest-arte{flex:0 0 90px}
+}
+.cuadro-cab[hidden],.cuadro-pie[hidden]{display:none !important}

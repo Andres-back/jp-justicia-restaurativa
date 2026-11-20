@@ -61,7 +61,11 @@
     condiciones: 'Lea los fragmentos y marque si cada requisito se cumple: la consecuencia cambia.',
     actividad: 'Elija una respuesta: si no es la correcta, lea la retroalimentación e inténtelo de nuevo.',
     marco: 'Recorra el recurso de esta sección.',
-    relato: 'Vea el video y lea el relato completo de la situación: el panel de la derecha se desplaza.'
+    relato: 'Vea el video y lea el relato completo de la situación: el panel de la derecha se desplaza.',
+    carrusel: 'Avance con las flechas o los puntos: cada diapositiva trae su texto completo.',
+    piramide: 'Toque cada nivel de la pirámide para leer su texto al lado.',
+    ciclo: 'Toque cada momento del ciclo para leer su texto al lado.',
+    destacado: 'Lea el texto destacado.'
   };
   // Con datos.puntosSoloLeyenda (ver B.puntos), lo que se toca son los rótulos de la derecha.
   if (datos.puntosSoloLeyenda) guias.puntos = 'Toque cada rótulo de la derecha; su número señala el lugar en la ilustración.';
@@ -1838,17 +1842,27 @@
      «columnas»: encabezado; cada item es una parte, con sus filas en «celdas» (la primera celda de la fila es su encabezado, <th
      scope="row">); «segs» reúne los segmentos de la parte (cobertura). */
   B.cuadro = function (b, k) {
-    var cols = (b.columnas || []).map(function (c) { return may(celdaTexto(c)); }), cap = b.titulo && b.titulo.length ? segs(b.titulo) : (escena.titulo_genially || '');
+    /* «multi» (Justicia restaurativa, 19/11/2026): dos o tres tablas seguidas de la ficha en una sola pestaña; cada parte es una
+       tabla con sus encabezados (it.columnas) y su fuente (it.pie), y se elige con su selector. Sin «multi», como siempre. */
+    var colsDe = function (it) { return ((b.multi && it.columnas) || b.columnas || []).map(function (c) { return may(celdaTexto(c)); }); };
+    var cols = colsDe(b.items[0] || {}), cap = b.titulo && b.titulo.length ? segs(b.titulo) : (escena.titulo_genially || '');
     var n = 0;
     var filas = b.items.map(function (it, i) {
+      var cs = colsDe(it);
       return it.celdas.map(function (fila) {
         n++;
         return '<tr class="cuadro-fila" data-parte="' + i + '"' + (i ? ' hidden' : '') + '>' + fila.map(function (c, j) {
           var t = '<span class="lectura-texto">' + rico(celdaTexto(c) || '–') + '</span>';
-          return j ? '<td data-rot="' + esc(cols[j] || '') + '">' + t + '</td>' : '<th scope="row" data-rot="' + esc(cols[0] || '') + '">' + t + '</th>';
+          return j ? '<td data-rot="' + esc(cs[j] || '') + '">' + t + '</td>' : '<th scope="row" data-rot="' + esc(cs[0] || '') + '">' + t + '</th>';
         }).join('') + '</tr>';
       }).join('');
     }).join('');
+    var cabeza = b.multi ? b.items.map(function (it, i) {
+      return '<tr class="cuadro-cab" data-parte="' + i + '"' + (i ? ' hidden' : '') + '>' + colsDe(it).map(function (c) { return '<th scope="col">' + esc(c) + '</th>'; }).join('') + '</tr>';
+    }).join('') : '<tr>' + cols.map(function (c) { return '<th scope="col">' + esc(c) + '</th>'; }).join('') + '</tr>';
+    var pies = b.multi ? b.items.map(function (it, i) {
+      return it.pie && it.pie.length ? '<p class="escena-pie cuadro-pie" data-parte="' + i + '"' + (i ? ' hidden' : '') + '>' + esc(may(segs(it.pie))) + '</p>' : '';
+    }).join('') : '';
     var partes = b.items.length > 1;
     return tituloBloque(b, k) + '<div class="cuadro' + (partes ? ' con-partes' : '') + '">' +
       (partes ? '<div class="cuadro-partes" role="group" aria-label="Partes de la tabla">' + b.items.map(function (it, i) {
@@ -1856,10 +1870,10 @@
           '<span class="cuadro-tab-n">' + (i + 1) + '</span>' + esc(may(it.label)) + '<span class="cuadro-tab-visto">' + visto + '</span></button>';
       }).join('') + '</div>' : '') +
       '<div class="cuadro-caja"><table class="cuadro-tabla">' + (cap ? '<caption class="sr-only">' + esc(may(cap)) + '</caption>' : '') +
-      '<thead><tr>' + cols.map(function (c) { return '<th scope="col">' + esc(c) + '</th>'; }).join('') + '</tr></thead><tbody>' + filas + '</tbody></table></div>' +
-      (partes ? '<div class="cuadro-nav"><button type="button" class="cuadro-ant"><i class="fas fa-arrow-left" aria-hidden="true"></i> Anterior</button>' +
+      '<thead>' + cabeza + '</thead><tbody>' + filas + '</tbody></table></div>' + pies +
+      (partes ? '<div class="cuadro-nav"><button type="button" class="cuadro-ant"><i class="fas fa-arrow-left" aria-hidden="true"></i> ' + (b.multi ? 'Tabla anterior' : 'Anterior') + '</button>' +
         '<span class="cuadro-donde" aria-live="polite"></span>' +
-        '<button type="button" class="cuadro-sig">Seguir leyendo <i class="fas fa-arrow-right" aria-hidden="true"></i></button></div>' : '') + '</div>';
+        '<button type="button" class="cuadro-sig">' + (b.multi ? 'Tabla siguiente' : 'Seguir leyendo') + ' <i class="fas fa-arrow-right" aria-hidden="true"></i></button></div>' : '') + '</div>';
   };
   /* La letra crece hasta 19 px si la parte es breve y baja de a medio punto (hasta 11,5 px) hasta caber: nunca desplazamiento. */
   function encajarCuadro(el) {
@@ -1876,11 +1890,14 @@
     var actualP = 0, tabs = el.querySelectorAll('.cuadro-tab'), ant = el.querySelector('.cuadro-ant'), sig = el.querySelector('.cuadro-sig'), donde = el.querySelector('.cuadro-donde');
     function mostrar(i) {
       actualP = i;
-      el.querySelectorAll('.cuadro-fila').forEach(function (tr) { tr.hidden = Number(tr.dataset.parte) !== i; });
+      el.querySelectorAll('.cuadro-fila, .cuadro-cab, .cuadro-pie').forEach(function (tr) { tr.hidden = Number(tr.dataset.parte) !== i; });
+      if (cajaC) cajaC.scrollTop = 0;
       tabs.forEach(function (t) { t.setAttribute('aria-pressed', String(Number(t.dataset.i) === i)); });
       if (ant) ant.disabled = i === 0;
       if (sig) { sig.disabled = i === b.items.length - 1; sig.classList.toggle('late', i < b.items.length - 1); }
-      if (donde) donde.textContent = 'Parte ' + (i + 1) + ' de ' + b.items.length + (i < b.items.length - 1 ? ' · La tabla continúa' : ' · Fin de la tabla');
+      if (donde) donde.textContent = b.multi ? 'Tabla ' + (i + 1) + ' de ' + b.items.length
+        : 'Parte ' + (i + 1) + ' de ' + b.items.length + (i < b.items.length - 1 ? ' · La tabla continúa' : ' · Fin de la tabla');
+      if (b.multi) setTimeout(pistaMas, 50);
       encajarCuadro(el);
       reanimar(el.querySelector('.cuadro-caja'));
       marcar(k + '-' + i);
@@ -2484,6 +2501,156 @@
       });
     });
     estado();
+  };
+  /* ---------- Formas con el texto a la vista (Justicia restaurativa, Juan y Samir, 19/11/2026: «más variabilidad porque ahora hay
+     muchas formas de mostrar el contenido que se repiten… si a la card le doy clic, me abre el contenido, esta se repite mucho»).
+     Carrusel, pirámide, ciclo y destacado: el texto de cada elemento se lee completo en su panel, sin ventana y sin «Seguir
+     leyendo»; la letra baja hasta 13 px para caber y, si aun así no cabe, el panel se desplaza (con su marca de que sigue). Cada
+     elemento queda visto al mostrarse. Solo los usa el curso que los pone en sus datos. ---------- */
+  /* Ilustración bajo el texto cuando sobra espacio (sin huecos grandes, 28/10/2026): la de relleno del tema o, si no la hay, la de la
+     escena, salvo donde la forma ya la muestra (carrusel, destacado). */
+  function rellenarForma(caja, sinEscena) {
+    var r = escena.relleno;
+    if (!r && !sinEscena) escena.relleno = escena.ilustracion;
+    rellenar(caja);
+    escena.relleno = r;
+  }
+  function panelCompleto(p) {
+    quitarRelleno(p); quitarRelleno(p.parentNode);
+    p.classList.remove('panel-desplaza');
+    /* La letra crece si el texto es breve (hasta 19 px) y baja hasta 13 px para caber. */
+    var sinEscena = !!p.closest('.carrusel, .destacado');
+    for (var fs = 19; fs >= 13; fs -= 0.5) { p.style.setProperty('--fs', fs + 'px'); if (entra(p)) { rellenarForma(p.parentNode, sinEscena); return; } }
+    p.style.setProperty('--fs', '13.5px');
+    p.classList.add('panel-desplaza');
+  }
+  function textoPanel(it, extra) {
+    return (extra || '') + '<div class="lectura-texto">' + rico(segs(it.segs)) + '</div>';
+  }
+  function arteItem(it, ancho) {
+    var f = it.ilustracion || (datos.ilustraciones && escena.ilustracion);
+    return f && datos.ilustraciones ? '<img src="' + srcImagen(f) + '" alt="">' : svgObjeto(it.obj, ancho);
+  }
+
+  /* Carrusel (narrativa de Adapt): una diapositiva por elemento, con su ilustración, su rótulo y su texto completo; flechas, puntos
+     y teclado (flechas izquierda y derecha). */
+  B.carrusel = function (b, k) {
+    var n = b.items.length;
+    var diapos = b.items.map(function (it, i) {
+      return '<article class="car-diapo' + refc(it.label) + '" data-id="' + k + '-' + i + '" data-i="' + i + '" role="group" aria-roledescription="diapositiva" aria-label="' +
+        (i + 1) + ' de ' + n + ': ' + esc(may(it.label)) + '"' + (i ? ' hidden' : '') + '>' +
+        '<figure class="car-arte" aria-hidden="true">' + arteItem(it, 150) + '</figure>' +
+        '<div class="car-cuerpo"><p class="car-rotulo"><span class="car-n">' + (i + 1) + '</span>' + rot(it.label) + '</p><div class="car-texto"></div></div></article>';
+    }).join('');
+    var puntos = b.items.map(function (it, i) {
+      return '<button type="button" class="car-punto" data-id="' + k + '-' + i + '" data-ir="' + i + '" aria-label="Ir a la diapositiva ' + (i + 1) + ': ' + esc(may(it.label)) + '"><span class="car-punto-visto">' + visto + '</span></button>';
+    }).join('');
+    return tituloBloque(b, k) + '<div class="carrusel n' + n + '" tabindex="0" aria-label="Carrusel de ' + n + ' diapositivas: use las flechas para recorrerlo">' +
+      '<div class="car-pista">' + diapos + '</div><div class="car-nav">' +
+      '<button type="button" class="car-flecha car-ant" aria-label="Diapositiva anterior"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>' +
+      '<div class="car-puntos">' + puntos + '</div><span class="car-donde" aria-live="polite"></span>' +
+      '<button type="button" class="car-flecha car-sig" aria-label="Diapositiva siguiente"><i class="fas fa-arrow-right" aria-hidden="true"></i></button></div></div>';
+  };
+  B.carrusel.activar = function (b, k, el) {
+    var c = el.querySelector('.carrusel'), ds = el.querySelectorAll('.car-diapo'), ps = el.querySelectorAll('.car-punto'), n = b.items.length, actualC = -1;
+    var ant = el.querySelector('.car-ant'), sig = el.querySelector('.car-sig'), donde = el.querySelector('.car-donde');
+    function ir(i, dir) {
+      if (i < 0 || i >= n || i === actualC) return;
+      actualC = i;
+      ds.forEach(function (d, j) {
+        var si = j === i, t = d.querySelector('.car-texto');
+        d.hidden = !si;
+        d.classList.toggle('desde-izq', si && dir < 0);
+        t.innerHTML = si ? textoPanel(b.items[j]) : '';
+      });
+      ps.forEach(function (x, j) { x.classList.toggle('actual', j === i); x.setAttribute('aria-current', j === i ? 'true' : 'false'); });
+      ant.disabled = i === 0; sig.disabled = i === n - 1; sig.classList.toggle('late', i < n - 1);
+      donde.textContent = (i + 1) + ' de ' + n;
+      var t = ds[i].querySelector('.car-texto');
+      panelCompleto(t); reanimar(ds[i]); marcar(k + '-' + i);
+    }
+    ant.addEventListener('click', function () { ir(actualC - 1, -1); });
+    sig.addEventListener('click', function () { ir(actualC + 1, 1); });
+    ps.forEach(function (x) { x.addEventListener('click', function () { var i = Number(x.dataset.ir); ir(i, i < actualC ? -1 : 1); }); });
+    c.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { ir(actualC + 1, 1); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft') { ir(actualC - 1, -1); e.preventDefault(); }
+    });
+    ir(0, 1);
+    window.addEventListener('resize', function () { var t = el.querySelector('.car-diapo:not([hidden]) .car-texto'); if (t) panelCompleto(t); });
+  };
+
+  /* Pirámide o escalera: niveles apilados (el primero de la ficha en la base, el último arriba); el nivel que se toca muestra su
+     texto al lado. Para niveles, grados o una progresión. */
+  B.piramide = function (b, k) {
+    var n = b.items.length;
+    var niveles = b.items.map(function (it, i) {
+      return '<button type="button" class="pir-nivel' + refc(it.label) + '" data-id="' + k + '-' + i + '" data-i="' + i + '" aria-pressed="false" style="--j:' + i + ';--d:' + (0.1 + i * 0.1) + 's">' +
+        '<span class="pir-n">' + (i + 1) + '</span><span class="pir-rotulo">' + rot(it.label) + '</span><span class="pir-marca">' + visto + '</span></button>';
+    }).reverse().join('');
+    return tituloBloque(b, k) + '<div class="piramide n' + n + '" style="--n:' + n + '"><div class="pir-niveles">' + niveles + '</div>' +
+      '<div class="pir-panel" aria-live="polite"><p class="pir-cab"><span class="pir-cab-n"></span><span class="pir-cab-rot"></span></p><div class="pir-texto"></div></div></div>';
+  };
+  B.piramide.activar = function (b, k, el) {
+    var bs = el.querySelectorAll('.pir-nivel'), cab = el.querySelector('.pir-cab'), t = el.querySelector('.pir-texto');
+    function ver(btn) {
+      var i = Number(btn.dataset.i), it = b.items[i];
+      bs.forEach(function (x) { x.classList.toggle('actual', x === btn); x.setAttribute('aria-pressed', String(x === btn)); });
+      cab.querySelector('.pir-cab-n').textContent = 'Nivel ' + (i + 1) + ' de ' + b.items.length;
+      cab.querySelector('.pir-cab-rot').innerHTML = rot(it.label);
+      t.innerHTML = textoPanel(it);
+      panelCompleto(t); reanimar(el.querySelector('.pir-panel')); marcar(btn.dataset.id);
+    }
+    bs.forEach(function (x) { x.addEventListener('click', function () { ver(x); }); });
+    ver(bs[bs.length - 1]);   // la base: el primer nivel de la ficha
+    window.addEventListener('resize', function () { panelCompleto(t); });
+  };
+
+  /* Ciclo: los elementos en un círculo con flechas que vuelven al comienzo (seguimiento, monitoreo, un proceso que se repite); el
+     centro lleva el título de la escena y el elemento que se toca muestra su texto al lado. */
+  B.ciclo = function (b, k) {
+    var n = b.items.length, nodos = '', arcos = '';
+    b.items.forEach(function (it, i) {
+      /* Elipse: el marco es más ancho que alto. Los arcos van entre nodo y nodo, con su punta hacia el siguiente. */
+      var a = -Math.PI / 2 + 2 * Math.PI * i / n, x = 50 + 31 * Math.cos(a), y = 50 + 37 * Math.sin(a);
+      var a1 = a + 0.5, a2 = a + 2 * Math.PI / n - 0.5;
+      arcos += '<path d="M ' + (50 + 31 * Math.cos(a1)).toFixed(2) + ' ' + (50 + 37 * Math.sin(a1)).toFixed(2) + ' A 31 37 0 0 1 ' +
+        (50 + 31 * Math.cos(a2)).toFixed(2) + ' ' + (50 + 37 * Math.sin(a2)).toFixed(2) + '" marker-end="url(#ciclo-punta-' + k + ')"/>';
+      nodos += '<button type="button" class="ciclo-nodo' + refc(it.label) + '" data-id="' + k + '-' + i + '" data-i="' + i + '" aria-pressed="false" style="left:' + x.toFixed(1) + '%;top:' + y.toFixed(1) + '%;--d:' + (0.15 + i * 0.12) + 's">' +
+        '<span class="ciclo-n">' + (i + 1) + '</span><span class="ciclo-rotulo">' + rot(it.label) + '</span><span class="ciclo-marca">' + visto + '</span></button>';
+    });
+    return tituloBloque(b, k) + '<div class="ciclo n' + n + '"><div class="ciclo-rueda"><svg class="ciclo-arcos" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' +
+      '<defs><marker id="ciclo-punta-' + k + '" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>' + arcos + '</svg>' +
+      '<div class="ciclo-centro" aria-hidden="true"><i class="fas fa-rotate" aria-hidden="true"></i><span>' + esc(may(b.centro || escena.pestana || centroTitulo())) + '</span></div>' + nodos + '</div>' +
+      '<div class="ciclo-panel" aria-live="polite"><p class="ciclo-cab"><span class="ciclo-cab-n"></span><span class="ciclo-cab-rot"></span></p><div class="ciclo-texto"></div></div></div>';
+  };
+  B.ciclo.activar = function (b, k, el) {
+    var bs = el.querySelectorAll('.ciclo-nodo'), cab = el.querySelector('.ciclo-cab'), t = el.querySelector('.ciclo-texto');
+    function ver(btn) {
+      var i = Number(btn.dataset.i), it = b.items[i];
+      bs.forEach(function (x) { x.classList.toggle('actual', x === btn); x.setAttribute('aria-pressed', String(x === btn)); });
+      cab.querySelector('.ciclo-cab-n').textContent = (i + 1) + ' de ' + b.items.length;
+      cab.querySelector('.ciclo-cab-rot').innerHTML = rot(it.label);
+      t.innerHTML = textoPanel(it);
+      panelCompleto(t); reanimar(el.querySelector('.ciclo-panel')); marcar(btn.dataset.id);
+    }
+    bs.forEach(function (x) { x.addEventListener('click', function () { ver(x); }); });
+    ver(bs[0]);
+    window.addEventListener('resize', function () { panelCompleto(t); });
+  };
+
+  /* Destacado: un texto único en la caja resaltada del curso (--clave-fondo y --clave-borde), junto a su ilustración; se lee
+     completo de una vez. Alterna con la lámina en las introducciones de un solo párrafo. */
+  B.destacado = function (b, k) {
+    var it = b.items[0];
+    return tituloBloque(b, k) + '<div class="destacado' + refc(it.label) + '" data-id="' + k + '-0"><figure class="dest-arte" aria-hidden="true">' + arteItem(it, 170) + '</figure>' +
+      '<div class="dest-caja"><p class="dest-rotulo"><i class="fas fa-star" aria-hidden="true"></i>' + rot(it.label) + '</p><div class="dest-texto">' + textoPanel(it) + '</div></div></div>';
+  };
+  B.destacado.activar = function (b, k, el) {
+    var t = el.querySelector('.dest-texto');
+    panelCompleto(t); marcar(k + '-0');
+    if (document.fonts) document.fonts.ready.then(function () { panelCompleto(t); });
+    window.addEventListener('resize', function () { panelCompleto(t); });
   };
   /* Comparador (contenido que contrasta figuras: «a diferencia de…», «buena fe simple y… exenta de culpa», «frente al
      comiso»): columnas lado a lado; la que se toca se ensancha con su texto completo y las demás se compactan. Usa los
@@ -3112,7 +3279,7 @@
       /* Texto junto a su video o figura (escena.video / escena.recurso, 19/11/2026): completo, con letra de lectura y desplazamiento,
          sin partes («si aparece el texto mejor que aparezca completo»). */
       if (escena.recurso || escena.video || escena.desplazar) {
-        caja.classList.remove('ctx-desplazable'); encajarTexto(cont, caja, 14);
+        caja.classList.remove('ctx-desplazable'); encajarTexto(cont, caja, datos.letraMinJunto || 14);   // «letraMinJunto»: dato del curso
         if (caja.scrollHeight > caja.clientHeight + 2) { caja.classList.add('ctx-desplazable'); caja.style.setProperty('--fs', '14.5px'); }
       }
       else if (!dosificar(caja, function () { encajarTexto(cont, caja); })) encajarTexto(cont, caja);
@@ -3240,7 +3407,7 @@
       return '<li style="--d:' + (0.4 + i * 0.1) + 's"><i class="fas fa-circle-check" aria-hidden="true"></i>' + esc(may(c)) + '</li>';
     }).join('') + '</ul>';
     /* Pie de una tabla de la ficha («Fuente. Elaboración propia», Derechos humanos, 31/10/2026): en la franja de abajo. */
-    if (escena.pie && escena.pie.length) cuerpo += '<p class="escena-pie">' + esc(may(segs(escena.pie))) + '</p>';
+    if (escena.pie && escena.pie.length && !escena.bloques.some(function (b) { return b.multi; })) cuerpo += '<p class="escena-pie">' + esc(may(segs(escena.pie))) + '</p>';
     if (escena.tail.length) cuerpo += '<p class="caja-clave' + (conAvance ? ' tras-completar" hidden' : '"') + '><span class="clave-rotulo"><i class="fas fa-star" aria-hidden="true"></i> ' +
       (conAvance ? 'Idea clave desbloqueada' : 'Idea clave') + '</span>' + rico(segs(escena.tail)) + '</p>';
     raiz.className = 'ova layout-' + (ctx ? 'contexto' : escena.layout === 'balanza' ? 'fichas' : escena.layout) + (embebido ? ' embebido' : '') + (embebido && leccionPadre() ? ' pc-leccion' : '') + (datos.sinHuecos ? ' sin-huecos' : '') +
