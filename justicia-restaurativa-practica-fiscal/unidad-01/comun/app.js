@@ -80,8 +80,21 @@
   function refc(s) { return esRef(s) ? ' ref' : ''; }
   function rot(s) { return (esRef(s) ? '<i class="fas fa-book-open ref-ico" aria-hidden="true"></i>' : '') + esc(may(s)); }
   /* Cada línea es un párrafo de la fuente; «[^n] …» al inicio es una nota al pie y «[^n]» en el texto, su llamada. */
+  /* Artículos con su ventana de consulta («datos.articulos», Justicia restaurativa, 19/11/2026: «si dice artículo 519… al darle clic…
+     muestre la información»): la cita de la ficha se vuelve un enlace discreto, con el mismo resaltado. Opcional por datos. */
+  var ARTS = (datos.articulos || []).map(function (a, i) { return { i: i, forma: esc(a.forma), seg: esc(a.seg || a.forma) }; });
   function marcado(s) {
-    return esc(s).replace(REF, function (m) { return '<mark class="ref-texto">' + m + '</mark>'; })
+    var e = esc(s), puestos = [];
+    ARTS.forEach(function (a) {
+      var p = e.indexOf(a.forma); if (p < 0) return;
+      var q = e.indexOf(a.seg, p); if (q < 0 || q > p + a.forma.length) return;
+      puestos.push(a.i);
+      e = e.slice(0, q) + '\u0001' + (puestos.length - 1) + '\u0002' + e.slice(q + a.seg.length);
+    });
+    e = e.replace(REF, function (m) { return '<mark class="ref-texto">' + m + '</mark>'; });
+    e = e.replace(/\u0001(\d+)\u0002/g, function (_, k) { var a = ARTS[puestos[Number(k)]];
+      return '<span class="art-enlace" role="button" tabindex="0" data-art="' + a.i + '" title="Clic para ver qué dice el curso de este artículo"><mark class="ref-texto">' + a.seg + '</mark></span>'; });
+    return e
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\[\^(\d+)\]/g, '<sup class="llamada">$1</sup>');
   }
   /* Párrafos con aire (Bienes, revisión de Juan: «que haga respirar un poquitico el párrafo»): con datos.respiro (caracteres
@@ -3261,5 +3274,14 @@
     }
   }
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') cerrarLector(); });
+  /* Ventana de consulta de un artículo: no suma puntos ni cuenta como leído. */
+  function abrirArticulo(el) {
+    var a = (datos.articulos || [])[Number(el.dataset.art)]; if (!a) return;
+    var texto = 'Lo que dice este curso:\n' + a.explicaciones.map(function (x) { return x.leccion + ': ' + x.texto; }).join('\n') +
+      '\nTambién se cita en: ' + a.tambien.join(', ') + '.';
+    leer(a.titulo, texto, 'documento', el);
+  }
+  raiz.addEventListener('click', function (e) { var el = e.target.closest('.art-enlace'); if (!el) return; e.stopPropagation(); e.preventDefault(); abrirArticulo(el); }, true);
+  raiz.addEventListener('keydown', function (e) { var el = e.target.closest && e.target.closest('.art-enlace'); if (!el || (e.key !== 'Enter' && e.key !== ' ')) return; e.preventDefault(); abrirArticulo(el); });
   render();
 })();

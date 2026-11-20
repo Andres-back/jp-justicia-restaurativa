@@ -1661,3 +1661,7 @@ html.en-pantalla-completa .ova{width:767px;height:510px;min-height:0;flex:none}
 .rv-texto .lectura-texto{flex:1;min-height:0;overflow-y:auto;padding-bottom:6px;padding-right:6px}
 .rv-pie{position:static;flex:none;margin:6px 0 0;padding:4px 0 0;background:none;border-top:1px solid color-mix(in srgb,var(--oxido) 25%,transparent)}
 .ctx-texto.ctx-desplazable{justify-content:flex-start !important;align-content:start !important}
+/* Enlace de un artículo con su ventana de consulta (datos.articulos, 19/11/2026). */
+.art-enlace{cursor:pointer;border-bottom:2px dotted var(--oxido);border-radius:2px}
+.art-enlace:hover mark,.art-enlace:focus-visible mark{background:var(--crema)}
+.art-enlace:focus-visible{outline:2px solid var(--oxido);outline-offset:1px}
