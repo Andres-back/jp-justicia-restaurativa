@@ -1761,3 +1761,18 @@ html.en-pantalla-completa .ova{width:767px;height:510px;min-height:0;flex:none}
 .cuadro-cab[hidden],.cuadro-pie[hidden]{display:none !important}
 /* Ventana amplia apretada (datos.ampliaEncaja, último recurso antes de desplazar): interlineado y párrafos más juntos. */
 .lector.amplia .hoja-texto.apretada{line-height:1.36}.lector.amplia .hoja-texto.apretada .parr+.parr{margin-top:.4em}
+/* Pestañas agrupadas («grupo_pestana», 20/11/2026): cada grupo cerrado es un botón con su rótulo completo; el abierto, una franja con
+   su rótulo y sus pestañas numeradas, y solo la abierta muestra el suyo. */
+.partes.con-grupos .parte-tab:not(.sub){flex:1 1 0;min-width:0;justify-content:flex-start;font-size:10.5px;line-height:1.15}
+.partes.con-grupos .parte-tab:not(.sub) .parte-rotulo{display:block !important}
+.parte-grupo{flex:3.2 1 0;min-width:0;display:flex;align-items:center;gap:4px;padding:3px 6px 3px 4px;border-radius:10px;background:var(--marino);color:#fff;font:800 11px/1.15 Montserrat,Arial,sans-serif}
+.parte-grupo > .parte-letra{flex:none;background:#fff;color:var(--marino)}
+.parte-grupo .grupo-rotulo{flex:0 1 auto;min-width:0;max-width:150px}
+.parte-grupo .parte-tab.sub{flex:0 0 auto;padding:2px;border-color:color-mix(in srgb,#fff 45%,transparent);background:transparent;color:#fff;animation:none}
+.parte-grupo .parte-tab.sub .parte-rotulo,.parte-grupo .parte-tab.sub .parte-visto{display:none !important}
+.parte-grupo .parte-tab.sub .parte-letra{background:color-mix(in srgb,#fff 18%,transparent);color:#fff}
+.parte-grupo .parte-tab.sub.hecha .parte-letra{box-shadow:inset 0 0 0 2px var(--coral)}
+.parte-grupo .parte-tab.sub.activa{flex:1 1 auto;min-width:0;padding:2px 8px 2px 2px;background:#fff;border-color:#fff;color:var(--marino)}
+.parte-grupo .parte-tab.sub.activa .parte-letra{background:var(--marino);color:#fff}
+.parte-grupo .parte-tab.sub.activa .parte-rotulo{display:block !important}
+@container ova (max-width:600px){.partes.con-grupos .parte-tab:not(.sub) .parte-rotulo{display:none !important}.parte-grupo{flex:1 1 100%}.parte-grupo .grupo-rotulo{max-width:none}}
