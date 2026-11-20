@@ -640,7 +640,7 @@
       var tmp = document.createElement('div'); tmp.innerHTML = rico(texto);
       var nt = (tmp.textContent || '').replace(/\s+/g, ' ').replace(/[…]/g, '').trim().toLowerCase(), nb = (desde.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
       if (nt && nb.indexOf(nt) >= 0) {
-        desde.classList.add('abierta', 'leida-en-sitio');
+        desde.classList.add('abierta', 'leida-en-sitio'); desde.dataset.pulso = String(Date.now());
         if (!quieto && desde.animate) desde.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.03)' }, { transform: 'scale(1)' }], { duration: 300 });
         return;
       }
@@ -3195,7 +3195,11 @@
           var a = caja.querySelector('.vt-frase.actual');
           if (a && !caja.hidden) { var top = a.offsetTop - caja.offsetTop; if (top < caja.scrollTop || top > caja.scrollTop + caja.clientHeight - 30) caja.scrollTop = Math.max(0, top - caja.clientHeight * 0.35); }
         });
-        caja.addEventListener('click', function (e) { var f = e.target.closest('.vt-frase'); if (!f || !video) return; video.currentTime = lineas[Number(f.dataset.k)].i + 0.01; if (video.paused) video.play(); });
+        caja.addEventListener('click', function (e) {
+          var f = e.target.closest('.vt-frase'); if (!f) return;
+          caja.querySelectorAll('.vt-frase.elegida').forEach(function (x) { x.classList.remove('elegida'); }); f.classList.add('elegida');
+          if (!video) return; video.currentTime = lineas[Number(f.dataset.k)].i + 0.01; if (video.paused) video.play();
+        });
       }
       iframe.addEventListener('load', enlazar);
       enlazar();
@@ -3287,7 +3291,7 @@
     raiz.querySelectorAll('.parte-tab').forEach(function (b) {
       b.addEventListener('click', function () {
         var ix = PAGINAS[paginaDe(actual)], j = ix[Number(b.dataset.parte)];
-        if (j === actual) return;
+        if (j === actual) { b.dataset.pulso = String(Date.now()); var esc0 = raiz.querySelector('.escenario'); if (esc0) esc0.scrollTop = 0; return; }
         completarEscrituras(); actual = j;
         if (embebido && history.replaceState) try { var q = new URLSearchParams(location.search); q.set('parte', String(ix.indexOf(j) + 1)); history.replaceState(null, '', '?' + q.toString()); } catch (e) { /* sin historial */ }
         render();

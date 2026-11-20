@@ -1679,3 +1679,4 @@ html.en-pantalla-completa .ova{width:767px;height:510px;min-height:0;flex:none}
 .vt-panel.vt-ctx{grid-area:txt}
 .vt-panel>.ctx-texto,.vt-panel>.rv-texto{flex:1;min-height:0}
 .vt-panel>.vt-trans{padding:10px 14px;border-radius:14px;background:var(--blanco);border-left:6px solid var(--marino)}
+.vt-frase.elegida{outline:2px solid var(--oxido);outline-offset:1px;border-radius:4px}
